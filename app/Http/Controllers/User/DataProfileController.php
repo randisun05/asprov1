@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\User;
 
-use Inertia\Inertia;
+use App\Http\Controllers\Controller;
 use App\Models\instansi;
-use Illuminate\Http\Request;
+use App\Models\Member;
 use App\Models\ProfileDataMain;
 use App\Models\ProfileDataPosition;
-use App\Http\Controllers\Controller;
 use App\Models\refCity;
 use App\Models\refProvince;
+use FontLib\Table\Type\name;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Laravel\Facades\Image;
 
@@ -265,6 +267,14 @@ class DataProfileController extends Controller
                 'religion' => $request->religion,
 
         ]);
+
+        Member::where('id',auth()->guard('member')->user()->id)
+        ->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'agency' => $request->agency,
+        ]);
+
 
         $position = ProfileDataPosition::where('main_id',$main->id)
         ->first();

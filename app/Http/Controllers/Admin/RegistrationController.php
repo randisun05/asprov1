@@ -619,6 +619,9 @@ class RegistrationController extends Controller
 
             public function exportPaid()
             {
+                if (auth()->user()->role !== 'administrator') {
+                    return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mengakses halaman ini.');
+                }
                 $paids = Registration::whereNotNull('paid')
                 ->get();
 
@@ -627,9 +630,14 @@ class RegistrationController extends Controller
 
             public function exportRegistration()
             {
-                $datas = Registration::oldest()->get();
+                if (auth()->user()->role === 'administrator') {
+                       $datas = Registration::oldest()->get();
 
                 return Excel::download(new RegistrationExport($datas), 'DataRegistrasiPer-'.Carbon::now().'.xlsx');
+                } else {
+                  return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mengakses halaman ini.');
+                }
+
             }
 
             public function sendemailApprove($id)
