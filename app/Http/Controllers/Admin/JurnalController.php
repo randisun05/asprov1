@@ -52,7 +52,7 @@ class JurnalController extends Controller
     public function store(Request $request)
     {
         // Check if the user is an administrator
-        if (auth()->check() && auth()->user()->role === 'administrator' || auth()->user()->role === 'bendahara') {
+        if (auth()->check() && (auth()->user()->role === 'administrator' || auth()->user()->role === 'bendahara')) {
                 // Validate request including file validation
       $request->validate([
         'title' => 'required|string',
@@ -159,7 +159,7 @@ class JurnalController extends Controller
     public function update(Request $request, $id)
     {
 
-        if (auth()->check() && auth()->user()->role === 'administrator' || auth()->user()->role === 'bendahara') {
+        if (auth()->check() && (auth()->user()->role === 'administrator' || auth()->user()->role === 'bendahara')) {
             $jurnal = Jurnal::findOrFail($id);
             // Validate request including file validation
             $request->validate([
@@ -217,7 +217,7 @@ class JurnalController extends Controller
      */
     public function destroy($id)
     {
-        if (auth()->check() && auth()->user()->role === 'administrator' || auth()->user()->role === 'bendahara') {
+        if (auth()->check() && (auth()->user()->role === 'administrator' || auth()->user()->role === 'bendahara')) {
             $jurnal = Jurnal::findOrFail($id);
         // Get the previous transaction's saldo
         $previousSaldo = $jurnal->nomor > 1
@@ -247,7 +247,7 @@ class JurnalController extends Controller
     public function exportReport()
     {
         // Check if the user is an administrator
-        if (auth()->check() && auth()->user()->role === 'administrator' || auth()->user()->role === 'bendahara') {
+        if (auth()->check() && (auth()->user()->role === 'administrator' || auth()->user()->role === 'bendahara')) {
             $datas = Jurnal::orderBy('nomor', 'asc')->get();
             return Excel::download(new KeuanganReport($datas), 'laporan_kas.xlsx');
         } else {

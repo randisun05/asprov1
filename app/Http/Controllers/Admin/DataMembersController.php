@@ -107,7 +107,7 @@ class DataMembersController extends Controller
      */
     public function show($id)
     {
-        if (auth()->user()->role === 'keanggotaan' || auth()->user()->role === 'administrator' | auth()->user()->role === 'pendanaan') {
+        if (auth()->user()->role === 'keanggotaan' || auth()->user()->role === 'administrator' || auth()->user()->role === 'pendanaan') {
             $data = ProfileDataPosition::where('id',$id)->with('main')->first();
             return inertia('Admin/Members/Show', [
                'data' => $data
