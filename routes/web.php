@@ -181,7 +181,7 @@ Route::get('/user/login', function () {
 });
 
 //login users
-Route::post('/user/login', \App\Http\Controllers\User\LoginController::class)->name('user.login');
+Route::post('/user/login', \App\Http\Controllers\User\LoginController::class)->middleware('throttle:6,1')->name('user.login');
 
 //prefix "admin"
 Route::prefix('user')->group(function() {
@@ -255,7 +255,7 @@ Route::prefix('user')->group(function() {
 //public
 Route::get('/registration', [\App\Http\Controllers\Public\RegistrationController::class, 'create'])->name('registration');
 Route::get('/registration/berhasil', [\App\Http\Controllers\Public\RegistrationController::class, 'berhasil'])->name('registration.berhasil');
-Route::post('/registration/store', [\App\Http\Controllers\Public\RegistrationController::class, 'store'])->name('registration.store');
+Route::post('/registration/store', [\App\Http\Controllers\Public\RegistrationController::class, 'store'])->middleware('throttle:6,1')->name('registration.store');
 Route::get('/registration/success', [\App\Http\Controllers\Public\RegistrationController::class, 'index'])->name('registration.success');
 Route::get('/registration/paid/{id}', [\App\Http\Controllers\Public\RegistrationController::class, 'show'])->name('registration.paid.show');
 Route::get('/registration/confirm/{id}/edit', [\App\Http\Controllers\Public\RegistrationController::class, 'edit'])->name('registration.confirm.edit');
@@ -264,7 +264,7 @@ Route::post('/registration/paid/{id}', [\App\Http\Controllers\Public\Registratio
 // Route::get('/registration/confirm/{id}/success', [\App\Http\Controllers\Public\RegistrationController::class, 'update'])->name('registration.confirm.success');
 Route::get('/registration/success', [\App\Http\Controllers\Public\RegistrationController::class, 'index'])->name('registration.success');
 Route::get('/registration/group', [\App\Http\Controllers\Public\RegistrationController::class, 'group'])->name('registration.group');
-Route::post('/registration/group', [\App\Http\Controllers\Public\RegistrationController::class, 'groupStore'])->name('registration.group.store');
+Route::post('/registration/group', [\App\Http\Controllers\Public\RegistrationController::class, 'groupStore'])->middleware('throttle:6,1')->name('registration.group.store');
 Route::get('/tentang-aspro', [\App\Http\Controllers\Public\PublicController::class, 'about'])->name('about');
 Route::get('/ketua-umum', [\App\Http\Controllers\Public\PublicController::class, 'ketuaUmum'])->name('ketuaUmum');
 Route::get('/peraturan-organisasi', [\App\Http\Controllers\Public\PublicController::class, 'peraturanOrganisasi'])->name('peraturanOrganisasi');
