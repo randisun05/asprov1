@@ -63,6 +63,7 @@ class DashboardController extends Controller
 
             $countsPerMonth = [];
             $accumulatedCounts = [];
+            $accumulatedCountsByPosition = [];
             $totalCount = 0;
 
             $startYear = 2024;

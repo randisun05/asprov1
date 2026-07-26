@@ -42,8 +42,9 @@ class ArchiveController extends Controller
         // Tambahkan pengecekan ini jika Anda ingin $archives menjadi null saat kosong
         if ($isNotAdminOrSekretariat && $archives->isEmpty()) {
             $archives = null;
+        } else {
+            $archives->appends(['q' => request()->q]);
         }
-   $archives->appends(['q' => request()->q]);
 
         return inertia('Admin/Archives/Index', [
             'archives' => $archives,
