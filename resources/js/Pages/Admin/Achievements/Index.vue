@@ -41,6 +41,7 @@
                                         <th class="border-0">Instansi</th>
                                         <th class="border-0">Penghargaan</th>
                                         <th class="border-0">Tanggal</th>
+                                        <th class="border-0">Status</th>
                                         <th class="border-0 rounded-end" style="width:12%">Aksi</th>
                                     </tr>
                                 </thead>
@@ -53,6 +54,10 @@
                                         <td>{{ data.member.agency }}</td>
                                         <td>{{ data.title }}</td>
                                         <td>{{ data.date}}</td>
+                                        <td class="text-center">
+                                            <button v-if="data.status === '1'" @click="changeStatus(data.id)" class="badge bg-success border-0">Aktif</button>
+                                            <button v-else @click="changeStatus(data.id)" class="badge bg-warning border-0">Nonaktif</button>
+                                        </td>
                                         <td class="text-center">
                                             <a class="btn btn-sm btn-primary border-0 shadow me-2" type="button" data-fancybox="" :href="showImage(data.image)"><i class="fa fa-eye" title="view"></i></a>
                                             <a class="btn btn-sm btn-success border-0 shadow me-2" data-fancybox="" :href="showDoc(data.document)"><i class="fa fa-file-pdf-o"></i></a>
@@ -165,7 +170,7 @@
             const changeStatus = (id) => {
                 Swal.fire({
                         title: 'Apakah Anda yakin?',
-                        text: "Anda akan mengganti status event!",
+                        text: "Anda akan mengganti status achievement!",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#3085d6',
@@ -175,11 +180,11 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.get(`/admin/achievements/${id}/change`);
+                            Inertia.post(`/admin/achievements/${id}/change`);
 
                             Swal.fire({
                                 title: 'Changed!',
-                                text: 'Status Event Berhasil Dirubah!.',
+                                text: 'Status Achievement Berhasil Dirubah!.',
                                 icon: 'success',
                                 timer: 2000,
                                 showConfirmButton: false,

@@ -180,4 +180,21 @@ class AchievementController extends Controller
         Achievement::destroy($id);
         return redirect()->route('admin.achievements.index')->with('success', 'Achievement deleted successfully.');
     }
+
+    /**
+     * Toggle the achievement's published status.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function change($id)
+    {
+        $status = Achievement::where('id', $id)->value('status');
+
+        Achievement::where('id', $id)->update([
+            'status' => $status == '1' ? '0' : '1',
+        ]);
+
+        return redirect()->route('admin.achievements.index')->with('success', 'Status achievement berhasil diubah.');
+    }
 }
