@@ -4,10 +4,8 @@ namespace App\Providers;
 
 use App\Models\User;
 use Inertia\Inertia;
-use App\Helpers\ReCaptcha;
 use Illuminate\Http\Request;
 use Laravel\Fortify\Fortify;
-use App\Services\RecaptchaService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use App\Actions\Fortify\CreateNewUser;
@@ -59,6 +57,36 @@ class FortifyServiceProvider extends ServiceProvider
         //login
         Fortify::loginView(function () {
             return Inertia::render('Auth/Login');
+        });
+
+        Fortify::authenticateUsing(function (Request $request) {
+            $request->validate([
+                'email' => 'required|string',
+                'password' => 'required|string',
+                'recaptcha_token' => 'required|string',
+            ], [
+                'recaptcha_token.required' => 'reCAPTCHA token is missing. Please try again.',
+            ]);
+
+            $verification = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret' => env('RECAPTCHA_SECRET_KEY'),
+                'response' => $request->recaptcha_token,
+                'remoteip' => $request->ip(),
+            ])->json();
+
+            if (!($verification['success'] ?? false) || ($verification['score'] ?? 0) < 0.5) {
+                throw ValidationException::withMessages([
+                    'recaptcha_token' => 'Verifikasi reCAPTCHA gagal. Silakan coba lagi.',
+                ]);
+            }
+
+            $user = User::where('email', $request->email)->first();
+
+            if ($user && Hash::check($request->password, $user->password)) {
+                return $user;
+            }
+
+            return null;
         });
 
 
