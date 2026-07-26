@@ -1,8 +1,5 @@
 <?php
 
-use App\Mail\SendEmailRegistration;
-use App\Mail\SendEmailReject;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,16 +21,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [\App\Http\Controllers\Public\PublicController::class, 'index'])->name('/');
 
-
-Route::get('/email', function () {
-    return view('Emails.Registration', [
-        'data' => [
-            'name' => "randi",
-            'id' => "123"
-        ]
-        // Add any data you want to pass to the view here
-    ]);
-});
 //prefix "admin"
 Route::prefix('admin')->group(function() {
 
@@ -51,73 +38,93 @@ Route::prefix('admin')->group(function() {
         Route::post('/management/store', [\App\Http\Controllers\Admin\ManagementController::class, 'store'])->name('admin.menegemnet.store');
         Route::post('/management/update', [\App\Http\Controllers\Admin\ManagementController::class, 'update'])->name('admin.menegemnet.update');
         Route::post('/management/update/status', [\App\Http\Controllers\Admin\ManagementController::class, 'status'])->name('admin.menegemnet.status');
-        Route::get('/registration/', [\App\Http\Controllers\Admin\RegistrationController::class, 'index'])->name('admin.registration.index');
-        Route::post('/registration/store', [\App\Http\Controllers\Admin\RegistrationController::class, 'store'])->name('admin.registration.store');
-        Route::get('/registration/group', [\App\Http\Controllers\Admin\RegistrationController::class, 'group'])->name('admin.registration.group');
-        Route::post('/registration/group/{id}/done', [\App\Http\Controllers\Admin\RegistrationController::class, 'doneGroup'])->name('admin.registration.group.done');
-        Route::post('/registration/group/{id}/confirm', [\App\Http\Controllers\Admin\RegistrationController::class, 'confirmGroup'])->name('admin.registration.group.confirm');
-        Route::post('/registration/group/{id}/reject', [\App\Http\Controllers\Admin\RegistrationController::class, 'rejectGroup'])->name('admin.registration.group.reject');
-        Route::post('/registration/import', [\App\Http\Controllers\Admin\RegistrationController::class, 'importStore'])->name('admin.registration.import.store');
-        Route::get('/registration/import', [\App\Http\Controllers\Admin\RegistrationController::class, 'import'])->name('admin.registration.import');
-        Route::post('/registration/{id}/email-approve', [\App\Http\Controllers\Admin\RegistrationController::class, 'Sendemailapprove'])->name('admin.registration.email.approve');
-        Route::post('/registration/group/approve', [\App\Http\Controllers\Admin\RegistrationController::class, 'approveGroup'])->name('admin.registration.group.approve');
-        Route::post('/registration/{id}/approve', [\App\Http\Controllers\Admin\RegistrationController::class, 'approve'])->name('admin.registration.approve');
-        Route::post('/registration/{id}/approve-lb', [\App\Http\Controllers\Admin\RegistrationController::class, 'approveLB'])->name('admin.registration.approve.lb');
-        Route::post('/registration/{id}/confirm', [\App\Http\Controllers\Admin\RegistrationController::class, 'confirm'])->name('admin.registration.confirm');
-        Route::post('/registration/{id}/paid', [\App\Http\Controllers\Admin\RegistrationController::class, 'paid'])->name('admin.registration.paid');
-        Route::post('/registration/{id}/reject', [\App\Http\Controllers\Admin\RegistrationController::class, 'reject'])->name('admin.registration.reject');
-        Route::post('/registration/{id}/email', [\App\Http\Controllers\Admin\RegistrationController::class, 'sendEmail'])->name('admin.registration.sendEmail');
-        Route::get('/registration/paid/export', [\App\Http\Controllers\Admin\RegistrationController::class, 'exportPaid'])->name('admin.registration.export');
-        Route::get('/registration/data/export', [\App\Http\Controllers\Admin\RegistrationController::class, 'exportRegistration'])->name('admin.registration.data.export');
-        Route::resource('/registration', \App\Http\Controllers\Admin\RegistrationController::class, ['as' => 'admin']);
-        Route::get('/admin/posts/', [\App\Http\Controllers\Admin\PostController::class, 'list'])->name('admin.posts.list');
-        Route::post('/posts/{id}', [\App\Http\Controllers\Admin\PostController::class, 'update'])->name('admin.posts.update');
-        Route::resource('/posts', \App\Http\Controllers\Admin\PostController::class, ['as' => 'admin']);
-        Route::post('/posts/{id}/limited', [\App\Http\Controllers\Admin\PostController::class, 'limited'])->name('admin.posts.limited');
-        Route::post('/posts/{id}/approve', [\App\Http\Controllers\Admin\PostController::class, 'approve'])->name('admin.posts.approve');
-        Route::post('/posts/{id}/return', [\App\Http\Controllers\Admin\PostController::class, 'return'])->name('admin.posts.return');
-        Route::post('/posts/{id}/reject', [\App\Http\Controllers\Admin\PostController::class, 'reject'])->name('admin.posts.reject');
-        Route::post('/posts/{id}/cancel', [\App\Http\Controllers\Admin\PostController::class, 'cancel'])->name('admin.posts.cancel');
-        Route::post('/posts/{id}/cancelLimited', [\App\Http\Controllers\Admin\PostController::class, 'cancelLimited'])->name('admin.posts.cancellimited');
-        Route::post('/posts/{id}/submission', [\App\Http\Controllers\Admin\PostController::class, 'cancel'])->name('admin.posts.submission');
+        Route::middleware('role:administrator,keanggotaan')->group(function () {
+            Route::get('/registration/', [\App\Http\Controllers\Admin\RegistrationController::class, 'index'])->name('admin.registration.index');
+            Route::post('/registration/store', [\App\Http\Controllers\Admin\RegistrationController::class, 'store'])->name('admin.registration.store');
+            Route::get('/registration/group', [\App\Http\Controllers\Admin\RegistrationController::class, 'group'])->name('admin.registration.group');
+            Route::post('/registration/group/{id}/done', [\App\Http\Controllers\Admin\RegistrationController::class, 'doneGroup'])->name('admin.registration.group.done');
+            Route::post('/registration/group/{id}/confirm', [\App\Http\Controllers\Admin\RegistrationController::class, 'confirmGroup'])->name('admin.registration.group.confirm');
+            Route::post('/registration/group/{id}/reject', [\App\Http\Controllers\Admin\RegistrationController::class, 'rejectGroup'])->name('admin.registration.group.reject');
+            Route::post('/registration/import', [\App\Http\Controllers\Admin\RegistrationController::class, 'importStore'])->name('admin.registration.import.store');
+            Route::get('/registration/import', [\App\Http\Controllers\Admin\RegistrationController::class, 'import'])->name('admin.registration.import');
+            Route::post('/registration/{id}/email-approve', [\App\Http\Controllers\Admin\RegistrationController::class, 'Sendemailapprove'])->name('admin.registration.email.approve');
+            Route::post('/registration/group/approve', [\App\Http\Controllers\Admin\RegistrationController::class, 'approveGroup'])->name('admin.registration.group.approve');
+            Route::post('/registration/{id}/approve', [\App\Http\Controllers\Admin\RegistrationController::class, 'approve'])->name('admin.registration.approve');
+            Route::post('/registration/{id}/approve-lb', [\App\Http\Controllers\Admin\RegistrationController::class, 'approveLB'])->name('admin.registration.approve.lb');
+            Route::post('/registration/{id}/confirm', [\App\Http\Controllers\Admin\RegistrationController::class, 'confirm'])->name('admin.registration.confirm');
+            Route::post('/registration/{id}/paid', [\App\Http\Controllers\Admin\RegistrationController::class, 'paid'])->name('admin.registration.paid');
+            Route::post('/registration/{id}/reject', [\App\Http\Controllers\Admin\RegistrationController::class, 'reject'])->name('admin.registration.reject');
+            Route::post('/registration/{id}/email', [\App\Http\Controllers\Admin\RegistrationController::class, 'sendEmail'])->name('admin.registration.sendEmail');
+            Route::get('/registration/paid/export', [\App\Http\Controllers\Admin\RegistrationController::class, 'exportPaid'])->name('admin.registration.export');
+            Route::get('/registration/data/export', [\App\Http\Controllers\Admin\RegistrationController::class, 'exportRegistration'])->name('admin.registration.data.export');
+            Route::resource('/registration', \App\Http\Controllers\Admin\RegistrationController::class, ['as' => 'admin']);
+        });
+
+        Route::middleware('role:administrator,humas')->group(function () {
+            Route::get('/admin/posts/', [\App\Http\Controllers\Admin\PostController::class, 'list'])->name('admin.posts.list');
+            Route::post('/posts/{id}', [\App\Http\Controllers\Admin\PostController::class, 'update'])->name('admin.posts.update');
+            Route::resource('/posts', \App\Http\Controllers\Admin\PostController::class, ['as' => 'admin']);
+            Route::post('/posts/{id}/limited', [\App\Http\Controllers\Admin\PostController::class, 'limited'])->name('admin.posts.limited');
+            Route::post('/posts/{id}/approve', [\App\Http\Controllers\Admin\PostController::class, 'approve'])->name('admin.posts.approve');
+            Route::post('/posts/{id}/return', [\App\Http\Controllers\Admin\PostController::class, 'return'])->name('admin.posts.return');
+            Route::post('/posts/{id}/reject', [\App\Http\Controllers\Admin\PostController::class, 'reject'])->name('admin.posts.reject');
+            Route::post('/posts/{id}/cancel', [\App\Http\Controllers\Admin\PostController::class, 'cancel'])->name('admin.posts.cancel');
+            Route::post('/posts/{id}/cancelLimited', [\App\Http\Controllers\Admin\PostController::class, 'cancelLimited'])->name('admin.posts.cancellimited');
+            Route::post('/posts/{id}/submission', [\App\Http\Controllers\Admin\PostController::class, 'cancel'])->name('admin.posts.submission');
+            Route::get('/category/create', [\App\Http\Controllers\Admin\PostController::class, 'categoryCreate'])->name('admin.category.create');
+            Route::post('/category/store', [\App\Http\Controllers\Admin\PostController::class, 'categoryStore'])->name('admin.category.store');
+        });
+
           Route::post('/events/{id}/generate-question', [\App\Http\Controllers\Admin\QuestionsController::class, 'EnrollQuestion'])->name('event.generate.question');
-        Route::get('/events/{id}/certificates/import', [\App\Http\Controllers\Admin\EventController::class, 'certificatesImportCreate'])->name('admin.events.certificates.import.create');
-        Route::post('/events/{id}/certificates/import', [\App\Http\Controllers\Admin\EventController::class, 'certificatesImportStore'])->name('admin.events.certificates.import.store');
-        Route::get('/events/{id}/certificates', [\App\Http\Controllers\Admin\EventController::class, 'certificatesIndex'])->name('admin.events.certificates.index');
-        Route::get('/events/{id}/certificates/create', [\App\Http\Controllers\Admin\EventController::class, 'certificatesCreate'])->name('admin.events.certificates.create');
-        Route::post('/events/{id}/certificates/store', [\App\Http\Controllers\Admin\EventController::class, 'certificatesStore'])->name('admin.events.certificates.store');
-        Route::get('/events/{event}/certificates/{id}', [\App\Http\Controllers\Admin\EventController::class, 'certificatesView'])->name('admin.events.certificates.view');
-        Route::delete('/events/{event}/certificates/{id}/destroy', [\App\Http\Controllers\Admin\EventController::class, 'certificatesDestroy'])->name('admin.events.certificates.destroy');
-        Route::get('/events/certificates/templates', [\App\Http\Controllers\Admin\EventController::class, 'certificatesTemplate'])->name('admin.events.certificates.template');
-        Route::post('/events/certificates/templates/store', [\App\Http\Controllers\Admin\EventController::class, 'certificatesTemplateStore'])->name('admin.events.certificates.template.store');
-        Route::delete('/events/certificates/templates/{id}', [\App\Http\Controllers\Admin\EventController::class, 'certificatesTemplateDelete'])->name('admin.events.certificates.template.delete');
-        // 1. Route untuk menampilkan halaman form import (GET)
-        Route::get('/events/{event}/certificates-excel', [App\Http\Controllers\Admin\EventController::class, 'certificatesExcelIndex'])->name('admin.events.certificates.import');
-        // 2. Route untuk memproses file excel (POST)
-        Route::post('/events/{event}/certificates-import', [App\Http\Controllers\Admin\EventController::class, 'certificatesExcelStore'])->name('admin.events.certificates.import.store');
-        Route::post('/events/{id}', [\App\Http\Controllers\Admin\EventController::class, 'update'])->name('admin.events.update');
-        Route::get('/events/{id}/export', [\App\Http\Controllers\Admin\EventController::class, 'exportParticipant'])->name('admin.events.export');
-        Route::post('/events/{id}/change', [\App\Http\Controllers\Admin\EventController::class, 'change'])->name('admin.events.status.change');
-        Route::post('/events/{id}/absen', [\App\Http\Controllers\Admin\EventController::class, 'absen'])->name('admin.events.status.absen');
-        Route::post('/events/{id}/updaterole', [\App\Http\Controllers\Admin\EventController::class, 'updateRole'])->name('admin.events.updateRole');
-        Route::post('/events/{id}/absenall', [\App\Http\Controllers\Admin\EventController::class, 'absenAll'])->name('admin.events.absenall');
-        Route::get('/members/find/{nip}', [\App\Http\Controllers\Admin\EventController::class, 'findMemberByNip']);
-        Route::post('/events/{id}/enroll', [\App\Http\Controllers\Admin\EventController::class, 'enrollMember'])->name('admin.events.enroll');
-        Route::resource('/events', \App\Http\Controllers\Admin\EventController::class, ['as' => 'admin']);
-        Route::post('/medias/{id}', [\App\Http\Controllers\Admin\MediaController::class, 'update'])->name('admin.medias.update');
-        Route::resource('/medias', \App\Http\Controllers\Admin\MediaController::class, ['as' => 'admin']);
-        Route::post('/merchans/{id}', [\App\Http\Controllers\Admin\MerchanController::class, 'update'])->name('admin.merchans.update');
-        Route::post('/merchans/{id}/change', [\App\Http\Controllers\Admin\MerchanController::class, 'change'])->name('admin.merchans.status');
-        Route::resource('/merchans', \App\Http\Controllers\Admin\MerchanController::class, ['as' => 'admin']);
-        Route::get('/category/create', [\App\Http\Controllers\Admin\PostController::class, 'categoryCreate'])->name('admin.category.create');
-        Route::post('/category/store', [\App\Http\Controllers\Admin\PostController::class, 'categoryStore'])->name('admin.category.store');
-        Route::resource('/setting', \App\Http\Controllers\Admin\AuthAdminController::class, ['as' => 'admin']);
+        Route::middleware('role:administrator,humas')->group(function () {
+            Route::get('/events/{id}/certificates/import', [\App\Http\Controllers\Admin\EventController::class, 'certificatesImportCreate'])->name('admin.events.certificates.import.create');
+            Route::post('/events/{id}/certificates/import', [\App\Http\Controllers\Admin\EventController::class, 'certificatesImportStore'])->name('admin.events.certificates.import.store');
+            Route::get('/events/{id}/certificates', [\App\Http\Controllers\Admin\EventController::class, 'certificatesIndex'])->name('admin.events.certificates.index');
+            Route::get('/events/{id}/certificates/create', [\App\Http\Controllers\Admin\EventController::class, 'certificatesCreate'])->name('admin.events.certificates.create');
+            Route::post('/events/{id}/certificates/store', [\App\Http\Controllers\Admin\EventController::class, 'certificatesStore'])->name('admin.events.certificates.store');
+            Route::get('/events/{event}/certificates/{id}', [\App\Http\Controllers\Admin\EventController::class, 'certificatesView'])->name('admin.events.certificates.view');
+            Route::delete('/events/{event}/certificates/{id}/destroy', [\App\Http\Controllers\Admin\EventController::class, 'certificatesDestroy'])->name('admin.events.certificates.destroy');
+            Route::get('/events/certificates/templates', [\App\Http\Controllers\Admin\EventController::class, 'certificatesTemplate'])->name('admin.events.certificates.template');
+            Route::post('/events/certificates/templates/store', [\App\Http\Controllers\Admin\EventController::class, 'certificatesTemplateStore'])->name('admin.events.certificates.template.store');
+            Route::delete('/events/certificates/templates/{id}', [\App\Http\Controllers\Admin\EventController::class, 'certificatesTemplateDelete'])->name('admin.events.certificates.template.delete');
+            // 1. Route untuk menampilkan halaman form import (GET)
+            Route::get('/events/{event}/certificates-excel', [App\Http\Controllers\Admin\EventController::class, 'certificatesExcelIndex'])->name('admin.events.certificates.import');
+            // 2. Route untuk memproses file excel (POST)
+            Route::post('/events/{event}/certificates-import', [App\Http\Controllers\Admin\EventController::class, 'certificatesExcelStore'])->name('admin.events.certificates.import.store');
+            Route::post('/events/{id}', [\App\Http\Controllers\Admin\EventController::class, 'update'])->name('admin.events.update');
+            Route::get('/events/{id}/export', [\App\Http\Controllers\Admin\EventController::class, 'exportParticipant'])->name('admin.events.export');
+            Route::post('/events/{id}/change', [\App\Http\Controllers\Admin\EventController::class, 'change'])->name('admin.events.status.change');
+            Route::post('/events/{id}/absen', [\App\Http\Controllers\Admin\EventController::class, 'absen'])->name('admin.events.status.absen');
+            Route::post('/events/{id}/updaterole', [\App\Http\Controllers\Admin\EventController::class, 'updateRole'])->name('admin.events.updateRole');
+            Route::post('/events/{id}/absenall', [\App\Http\Controllers\Admin\EventController::class, 'absenAll'])->name('admin.events.absenall');
+            Route::get('/members/find/{nip}', [\App\Http\Controllers\Admin\EventController::class, 'findMemberByNip']);
+            Route::post('/events/{id}/enroll', [\App\Http\Controllers\Admin\EventController::class, 'enrollMember'])->name('admin.events.enroll');
+            Route::resource('/events', \App\Http\Controllers\Admin\EventController::class, ['as' => 'admin']);
+            Route::post('/medias/{id}', [\App\Http\Controllers\Admin\MediaController::class, 'update'])->name('admin.medias.update');
+            Route::resource('/medias', \App\Http\Controllers\Admin\MediaController::class, ['as' => 'admin']);
+        });
+
+        Route::middleware('role:administrator,pendanaan')->group(function () {
+            Route::post('/merchans/{id}', [\App\Http\Controllers\Admin\MerchanController::class, 'update'])->name('admin.merchans.update');
+            Route::post('/merchans/{id}/change', [\App\Http\Controllers\Admin\MerchanController::class, 'change'])->name('admin.merchans.status');
+            Route::resource('/merchans', \App\Http\Controllers\Admin\MerchanController::class, ['as' => 'admin']);
+        });
+
+        Route::middleware('role:administrator')->group(function () {
+            Route::resource('/setting', \App\Http\Controllers\Admin\AuthAdminController::class, ['as' => 'admin']);
+        });
+
         Route::get('/members/report/export', [\App\Http\Controllers\Admin\DataMembersController::class, 'exportReport'])->name('admin.member.export');
         Route::get('/members/report', [\App\Http\Controllers\Admin\DataMembersController::class, 'indexReport'])->name('admin.member.report');
         Route::get('/members/report/recap', [\App\Http\Controllers\Admin\DataMembersController::class, 'recapitulation'])->name('admin.member.report.recap');
         Route::resource('/members', \App\Http\Controllers\Admin\DataMembersController::class, ['as' => 'admin']);
-        Route::resource('/achievements', \App\Http\Controllers\Admin\AchievementController::class, ['as' => 'admin']);
-        Route::post('/achievements/{id}', [\App\Http\Controllers\Admin\AchievementController::class, 'update'])->name('admin.acievements.update');
+
+        Route::middleware('role:administrator')->group(function () {
+            Route::resource('/achievements', \App\Http\Controllers\Admin\AchievementController::class, ['as' => 'admin']);
+            Route::post('/achievements/{id}', [\App\Http\Controllers\Admin\AchievementController::class, 'update'])->name('admin.acievements.update');
+            Route::post('/achievements/{id}/change', [\App\Http\Controllers\Admin\AchievementController::class, 'change'])->name('admin.achievements.change');
+        });
+
         Route::get('/generate-qr', [\App\Http\Controllers\Admin\QRCodeController::class, 'generateQRCode']);
         Route::get('/members/qrcode/{id}', [\App\Http\Controllers\Admin\QRCodeController::class, 'generateQRCode1']);
         Route::get('/member-card/download/{id}', [\App\Http\Controllers\Admin\DataMembersController::class, 'downloadMemberCard'])->name('admin.card.download');
@@ -158,11 +165,13 @@ Route::prefix('admin')->group(function() {
 
 
 
-        Route::post('/questions/{id}/import', [\App\Http\Controllers\Admin\QuestionsController::class, 'storeImport'])->name('admin.questions.import.store');
-        Route::get('/questions/import', [\App\Http\Controllers\Admin\QuestionsController::class, 'import'])->name('admin.questions.import');
+        Route::middleware('role:administrator')->group(function () {
+            Route::post('/questions/{id}/import', [\App\Http\Controllers\Admin\QuestionsController::class, 'storeImport'])->name('admin.questions.import.store');
+            Route::get('/questions/import', [\App\Http\Controllers\Admin\QuestionsController::class, 'import'])->name('admin.questions.import');
 
-        //soal
-        Route::resource('/questions', \App\Http\Controllers\Admin\QuestionsController::class, ['as' => 'admin']);
+            //soal
+            Route::resource('/questions', \App\Http\Controllers\Admin\QuestionsController::class, ['as' => 'admin']);
+        });
 
     });
 });
@@ -320,16 +329,3 @@ Route::get('/documents/{filename}', function ($filename) {
 
     return response()->file($path);
 })->name('documents.show');
-
-
-Route::get('/send-email',function(){
-    $data = [
-        'name' => 'Syahrizal As',
-
-    ];
-
-    Mail::to('randisun1995@gmail.com')->send(new SendEmailReject($data));
-
-    dd("Email Berhasil dikirim.");
-
-});

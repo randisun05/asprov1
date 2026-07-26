@@ -124,7 +124,7 @@
                     </Link>
                 </li>
 
-                <li class="nav-item" v-if="$page.props.auth.user.role != 'administrator' || $page.props.auth.user.role != 'sekretariat'" :class="{ 'active': $page.url.startsWith('/admin/archives') }">
+                <li class="nav-item" v-if="$page.props.auth.user.role === 'administrator' || $page.props.auth.user.role === 'sekretariat'" :class="{ 'active': $page.url.startsWith('/admin/archives') }">
                     <Link href="/admin/archives/inbox" class="nav-link d-flex justify-content-between">
                     <span>
                         <span class="sidebar-icon">

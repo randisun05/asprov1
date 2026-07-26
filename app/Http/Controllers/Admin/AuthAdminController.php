@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class AuthAdminController extends Controller
 {
@@ -58,7 +59,7 @@ class AuthAdminController extends Controller
         'nip' => 'required|string',
         'name' => 'required|',
         'email' => 'required',
-        'role' => 'required',
+        'role' => ['required', Rule::in(array_keys(config('roles')))],
         'password' => 'required',
         'position' => 'required',
     ]);
@@ -119,7 +120,7 @@ class AuthAdminController extends Controller
         'nip' => 'required|string',
         'name' => 'required|',
         'email' => 'required',
-        'role' => 'required',
+        'role' => ['required', Rule::in(array_keys(config('roles')))],
         'password' => 'required',
         'position' => 'required',
     ]);

@@ -57,6 +57,7 @@
                                                     <option value="pendanaan">Pendanaan</option>
                                                     <option value="hukum">Hukum</option>
                                                     <option value="kapasitas">Kapasitas Insani</option>
+                                                    <option value="sekretariat">Sekretariat</option>
                                                 </select>
                                                 <div v-if="errors.role" class="alert alert-danger mt-2">
                                                     {{ errors.role }}
