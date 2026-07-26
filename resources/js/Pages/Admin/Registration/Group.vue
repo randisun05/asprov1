@@ -154,7 +154,7 @@
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.get(`/admin/registration/group/${id}/done`);
+                        Inertia.post(`/admin/registration/group/${id}/done`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Done!.',
@@ -178,7 +178,7 @@
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.get(`/admin/registration/group/${id}/confirm`);
+                        Inertia.post(`/admin/registration/group/${id}/confirm`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Conirmed!.',
@@ -203,7 +203,7 @@
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.get(`/admin/registration/group/${id}/reject`);
+                        Inertia.post(`/admin/registration/group/${id}/reject`);
 
                         Swal.fire({
                             title: 'Success!',

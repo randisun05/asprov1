@@ -254,7 +254,7 @@ export default {
             })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.get(`/admin/registration/${id}/approve`);
+                        Inertia.post(`/admin/registration/${id}/approve`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Approved!.',
@@ -282,7 +282,7 @@ export default {
             })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.get(`/admin/registration/group/approve`, {
+                        Inertia.post(`/admin/registration/group/approve`, {
                             registration_ids: form.registration_ids
                         });
                         Swal.fire({
@@ -310,7 +310,7 @@ export default {
             })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.get(`/admin/registration/${id}/confirm`);
+                        Inertia.post(`/admin/registration/${id}/confirm`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Conirmed!.',
@@ -335,7 +335,7 @@ export default {
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.get(`/admin/registration/${id}/reject`);
+                        Inertia.post(`/admin/registration/${id}/reject`);
 
                         Swal.fire({
                             title: 'Success!',

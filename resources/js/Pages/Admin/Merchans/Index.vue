@@ -172,7 +172,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.get(`/admin/merchans/${id}/change`);
+                            Inertia.post(`/admin/merchans/${id}/change`);
 
                             Swal.fire({
                                 title: 'Changed!',

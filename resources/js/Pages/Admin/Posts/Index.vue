@@ -273,7 +273,7 @@
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.get(`/admin/posts/${id}/approve`);
+                        Inertia.post(`/admin/posts/${id}/approve`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Approved!.',
@@ -297,7 +297,7 @@
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.get(`/admin/posts/${id}/return`);
+                        Inertia.post(`/admin/posts/${id}/return`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Returned!.',
@@ -324,7 +324,7 @@
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.get(`/admin/posts/${id}/reject`);
+                        Inertia.post(`/admin/posts/${id}/reject`);
 
                         Swal.fire({
                             title: 'Success!',
@@ -350,7 +350,7 @@
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.get(`/admin/posts/${id}/cancel`);
+                        Inertia.post(`/admin/posts/${id}/cancel`);
 
                         Swal.fire({
                             title: 'Success!',
@@ -376,7 +376,7 @@
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.get(`/admin/posts/${id}/limited`);
+                        Inertia.post(`/admin/posts/${id}/limited`);
 
                         Swal.fire({
                             title: 'Success!',
@@ -402,7 +402,7 @@
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.get(`/admin/posts/${id}/cancelLimited`);
+                        Inertia.post(`/admin/posts/${id}/cancelLimited`);
 
                         Swal.fire({
                             title: 'Success!',

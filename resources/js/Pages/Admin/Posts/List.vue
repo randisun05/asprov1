@@ -190,7 +190,7 @@
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.get(`/admin/posts/${id}/submission`);
+                        Inertia.post(`/admin/posts/${id}/submission`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Returned!.',

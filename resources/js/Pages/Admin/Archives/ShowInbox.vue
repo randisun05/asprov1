@@ -333,7 +333,7 @@
                                         .then((result) => {
                                             if (result.isConfirmed) {
 
-                                                Inertia.get(`/admin/archives/inbox/${id}/update`,
+                                                Inertia.post(`/admin/archives/inbox/${id}/update`,
                                                     {
                                                         'detail': form.detail,
                                                         'status': form.status

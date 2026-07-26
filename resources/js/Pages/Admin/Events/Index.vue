@@ -185,7 +185,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.get(`/admin/events/${id}/change`);
+                            Inertia.post(`/admin/events/${id}/change`);
 
                             Swal.fire({
                                 title: 'Changed!',
@@ -213,7 +213,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.get(`/admin/events/${id}/absen`);
+                            Inertia.post(`/admin/events/${id}/absen`);
 
                             Swal.fire({
                                 title: 'Changed!',

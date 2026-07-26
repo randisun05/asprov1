@@ -384,7 +384,7 @@ export default {
                 confirmButtonText: 'Ya, absen semua',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Inertia.get(`/admin/events/${this.event.id}/absenall`, {}, {
+                    Inertia.post(`/admin/events/${this.event.id}/absenall`, {}, {
                         onSuccess: () => {
                             Swal.fire('Sukses', 'Semua peserta telah diabsen!', 'success');
                         }

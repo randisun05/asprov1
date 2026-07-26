@@ -205,7 +205,7 @@ export default {
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.get(`/admin/registration/${id}/approve`,
+                        Inertia.post(`/admin/registration/${id}/approve`,
                             {
                                 'info': form.info
                             });
@@ -234,7 +234,7 @@ export default {
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.get(`/admin/registration/${id}/confirm`, {
+                        Inertia.post(`/admin/registration/${id}/confirm`, {
                             'info': form.info,
                             'email': form.sendemail
                         });
@@ -264,7 +264,7 @@ export default {
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.get(`/admin/registration/${id}/reject`);
+                        Inertia.post(`/admin/registration/${id}/reject`);
 
                         Swal.fire({
                             title: 'Success!',
@@ -290,7 +290,7 @@ export default {
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.get(`/admin/registration/${id}/email`);
+                        Inertia.post(`/admin/registration/${id}/email`);
 
                         Swal.fire({
                             title: 'Success!',

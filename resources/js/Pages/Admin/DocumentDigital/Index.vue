@@ -179,7 +179,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.get(`/admin/docudigi/${id}/paraf`);
+                            Inertia.post(`/admin/docudigi/${id}/paraf`);
 
                             Swal.fire({
                                 title: 'Berhasil!',
@@ -207,7 +207,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.get(`/admin/docudigi/${id}/approve`);
+                            Inertia.post(`/admin/docudigi/${id}/approve`);
 
                             Swal.fire({
                                 title: 'Berhasil!',
@@ -235,7 +235,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.get(`/admin/docudigi/${id}/cancel`);
+                            Inertia.post(`/admin/docudigi/${id}/cancel`);
 
                             Swal.fire({
                                 title: 'Deleted!',
