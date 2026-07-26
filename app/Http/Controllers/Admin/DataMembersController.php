@@ -239,6 +239,7 @@ class DataMembersController extends Controller
 
             $countsPerMonth = [];
             $accumulatedCounts = [];
+            $accumulatedCountsByPosition = [];
             $totalCount = 0;
 
             $startYear = 2024;
@@ -418,6 +419,10 @@ public function updateMissingGenders()
 
 public function recapitulation()
 {
+    if (auth()->user()->role !== 'keanggotaan' && auth()->user()->role !== 'administrator') {
+        return redirect()->route('admin.dashboard')->with('error', 'Anda tidak memiliki akses ke halaman tersebut');
+    }
+
     // 1. Ambil data dengan logika yang sama seperti indexReport
     $dataCountsByPosition = ProfileDataPosition::whereIn('position', ['Analis SDM Aparatur','Pranata SDM Aparatur'])
         ->select('position', DB::raw('count(*) as total'))
