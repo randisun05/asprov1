@@ -24,6 +24,8 @@
                     <ul class="dropdown-menu" aria-labelledby="sidemenu_toggle">
                         <Link v-if="$page.props.auth.user.role === 'administrator'" href="/admin/setting" class="dropdown-item d-flex align-items-center" role="button">Setting
                         </Link>
+                        <Link href="/admin/security/two-factor" class="dropdown-item d-flex align-items-center" role="button">Keamanan (2FA)
+                        </Link>
                         <Link class="dropdown-item d-flex align-items-center" href="/logout" method="POST" as="button" :data="{role : 'admin'}">
                         Logout
                         </Link>

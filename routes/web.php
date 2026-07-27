@@ -25,10 +25,19 @@ Route::get('/', [\App\Http\Controllers\Public\PublicController::class, 'index'])
 Route::prefix('admin')->group(function() {
 
     //middleware "auth"
-    Route::group(['middleware' => ['auth']], function () {
+    Route::group(['middleware' => ['auth', 'two-factor.required']], function () {
         //route dashboard
 
         Route::get('/dashboard', App\Http\Controllers\Admin\DashboardController::class)->name('admin.dashboard');
+        Route::get('/security/two-factor', function () {
+            $user = auth()->user();
+
+            return \Inertia\Inertia::render('Admin/Security/TwoFactor', [
+                'enabled' => !is_null($user->two_factor_secret),
+                'confirmed' => !is_null($user->two_factor_confirmed_at),
+                'mustEnable' => in_array($user->role, ['administrator', 'sekretariat'], true),
+            ]);
+        })->name('admin.security.two-factor');
         Route::resource('/management', App\Http\Controllers\Admin\ManagementController::class, ['as' => 'admin']);
         Route::resource('/docudigi', App\Http\Controllers\Admin\DocuDigiController::class, ['as' => 'admin']);
         Route::post('/docudigi/{id}/paraf', [\App\Http\Controllers\Admin\DocuDigiController::class, 'paraf'])->name('admin.docudigi.paraf');

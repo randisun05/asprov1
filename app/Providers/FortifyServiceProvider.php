@@ -59,6 +59,14 @@ class FortifyServiceProvider extends ServiceProvider
             return Inertia::render('Auth/Login');
         });
 
+        Fortify::twoFactorChallengeView(function () {
+            return Inertia::render('Auth/TwoFactorChallenge');
+        });
+
+        Fortify::confirmPasswordView(function () {
+            return Inertia::render('Auth/ConfirmPassword');
+        });
+
         Fortify::authenticateUsing(function (Request $request) {
             $request->validate([
                 'email' => 'required|string',

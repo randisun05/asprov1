@@ -4,7 +4,6 @@ namespace Tests\Feature\Admin;
 
 use App\Mail\SendEmailAprrove;
 use App\Models\Registration;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -12,6 +11,7 @@ use Tests\TestCase;
 class RegistrationApprovalTest extends TestCase
 {
     use RefreshDatabase;
+    use CreatesAdminUsers;
 
     private function makeRegistration(): Registration
     {
@@ -24,19 +24,6 @@ class RegistrationApprovalTest extends TestCase
             'position' => 'Analis SDM Aparatur',
             'level' => 'Ahli Pertama',
             'status' => 'confirm',
-        ]);
-    }
-
-    private function makeAdmin(): User
-    {
-        return User::create([
-            'nip' => '198001012010121001',
-            'name' => 'Admin Test',
-            'email' => 'admin@example.com',
-            'role' => 'administrator',
-            'position' => 'Sekretariat',
-            'ref' => '-',
-            'password' => bcrypt('password'),
         ]);
     }
 
@@ -53,7 +40,7 @@ class RegistrationApprovalTest extends TestCase
     public function test_get_request_to_approve_route_is_no_longer_allowed()
     {
         $registration = $this->makeRegistration();
-        $admin = $this->makeAdmin();
+        $admin = $this->makeAdminUser('administrator');
 
         $response = $this->actingAs($admin)->get("/admin/registration/{$registration->id}/approve");
 
@@ -65,7 +52,7 @@ class RegistrationApprovalTest extends TestCase
         Mail::fake();
 
         $registration = $this->makeRegistration();
-        $admin = $this->makeAdmin();
+        $admin = $this->makeAdminUser('administrator');
 
         $response = $this->actingAs($admin)->post("/admin/registration/{$registration->id}/approve", [
             'info' => 'Disetujui saat pengujian',
