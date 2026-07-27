@@ -78,7 +78,7 @@ import Pagination from '../../../../Components/Pagination.vue';
 import {
     Head,
     Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 //import ref from vue
 import {
@@ -86,7 +86,7 @@ import {
 } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 export default {
 
@@ -115,7 +115,7 @@ export default {
 
         //define method search
         const handleSearch = () => {
-            Inertia.get('/posts', {
+            router.get('/posts', {
 
                 //send params "q" with value from state "search"
                 q: search.value,

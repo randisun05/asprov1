@@ -778,7 +778,7 @@ import LayoutWebsite from '../../../../Layouts/Website.vue';
 //import Head from Inertia
 import {
     Head
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 
 

@@ -172,7 +172,7 @@ import Editor from '@tinymce/tinymce-vue';
 import {
     Head,
     Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 //import ref from vue
 import {
@@ -180,7 +180,7 @@ import {
 } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 //import sweet alert2
 import Swal from 'sweetalert2';
@@ -223,7 +223,7 @@ export default {
         const submit = () => {
 
             //send data to server
-            Inertia.post('/admin/questions/', {
+            router.post('/admin/questions/', {
 
                 //data
                 text: form.text,

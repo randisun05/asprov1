@@ -85,13 +85,13 @@ import MemberCard from '../../../Components/User/MemberCard.vue';
 import BackCard from '../../../Components/User/MemberCardBack.vue';
 
 //import Head and Link from Inertia
-import { Head, Link } from '@inertiajs/inertia-vue3';
+import { Head, Link } from '@inertiajs/vue3';
 
 //import ref from vue
 import { ref, reactive } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 //import sweet alert2
 import Swal from 'sweetalert2';
@@ -126,7 +126,7 @@ export default {
 
         //define method search
         const changePhoto = () => {
-            Inertia.get('/user/member-card/edit', {
+            router.get('/user/member-card/edit', {
                 //send params "q" with value from state "search"
                 q: search.value,
             });

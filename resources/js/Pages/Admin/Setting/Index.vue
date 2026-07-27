@@ -71,7 +71,7 @@
     import {
         Head,
         Link
-    } from '@inertiajs/inertia-vue3';
+    } from '@inertiajs/vue3';
 
     //import ref from vue
     import {
@@ -79,7 +79,7 @@
     } from 'vue';
 
     //import inertia adapter
-    import { Inertia } from '@inertiajs/inertia';
+    import { router } from '@inertiajs/vue3';
 
     //import sweet alert2
     import Swal from 'sweetalert2';
@@ -123,7 +123,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.delete(`/admin/setting/${id}`);
+                            router.delete(`/admin/setting/${id}`);
 
                             Swal.fire({
                                 title: 'Deleted!',

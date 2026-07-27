@@ -99,12 +99,12 @@
                 import {
                     Head,
                     Link,
-                } from '@inertiajs/inertia-vue3';
+                } from '@inertiajs/vue3';
 
                 import { ref } from 'vue';
 
                  //import inertia adapter
-                import { Inertia } from '@inertiajs/inertia';
+                import { router } from '@inertiajs/vue3';
 
 
                  //import sweet alert2
@@ -157,7 +157,7 @@
                                 .then((result) => {
                                     if (result.isConfirmed) {
 
-                                        Inertia.delete(`/admin/events/certificates/templates/${id}`);
+                                        router.delete(`/admin/events/certificates/templates/${id}`);
 
                                         Swal.fire({
                                             title: 'Deleted!',
@@ -181,7 +181,7 @@
                             formData.append('title', form.value.title);
                             formData.append('image', form.value.image);
                             formData.append('status', form.value.status);
-                            Inertia.post('/admin/events/certificates/templates/store', formData);
+                            router.post('/admin/events/certificates/templates/store', formData);
                         };
 
                         const updateImage = (event) => {

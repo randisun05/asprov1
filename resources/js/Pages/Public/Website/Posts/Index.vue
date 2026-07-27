@@ -100,7 +100,7 @@ import Pagination from '../../../../Components/Pagination.vue';
 import {
     Head,
     Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 //import ref from vue
 import {
@@ -108,7 +108,7 @@ import {
 } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 export default {
 
@@ -142,7 +142,7 @@ export default {
             const currentPath = window.location.pathname;
             const searchUrl = currentPath.includes('/artikel') ? '/artikel' : '/berita';
 
-            Inertia.get(searchUrl, {
+            router.get(searchUrl, {
             //send params "q" with value from state "search"
             q: search.value,
             });

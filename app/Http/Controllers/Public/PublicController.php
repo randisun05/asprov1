@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Log;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use F9WebLtd\QrCode\Facades\QrCode;
 
 class PublicController extends Controller
 {

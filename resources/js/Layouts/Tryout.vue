@@ -40,7 +40,7 @@
 
 <script>
 import Footer from '../Components/Footer.vue';
-import { Link } from '@inertiajs/inertia-vue3';
+import { Link } from '@inertiajs/vue3';
 import FlashMessages from '../Components/FlashMessages.vue';
 
 export default {

@@ -152,12 +152,10 @@
     //import Head from Inertia
     import {
        Head
-   } from '@inertiajs/inertia-vue3';
+   } from '@inertiajs/vue3';
 
    //import inertia adapter
-   import {
-       Inertia
-   } from '@inertiajs/inertia';
+   import { router } from '@inertiajs/vue3';
 
    export default {
 

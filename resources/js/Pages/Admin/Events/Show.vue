@@ -286,7 +286,7 @@ import Pagination from '../../../Components/Pagination.vue';
 import {
     Head,
     Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 //import tinyMCE
 import Editor from '@tinymce/tinymce-vue';
@@ -299,7 +299,7 @@ import {
 } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 //import sweet alert2
 import Swal from 'sweetalert2';
@@ -366,7 +366,7 @@ export default {
         },
 
         updateRole(participantId, role) {
-            Inertia.post(`/admin/events/${participantId}/updaterole`, {
+            router.post(`/admin/events/${participantId}/updaterole`, {
                 title: role
             }, {
                 onSuccess: () => {
@@ -384,7 +384,7 @@ export default {
                 confirmButtonText: 'Ya, absen semua',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Inertia.post(`/admin/events/${this.event.id}/absenall`, {}, {
+                    router.post(`/admin/events/${this.event.id}/absenall`, {}, {
                         onSuccess: () => {
                             Swal.fire('Sukses', 'Semua peserta telah diabsen!', 'success');
                         }
@@ -471,7 +471,7 @@ export default {
         },
 
         submitEnroll() {
-            Inertia.post(`/admin/events/${this.event.id}/enroll`, {
+            router.post(`/admin/events/${this.event.id}/enroll`, {
                 member_id: this.enrollForm.member_id,
                 title: this.enrollForm.title
             }, {
@@ -504,7 +504,7 @@ export default {
 
         //define method search
         const handleSearch = () => {
-            Inertia.get(`/admin/events/${props.event.id}`, {
+            router.get(`/admin/events/${props.event.id}`, {
 
                 //send params "q" with value from state "search"
                 q: search.value,

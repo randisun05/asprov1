@@ -98,7 +98,7 @@
     import {
         Head,
         Link
-    } from '@inertiajs/inertia-vue3';
+    } from '@inertiajs/vue3';
 
     //import reactive
     import {
@@ -109,9 +109,7 @@
     import Swal from 'sweetalert2';
 
     //import inertia adapter
-    import {
-        Inertia
-    } from '@inertiajs/inertia';
+    import { router } from '@inertiajs/vue3';
 
     export default {
 
@@ -146,8 +144,8 @@
             //submit method
             const submit = () => {
 
-            // Sending data using Inertia.post
-            Inertia.post(`/registration/paid/${props.register.id}`, {
+            // Sending data using router.post
+            router.post(`/registration/paid/${props.register.id}`, {
                 paid : form.paid
             }, {
                 onSuccess: () => {

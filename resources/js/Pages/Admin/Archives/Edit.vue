@@ -137,13 +137,13 @@ import LayoutAdmin from '../../../Layouts/Admin.vue';
 import {
     Head,
     Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 //import reactive from vue
 import { reactive, ref } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 //import sweet alert2
 import Swal from 'sweetalert2';
@@ -205,7 +205,7 @@ export default {
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.post(`/admin/registration/${id}/approve`,
+                        router.post(`/admin/registration/${id}/approve`,
                             {
                                 'info': form.info
                             });
@@ -234,7 +234,7 @@ export default {
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.post(`/admin/registration/${id}/confirm`, {
+                        router.post(`/admin/registration/${id}/confirm`, {
                             'info': form.info,
                             'email': form.sendemail
                         });
@@ -264,7 +264,7 @@ export default {
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.post(`/admin/registration/${id}/reject`);
+                        router.post(`/admin/registration/${id}/reject`);
 
                         Swal.fire({
                             title: 'Success!',
@@ -290,7 +290,7 @@ export default {
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.post(`/admin/registration/${id}/email`);
+                        router.post(`/admin/registration/${id}/email`);
 
                         Swal.fire({
                             title: 'Success!',
@@ -315,7 +315,7 @@ export default {
             })
             .then((result) => {
                 if (result.isConfirmed) {
-                    Inertia.post(`/admin/archives/disposition/${id}`, { user_id: form.user_id });
+                    router.post(`/admin/archives/disposition/${id}`, { user_id: form.user_id });
 
                     Swal.fire({
                         title: 'Success!',

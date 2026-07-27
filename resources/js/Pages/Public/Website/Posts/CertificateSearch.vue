@@ -102,12 +102,10 @@
             //import Head from Inertia
             import {
                 Head
-            } from '@inertiajs/inertia-vue3';
+            } from '@inertiajs/vue3';
 
             //import inertia adapter
-            import {
-                Inertia
-            } from '@inertiajs/inertia';
+            import { router } from '@inertiajs/vue3';
 
             export default {
 
@@ -141,7 +139,7 @@
 
                     //define method search
                     const handleSearch = () => {
-                        Inertia.get('/certificates/filter', {
+                        router.get('/certificates/filter', {
 
                             //send params "q" with value from state "search"
                             q: search.value,

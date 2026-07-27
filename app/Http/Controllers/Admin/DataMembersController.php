@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\ProfileDataPosition;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use F9WebLtd\QrCode\Facades\QrCode;
 
 
 

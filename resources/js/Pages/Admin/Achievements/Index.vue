@@ -91,7 +91,7 @@
     import {
         Head,
         Link
-    } from '@inertiajs/inertia-vue3';
+    } from '@inertiajs/vue3';
 
     //import ref from vue
     import {
@@ -99,7 +99,7 @@
     } from 'vue';
 
     //import inertia adapter
-    import { Inertia } from '@inertiajs/inertia';
+    import { router } from '@inertiajs/vue3';
 
     //import sweet alert2
     import Swal from 'sweetalert2';
@@ -132,7 +132,7 @@
 
             //define method search
             const handleSearch = () => {
-                Inertia.get('/admin/achievements', {
+                router.get('/admin/achievements', {
 
                     //send params "q" with value from state "search"
                     q: search.value,
@@ -153,7 +153,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.delete(`/admin/achievements/${id}`);
+                            router.delete(`/admin/achievements/${id}`);
 
                             Swal.fire({
                                 title: 'Deleted!',
@@ -180,7 +180,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.post(`/admin/achievements/${id}/change`);
+                            router.post(`/admin/achievements/${id}/change`);
 
                             Swal.fire({
                                 title: 'Changed!',

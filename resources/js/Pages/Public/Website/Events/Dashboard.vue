@@ -217,7 +217,7 @@ import LayoutWebsite from '../../../../Layouts/Website.vue';
 import {
     Head,
     Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 //import ref from vue
 import {
@@ -225,7 +225,7 @@ import {
 } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 export default {
     //layout
@@ -246,7 +246,7 @@ export default {
 
     this.interval = setInterval(() => {
 
-        Inertia.reload({
+        router.reload({
             only:[
                 'stats',
                 'fastest',

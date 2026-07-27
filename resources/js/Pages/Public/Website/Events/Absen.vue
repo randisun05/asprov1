@@ -91,7 +91,7 @@
 
 <script>
 import LayoutWebsite from '../../../../Layouts/Website.vue';
-import { Head, Link, useForm } from '@inertiajs/inertia-vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
 import { watch } from 'vue'; // Tambahkan watch
 

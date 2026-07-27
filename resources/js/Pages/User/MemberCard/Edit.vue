@@ -102,8 +102,8 @@
 import LayoutUser from '../../../Layouts/User.vue';
 import MemberCard from '../../../Components/User/MemberCard.vue';
 
-// Import Head and Link from Inertia.js
-import { Head, Link } from '@inertiajs/inertia-vue3';
+// Import Head and Link from router.js
+import { Head, Link } from '@inertiajs/vue3';
 
 // Import Vue features
 import { ref } from 'vue';

@@ -140,12 +140,12 @@
             //import layout
             import LayoutAdmin from '../../../Layouts/Admin.vue';
             import { ref } from 'vue';
-            import { Inertia } from '@inertiajs/inertia';
+            import { router } from '@inertiajs/vue3';
             //import Heade and Link from Inertia
             import {
                 Head,
                 Link
-            } from '@inertiajs/inertia-vue3';
+            } from '@inertiajs/vue3';
 
             export default {
                 layout: LayoutAdmin,
@@ -202,7 +202,7 @@
                     //submit method
                     const submit = () => {
                         //send data to server
-                        Inertia.post(`/admin/achievements`, {
+                        router.post(`/admin/achievements`, {
                             //data
                             nip: form.value.nip,
                             title: form.value.title,

@@ -48,7 +48,7 @@
     import {
         Head,
         Link // tambahkan Link di sini
-    } from '@inertiajs/inertia-vue3';
+    } from '@inertiajs/vue3';
 
     //import reactive
     import {

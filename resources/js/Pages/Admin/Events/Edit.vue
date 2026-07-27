@@ -251,7 +251,7 @@ import LayoutAdmin from '../../../Layouts/Admin.vue';
 import {
     Head,
     Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 //import tinyMCE
 import Editor from '@tinymce/tinymce-vue';
@@ -262,7 +262,7 @@ import {
 } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 //import sweet alert2
 import Swal from 'sweetalert2';
@@ -312,7 +312,7 @@ export default {
         const submit = () => {
 
             //send data to server
-            Inertia.post(`/admin/events/${props.event.id}`, {
+            router.post(`/admin/events/${props.event.id}`, {
                 //data
                 title: form.title,
                 date: form.date,

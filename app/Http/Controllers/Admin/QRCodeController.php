@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\ProfileDataMain;
 use App\Models\ProfileDataPosition;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use F9WebLtd\QrCode\Facades\QrCode;
 use Intervention\Image\Facades\Image;
 
 class QRCodeController extends Controller

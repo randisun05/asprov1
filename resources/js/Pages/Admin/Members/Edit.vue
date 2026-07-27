@@ -442,7 +442,7 @@
 import LayoutAdmin from '../../../Layouts/Admin.vue';
 
 //import Head from Inertia
-import { Head, Link } from "@inertiajs/inertia-vue3";
+import { Head, Link } from "@inertiajs/vue3";
 
 //import reactive
 import { reactive, watch, ref, computed } from "vue";
@@ -451,7 +451,7 @@ import { reactive, watch, ref, computed } from "vue";
 import Swal from "sweetalert2";
 
 //import inertia adapter
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/vue3";
 
 export default {
 
@@ -568,7 +568,7 @@ export default {
         //submit method
         const submit = () => {
             //send data to server
-            Inertia.put(`/admin/members/${props.data.id}`,
+            router.put(`/admin/members/${props.data.id}`,
                 {
                     //data
                     nip: form.nip,
@@ -631,7 +631,7 @@ export default {
             // Tambahkan file gambar yang dipilih ke FormData
             formData.append('image', event.target.files[0]);
             // Kirim permintaan dengan Inertia
-            Inertia.post(`/user/profile/image`, formData);
+            router.post(`/user/profile/image`, formData);
         };
 
 

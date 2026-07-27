@@ -200,7 +200,7 @@
     import {
         Head,
         Link
-    } from '@inertiajs/inertia-vue3';
+    } from '@inertiajs/vue3';
 
     //import ref from vue
     import {
@@ -208,7 +208,7 @@
     } from 'vue';
 
     //import inertia adapter
-    import { Inertia } from '@inertiajs/inertia';
+    import { router } from '@inertiajs/vue3';
 
     //import sweet alert2
     import Swal from 'sweetalert2';
@@ -254,7 +254,7 @@
 
             //define method search
             const handleSearch = () => {
-                Inertia.get('/admin/posts', {
+                router.get('/admin/posts', {
 
                     //send params "q" with value from state "search"
                     q: search.value,
@@ -273,7 +273,7 @@
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.post(`/admin/posts/${id}/approve`);
+                        router.post(`/admin/posts/${id}/approve`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Approved!.',
@@ -297,7 +297,7 @@
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.post(`/admin/posts/${id}/return`);
+                        router.post(`/admin/posts/${id}/return`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Returned!.',
@@ -324,7 +324,7 @@
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.post(`/admin/posts/${id}/reject`);
+                        router.post(`/admin/posts/${id}/reject`);
 
                         Swal.fire({
                             title: 'Success!',
@@ -350,7 +350,7 @@
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.post(`/admin/posts/${id}/cancel`);
+                        router.post(`/admin/posts/${id}/cancel`);
 
                         Swal.fire({
                             title: 'Success!',
@@ -376,7 +376,7 @@
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.post(`/admin/posts/${id}/limited`);
+                        router.post(`/admin/posts/${id}/limited`);
 
                         Swal.fire({
                             title: 'Success!',
@@ -402,7 +402,7 @@
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.post(`/admin/posts/${id}/cancelLimited`);
+                        router.post(`/admin/posts/${id}/cancelLimited`);
 
                         Swal.fire({
                             title: 'Success!',

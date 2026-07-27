@@ -97,7 +97,7 @@ import LayoutUser from '../../../Layouts/User.vue';
 import {
     Head,
     Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 // No unused imports
 

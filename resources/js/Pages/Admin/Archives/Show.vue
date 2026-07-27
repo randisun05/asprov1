@@ -271,13 +271,13 @@
                     import {
                         Head,
                         Link
-                    } from '@inertiajs/inertia-vue3';
+                    } from '@inertiajs/vue3';
 
                     //import reactive from vue
                     import { reactive, ref, computed } from 'vue';
 
                     //import inertia adapter
-                    import { Inertia } from '@inertiajs/inertia';
+                    import { router } from '@inertiajs/vue3';
 
                     //import sweet alert2
                     import Swal from 'sweetalert2';
@@ -346,7 +346,7 @@
                                                     })
                                                         .then((result) => {
                                                             if (result.isConfirmed) {
-                                                                Inertia.post(`/admin/archives/disposition/${id}`, {
+                                                                router.post(`/admin/archives/disposition/${id}`, {
                                                                     user_id: form.user_id,
                                                                     isi: form.isi
                                                                 });

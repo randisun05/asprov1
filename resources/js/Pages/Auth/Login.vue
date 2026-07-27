@@ -84,8 +84,8 @@
 </template>
 
 <!-- <script setup>
-import { Head } from '@inertiajs/inertia-vue3'
-import { Inertia } from '@inertiajs/inertia'
+import { Head } from '@inertiajs/vue3'
+import { router } from '@inertiajs/vue3';
 import { reactive, ref, onMounted, nextTick } from 'vue'
 
 const props = defineProps({
@@ -168,7 +168,7 @@ const submit = async () => {
 
   submitting.value = true
 
-  Inertia.post('/login', form, {
+  router.post('/login', form, {
     onFinish: () => {
       submitting.value = false
       // ✅ Reset reCAPTCHA aman
@@ -185,8 +185,8 @@ const submit = async () => {
 }
 </script> -->
 <script setup>
-import { Head } from '@inertiajs/inertia-vue3'
-import { Inertia } from '@inertiajs/inertia'
+import { Head } from '@inertiajs/vue3'
+import { router } from '@inertiajs/vue3';
 import { reactive, ref } from 'vue'
 
 const form = reactive({
@@ -210,7 +210,7 @@ const submit = async () => {
       const token = await grecaptcha.execute(sitekey, { action: 'submit' })
       form.recaptcha_token = token
 
-      Inertia.post('/login', form, {
+      router.post('/login', form, {
         onFinish: () => (submitting.value = false),
       })
     } catch (err) {

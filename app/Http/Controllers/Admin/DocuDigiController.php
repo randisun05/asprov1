@@ -11,7 +11,7 @@ use Smalot\PdfParser\Parser;
 use App\Models\DocumentDigital;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use F9WebLtd\QrCode\Facades\QrCode;
 
 class DocuDigiController extends Controller
 {

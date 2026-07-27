@@ -221,7 +221,7 @@
 import LayoutUser from "../../../Layouts/User.vue";
 
 //import Head from Inertia
-import { Head, Link } from "@inertiajs/inertia-vue3";
+import { Head, Link } from "@inertiajs/vue3";
 
 //import reactive
 import { reactive } from "vue";
@@ -230,7 +230,7 @@ import { reactive } from "vue";
 import Swal from "sweetalert2";
 
 //import inertia adapter
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/vue3";
 
 export default {
     data() {
@@ -317,7 +317,7 @@ export default {
         //submit method
         const submit = () => {
             //send data to server
-            Inertia.post(
+            router.post(
                 "/user/profile/data-jabatan/edit",
                 {
                     //data

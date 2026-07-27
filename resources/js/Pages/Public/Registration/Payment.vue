@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import { Head } from '@inertiajs/inertia-vue3';
-import { Inertia } from '@inertiajs/inertia';
+import { Head } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import LayoutWebsite from '../../../Layouts/Website.vue';
 
 export default {
@@ -63,10 +63,10 @@ export default {
             this.paying = true;
             window.snap.pay(this.snapToken, {
                 onSuccess: () => {
-                    Inertia.visit(`/registration/success`);
+                    router.visit(`/registration/success`);
                 },
                 onPending: () => {
-                    Inertia.visit(`/registration/success`);
+                    router.visit(`/registration/success`);
                 },
                 onError: () => {
                     this.paying = false;

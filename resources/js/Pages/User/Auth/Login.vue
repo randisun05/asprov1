@@ -94,7 +94,7 @@
     //import Head from Inertia
     import {
         Head
-    } from '@inertiajs/inertia-vue3';
+    } from '@inertiajs/vue3';
 
     //import reactive
     import {
@@ -102,9 +102,7 @@
     } from 'vue';
 
     //import inertia adapter
-    import {
-        Inertia
-    } from '@inertiajs/inertia';
+    import { router } from '@inertiajs/vue3';
 
     export default {
 
@@ -144,7 +142,7 @@
                         })
                         form.recaptcha_token = token
 
-                        Inertia.post('/user/login', form, {
+                        router.post('/user/login', form, {
                             onFinish: () => (submitting.value = false),
                         })
                     } catch (error) {

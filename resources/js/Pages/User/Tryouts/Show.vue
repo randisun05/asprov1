@@ -149,12 +149,12 @@
 </template>
 <script>
 import LayoutUser from "../../../Layouts/Tryout.vue"
-import { Head } from "@inertiajs/inertia-vue3"
+import { Head } from "@inertiajs/vue3"
 import { ref } from "vue"
 import VueCountdown from "@chenfengyuan/vue-countdown"
 import axios from "axios"
 // 1. IMPORT INERTIA WAJIB DISINI
-import { Inertia } from "@inertiajs/inertia"
+import { router } from "@inertiajs/vue3";
 
 export default {
     layout: LayoutUser,
@@ -195,22 +195,22 @@ export default {
         const prevPage = () => {
             // Menggunakan parseInt untuk memastikan operasi matematika
             const prev = parseInt(props.page) - 1;
-            Inertia.get(`/user/tryout/${props.id}/${prev}`, {}, { preserveState: true });
+            router.get(`/user/tryout/${props.id}/${prev}`, {}, { preserveState: true });
         }
 
         const nextPage = () => {
             // Menggunakan parseInt untuk memastikan operasi matematika
             const next = parseInt(props.page) + 1;
-            Inertia.get(`/user/tryout/${props.id}/${next}`, {}, { preserveState: true });
+            router.get(`/user/tryout/${props.id}/${next}`, {}, { preserveState: true });
         }
 
         const clickQuestion = (index) => {
-            Inertia.get(`/user/tryout/${props.id}/${index + 1}`, {}, { preserveState: true })
+            router.get(`/user/tryout/${props.id}/${index + 1}`, {}, { preserveState: true })
         }
 
         // 3. GUNAKAN INERTIA.POST AGAR WARNA NAVIGATOR TERUPDATE (PROPS REFRESH)
         const submitAnswer = (question_id, answer) => {
-            Inertia.post("/user/tryout-answer", {
+            router.post("/user/tryout-answer", {
                 detail_event_id: props.id,
                 question_id: question_id,
                 answer: answer,
@@ -222,7 +222,7 @@ export default {
         }
 
         const endExam = () => {
-            Inertia.post("/user/tryout-end", {
+            router.post("/user/tryout-end", {
                 detail_event_id: props.id
             })
         }

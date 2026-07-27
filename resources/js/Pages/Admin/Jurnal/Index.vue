@@ -110,9 +110,9 @@
             <script>
             import LayoutAdmin from '../../../Layouts/Admin.vue';
             import Pagination from '../../../Components/Pagination.vue';
-            import { Head } from '@inertiajs/inertia-vue3';
+            import { Head } from '@inertiajs/vue3';
             import { ref } from 'vue';
-            import { Inertia } from '@inertiajs/inertia';
+            import { router } from '@inertiajs/vue3';
             import Swal from 'sweetalert2';
 
             export default {
@@ -181,7 +181,7 @@
                         formData.append('type', form.value.type);
                         formData.append('nominal', form.value.nominal);
                         formData.append('keterangan', form.value.keterangan);
-                        Inertia.post('/admin/jurnals/', formData, {
+                        router.post('/admin/jurnals/', formData, {
                             onError: (errors) => {
                                 console.error('Validation errors:', errors);
                                 Swal.fire({
@@ -241,7 +241,7 @@
 
     formData.append('_method', 'PUT'); // karena FormData tidak mendukung PUT secara langsung
 
-    Inertia.post(`/admin/jurnals/${form.value.id}`, formData, {
+    router.post(`/admin/jurnals/${form.value.id}`, formData, {
         forceFormData: true, // Pastikan Inertia mengirim sebagai multipart/form-data
         onError: (errors) => {
             console.error('Validation errors:', errors);
@@ -287,7 +287,7 @@
                             confirmButtonText: 'Yes, delete it!'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                Inertia.delete(`/admin/jurnals/${id}`);
+                                router.delete(`/admin/jurnals/${id}`);
                                 Swal.fire({
                                     title: 'Deleted!',
                                     text: 'Pencatatan Berhasil Dihapus!.',

@@ -303,7 +303,7 @@ import LayoutWebsite from '../../../Layouts/Website.vue';
 //import Head from Inertia
 import {
     Head
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 //import reactive
 import {
@@ -314,9 +314,7 @@ import {
 import Swal from 'sweetalert2';
 
 //import inertia adapter
-import {
-    Inertia
-} from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 export default {
 
@@ -412,7 +410,7 @@ export default {
         const submit = () => {
 
             //send data to server
-            Inertia.post('/registration/store', {
+            router.post('/registration/store', {
 
                 //data
                 nip: form.nip,

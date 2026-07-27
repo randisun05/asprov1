@@ -91,7 +91,7 @@
     //import Head from Inertia
     import {
         Head
-    } from '@inertiajs/inertia-vue3';
+    } from '@inertiajs/vue3';
 
     //import reactive
     import {
@@ -99,9 +99,7 @@
     } from 'vue';
 
     //import inertia adapter
-    import {
-        Inertia
-    } from '@inertiajs/inertia';
+    import { router } from '@inertiajs/vue3';
 
     export default {
 
@@ -134,7 +132,7 @@
             const submit = () => {
 
                 //send data to server
-                Inertia.get('/forget-password/email', {
+                router.get('/forget-password/email', {
                     //data
                     nip: form.nip,
                     email: form.email,

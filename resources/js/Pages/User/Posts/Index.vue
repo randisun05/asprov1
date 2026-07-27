@@ -84,7 +84,7 @@
     import {
         Head,
         Link
-    } from '@inertiajs/inertia-vue3';
+    } from '@inertiajs/vue3';
 
     //import ref from vue
     import {
@@ -92,7 +92,7 @@
     } from 'vue';
 
     //import inertia adapter
-    import { Inertia } from '@inertiajs/inertia';
+    import { router } from '@inertiajs/vue3';
 
     //import sweet alert2
     import Swal from 'sweetalert2';
@@ -122,7 +122,7 @@
 
             //define method search
             const handleSearch = () => {
-                Inertia.get('/user/posts', {
+                router.get('/user/posts', {
 
                     //send params "q" with value from state "search"
                     q: search.value,
@@ -143,7 +143,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.delete(`/user/posts/${id}`);
+                            router.delete(`/user/posts/${id}`);
 
                             Swal.fire({
                                 title: 'Deleted!',
@@ -168,7 +168,7 @@
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.get(`/user/posts/${id}/submission`);
+                        router.get(`/user/posts/${id}/submission`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Returned!.',

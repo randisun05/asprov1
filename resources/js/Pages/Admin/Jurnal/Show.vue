@@ -82,7 +82,7 @@
 
             <script>
 import LayoutAdmin from '../../../Layouts/Admin.vue';
-import { Head } from '@inertiajs/inertia-vue3';
+import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 export default {

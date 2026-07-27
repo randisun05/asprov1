@@ -169,7 +169,7 @@ import LayoutUser from '../../../Layouts/User.vue';
 import {
     Head,
     Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 //import reactive
 import {
@@ -181,9 +181,7 @@ import {
 import Swal from 'sweetalert2';
 
 //import inertia adapter
-import {
-    Inertia
-} from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 export default {
 

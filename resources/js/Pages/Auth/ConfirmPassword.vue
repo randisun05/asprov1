@@ -42,8 +42,8 @@
 </template>
 
 <script setup>
-import { Head } from '@inertiajs/inertia-vue3'
-import { Inertia } from '@inertiajs/inertia'
+import { Head } from '@inertiajs/vue3'
+import { router } from '@inertiajs/vue3';
 import { reactive, ref } from 'vue'
 
 defineProps({
@@ -55,7 +55,7 @@ const form = reactive({ password: '' })
 
 const submit = () => {
   submitting.value = true
-  Inertia.post('/user/confirm-password', form, {
+  router.post('/user/confirm-password', form, {
     onFinish: () => (submitting.value = false),
   })
 }

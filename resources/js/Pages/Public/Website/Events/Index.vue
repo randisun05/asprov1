@@ -109,13 +109,13 @@ import LayoutWebsite from "../../../../Layouts/Website.vue";
 import Pagination from "../../../../Components/Pagination.vue";
 
 //import Heade and Link from Inertia
-import { Head, Link } from "@inertiajs/inertia-vue3";
+import { Head, Link } from "@inertiajs/vue3";
 
 //import ref from vue
 import { ref } from "vue";
 
 //import inertia adapter
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/vue3";
 
 export default {
     //layout
@@ -144,7 +144,7 @@ export default {
 
         //define method search
         const handleSearch = () => {
-            Inertia.get("/events", {
+            router.get("/events", {
                 //send params "q" with value from state "search"
                 q: search.value,
             });

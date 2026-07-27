@@ -104,9 +104,9 @@
     //import layout Admin
     import LayoutAdmin from '../../../Layouts/Admin.vue';
 
-    import { Head, Link } from '@inertiajs/inertia-vue3';
+    import { Head, Link } from '@inertiajs/vue3';
     import { ref, reactive, computed, onMounted } from 'vue';
-    import { Inertia } from '@inertiajs/inertia';
+    import { router } from '@inertiajs/vue3';
     import Swal from 'sweetalert2';
     import BarChart from '../../../Components/BarChart.vue';
     import html2canvas from 'html2canvas';

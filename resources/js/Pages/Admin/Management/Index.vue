@@ -542,7 +542,7 @@
     //import Heade from Inertia
     import {
         Head,
-    } from '@inertiajs/inertia-vue3';
+    } from '@inertiajs/vue3';
 
     //import sweet alert2
     import Swal from 'sweetalert2';
@@ -556,7 +556,7 @@
     import Editor from '@tinymce/tinymce-vue';
 
     //import inertia adapter
-    import { Inertia } from '@inertiajs/inertia';
+    import { router } from '@inertiajs/vue3';
 
     export default {
 
@@ -621,7 +621,7 @@
 
             // Fungsi untuk pencarian otomatis
             const handleSearch = () => {
-                Inertia.get('/admin/managementfilter', {
+                router.get('/admin/managementfilter', {
                     q: activeTab.value, // Menggunakan activeTab langsung sebagai parameter pencarian
                 });
             };
@@ -643,7 +643,7 @@
 
             const store = () => {
                 // Kirim data ke server
-                Inertia.post('/admin/management/store', {
+                router.post('/admin/management/store', {
                     item: tab,
                     sub: form.sub,
                     subitem: form.subitem,
@@ -673,7 +673,7 @@
                                     modalInstance.hide(); // Tutup modal jika instance valid
                                 }
                             }
-                            Inertia.reload({ preserveState: true });
+                            router.reload({ preserveState: true });
                         });
                     },
                     onError: (errors) => {
@@ -691,7 +691,7 @@
             //update method
             const update = () => {
                 //send data to server
-                Inertia.post(`/admin/management/update`, {
+                router.post(`/admin/management/update`, {
                     //data
                     id: form.id,
                     item: form.item,
@@ -731,7 +731,7 @@
                 })
                     .then((result) => {
                         if (result.isConfirmed) {
-                            Inertia.post(`/admin/management/update/status`, {
+                            router.post(`/admin/management/update/status`, {
                                 id: data.id,
                                 status: 1,
                                 item: data.item,
@@ -759,7 +759,7 @@
                 })
                     .then((result) => {
                         if (result.isConfirmed) {
-                            Inertia.post(`/admin/management/update/status`, {
+                            router.post(`/admin/management/update/status`, {
                                 id: data.id,
                                 status: 0,
                                 item: data.item,
@@ -827,7 +827,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.delete(`/admin/management/${id}`);
+                            router.delete(`/admin/management/${id}`);
 
                             Swal.fire({
                                 title: 'Deleted!',

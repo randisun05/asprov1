@@ -15,7 +15,7 @@
         //import Heade from Inertia
         import {
             Head,
-        } from '@inertiajs/inertia-vue3';
+        } from '@inertiajs/vue3';
     
         export default {
     

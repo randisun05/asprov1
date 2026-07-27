@@ -67,7 +67,7 @@ class PostsController extends Controller
         'title' => 'required|string',
         'body' => 'required|',
         'document' => 'file|mimes:pdf|max:2048|nullable',
-        'image' => '|image|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
+        'image' => '|image:allow_svg|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
     ]);
 
     $slug = strtolower(str_replace(' ', '-', $request->title));

@@ -87,7 +87,7 @@
     import {
         Head,
         Link
-    } from '@inertiajs/inertia-vue3';
+    } from '@inertiajs/vue3';
 
     //import ref from vue
     import {
@@ -95,7 +95,7 @@
     } from 'vue';
 
     //import inertia adapter
-    import { Inertia } from '@inertiajs/inertia';
+    import { router } from '@inertiajs/vue3';
 
     //import sweet alert2
     import Swal from 'sweetalert2';
@@ -131,7 +131,7 @@
 
             //define method search
             const handleSearch = () => {
-                Inertia.get('/admin/docudigi', {
+                router.get('/admin/docudigi', {
 
                     //send params "q" with value from state "search"
                     q: search.value,
@@ -152,7 +152,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.delete(`/admin/docudigi/${id}`);
+                            router.delete(`/admin/docudigi/${id}`);
 
                             Swal.fire({
                                 title: 'Deleted!',
@@ -179,7 +179,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.post(`/admin/docudigi/${id}/paraf`);
+                            router.post(`/admin/docudigi/${id}/paraf`);
 
                             Swal.fire({
                                 title: 'Berhasil!',
@@ -207,7 +207,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.post(`/admin/docudigi/${id}/approve`);
+                            router.post(`/admin/docudigi/${id}/approve`);
 
                             Swal.fire({
                                 title: 'Berhasil!',
@@ -235,7 +235,7 @@
                     .then((result) => {
                         if (result.isConfirmed) {
 
-                            Inertia.post(`/admin/docudigi/${id}/cancel`);
+                            router.post(`/admin/docudigi/${id}/cancel`);
 
                             Swal.fire({
                                 title: 'Deleted!',

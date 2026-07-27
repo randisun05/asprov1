@@ -163,10 +163,10 @@
 <script>
 
 import LayoutUser from "../../../Layouts/User.vue"
-import { Head, Link } from '@inertiajs/inertia-vue3'
+import { Head, Link } from '@inertiajs/vue3'
 import { ref, computed } from "vue"
 import axios from "axios"
-import { Inertia } from "@inertiajs/inertia"
+import { router } from "@inertiajs/vue3";
 
 export default {
 
@@ -248,7 +248,7 @@ export default {
                 await axios.post(`/user/tryout/${eventId}/generate`)
 
                 // REDIRECT
-                Inertia.visit(`/user/tryout-confirmation/${detailEventId}`)
+                router.visit(`/user/tryout-confirmation/${detailEventId}`)
 
             } catch (error) {
                 console.error(error)

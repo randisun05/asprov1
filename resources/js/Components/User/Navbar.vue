@@ -109,7 +109,7 @@
 
 <script>
 //import Link
-import { Link } from '@inertiajs/inertia-vue3';
+import { Link } from '@inertiajs/vue3';
 
 export default {
     //register component

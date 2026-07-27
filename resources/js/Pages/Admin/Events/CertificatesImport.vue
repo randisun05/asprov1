@@ -109,8 +109,8 @@
             //import layout
             import LayoutAdmin from '../../../Layouts/Admin.vue';
             import { ref } from 'vue';
-            import { Link, Head } from '@inertiajs/inertia-vue3';
-            import { Inertia } from '@inertiajs/inertia';
+            import { Link, Head } from '@inertiajs/vue3';
+            import { router } from '@inertiajs/vue3';
             //import tinyMCE
             import Editor from '@tinymce/tinymce-vue';
               //import component pagination
@@ -140,7 +140,7 @@
 
             //define method search
             const handleSearch = () => {
-                Inertia.get(`/admin/events/${props.event.id}/certificates/import`, {
+                router.get(`/admin/events/${props.event.id}/certificates/import`, {
                     //send params "q" with value from state "search"
                     q: search.value,
                 });
@@ -165,7 +165,7 @@
                         formData.append('date', form.value.date);
                         formData.append('template', form.value.template);
                         formData.append('user_id', form.value.user_id);
-                        Inertia.post(`/admin/events/${props.event.id}/certificates/import`, formData);
+                        router.post(`/admin/events/${props.event.id}/certificates/import`, formData);
                     };
 
                     return {

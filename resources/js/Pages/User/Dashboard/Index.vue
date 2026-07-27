@@ -272,7 +272,7 @@ import LayoutUser from '../../../Layouts/User.vue';
 //import Heade from Inertia
 import {
     Head, Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
@@ -286,7 +286,7 @@ import {
 } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 //import sweet alert2
 import Swal from 'sweetalert2';
@@ -323,7 +323,7 @@ export default {
 
         //define method search
         const handleSearch = () => {
-            Inertia.get('/events', {
+            router.get('/events', {
 
                 //send params "q" with value from state "search"
                 q: search.value,

@@ -87,7 +87,7 @@ class PostController extends Controller
         'title' => 'required|string',
         'body' => 'required|',
         'document' => 'file|mimes:pdf|max:2048|nullable',
-        'image' => '|image|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
+        'image' => '|image:allow_svg|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
     ]);
 
     // Generate initial slug from title

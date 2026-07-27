@@ -107,9 +107,9 @@
 
 <script>
 import LayoutWebsite from '../../../../Layouts/Website.vue';
-import { Head, useForm } from '@inertiajs/inertia-vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 export default {
     layout: LayoutWebsite,
@@ -127,7 +127,7 @@ export default {
         const handleSearch = () => {
             if (!search.value) return;
 
-            Inertia.get(`/events/${props.event.slug}/certificate`, {
+            router.get(`/events/${props.event.slug}/certificate`, {
                 q: search.value
             }, {
                 preserveState: true,

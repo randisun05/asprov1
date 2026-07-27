@@ -20,7 +20,7 @@ use App\Models\ProfileDataMain;
 use App\Models\ProfileDataPosition;
 use App\Http\Controllers\Controller;
 use Barryvdh\Snappy\Facades\SnappyImage;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use F9WebLtd\QrCode\Facades\QrCode;
 
 class DashboardController extends Controller
 {

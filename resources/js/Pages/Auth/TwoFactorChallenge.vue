@@ -66,8 +66,8 @@
 </template>
 
 <script setup>
-import { Head } from '@inertiajs/inertia-vue3'
-import { Inertia } from '@inertiajs/inertia'
+import { Head } from '@inertiajs/vue3'
+import { router } from '@inertiajs/vue3';
 import { reactive, ref } from 'vue'
 
 defineProps({
@@ -85,7 +85,7 @@ const form = reactive({
 const submit = () => {
   submitting.value = true
 
-  Inertia.post('/two-factor-challenge', {
+  router.post('/two-factor-challenge', {
     code: useRecovery.value ? '' : form.code,
     recovery_code: useRecovery.value ? form.recovery_code : '',
   }, {

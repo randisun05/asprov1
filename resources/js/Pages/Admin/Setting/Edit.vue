@@ -145,13 +145,13 @@
 import LayoutAdmin from '../../../Layouts/Admin.vue';
 
 //import Head and Link from Inertia
-import { Head, Link } from '@inertiajs/inertia-vue3';
+import { Head, Link } from '@inertiajs/vue3';
 
 //import ref from vue
 import { reactive } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 //import sweet alert2
 import Swal from 'sweetalert2';
@@ -202,7 +202,7 @@ export default {
         //submit method
         const submit = () => {
 
-            Inertia.put(
+            router.put(
                 `/admin/setting/${props.user.id}`,
                 {
                     //data

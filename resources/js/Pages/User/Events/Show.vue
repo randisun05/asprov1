@@ -95,7 +95,7 @@ import LayoutUser from '../../../Layouts/User.vue';
 import {
     Head,
     Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 //import ref from vue
 import {
@@ -103,7 +103,7 @@ import {
 } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 //import sweet alert2
 import Swal from 'sweetalert2';
@@ -148,7 +148,7 @@ export default {
         confirmButtonText: 'Yes, Daftarkan!'
     }).then((result) => {
         if (result.isConfirmed) {
-            Inertia.post(`/user/events/${id}/join`, {
+            router.post(`/user/events/${id}/join`, {
                 // Assuming form.document is available in the current scope
                 document: form.document,
             }, {
@@ -178,7 +178,7 @@ const absen = (id) => {
         confirmButtonText: 'Yes, Tandai Hadir!'
     }).then((result) => {
         if (result.isConfirmed) {
-            Inertia.post(`/user/events/${id}/absen`, {
+            router.post(`/user/events/${id}/absen`, {
                 // Assuming form.document is available in the current scope
                 document: form.document,
             }, {
@@ -204,7 +204,7 @@ const absen = (id) => {
         }
 
         const info = (id) => {
-            return Inertia.get(`/user/events/${id}/info`);
+            return router.get(`/user/events/${id}/info`);
 
         }
 

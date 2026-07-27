@@ -93,7 +93,7 @@
     import {
         Head,
         Link
-    } from '@inertiajs/inertia-vue3';
+    } from '@inertiajs/vue3';
 
     //import ref from vue
     import {
@@ -101,7 +101,7 @@
     } from 'vue';
 
     //import inertia adapter
-    import { Inertia } from '@inertiajs/inertia';
+    import { router } from '@inertiajs/vue3';
 
     //import sweet alert2
     import Swal from 'sweetalert2';
@@ -130,7 +130,7 @@
 
             //define method search
             const handleSearch = () => {
-                Inertia.get('/admin/registration/group', {
+                router.get('/admin/registration/group', {
 
                     //send params "q" with value from state "search"
                     q: search.value,
@@ -154,7 +154,7 @@
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.post(`/admin/registration/group/${id}/done`);
+                        router.post(`/admin/registration/group/${id}/done`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Done!.',
@@ -178,7 +178,7 @@
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.post(`/admin/registration/group/${id}/confirm`);
+                        router.post(`/admin/registration/group/${id}/confirm`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Conirmed!.',
@@ -203,7 +203,7 @@
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.post(`/admin/registration/group/${id}/reject`);
+                        router.post(`/admin/registration/group/${id}/reject`);
 
                         Swal.fire({
                             title: 'Success!',

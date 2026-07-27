@@ -162,7 +162,7 @@ import Pagination from '../../../Components/Pagination.vue';
 import {
     Head,
     Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 //import ref from vue
 import {
@@ -170,7 +170,7 @@ import {
 } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 //import sweet alert2
 import Swal from 'sweetalert2';
@@ -225,7 +225,7 @@ export default {
 
         //define method search
         const handleSearch = () => {
-            Inertia.get('/admin/registration', {
+            router.get('/admin/registration', {
 
                 //send params "q" with value from state "search"
                 q: search.value,
@@ -254,7 +254,7 @@ export default {
             })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.post(`/admin/registration/${id}/approve`);
+                        router.post(`/admin/registration/${id}/approve`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Approved!.',
@@ -282,7 +282,7 @@ export default {
             })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.post(`/admin/registration/group/approve`, {
+                        router.post(`/admin/registration/group/approve`, {
                             registration_ids: form.registration_ids
                         });
                         Swal.fire({
@@ -310,7 +310,7 @@ export default {
             })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        Inertia.post(`/admin/registration/${id}/confirm`);
+                        router.post(`/admin/registration/${id}/confirm`);
                         Swal.fire({
                             title: 'Success!',
                             text: 'Status Conirmed!.',
@@ -335,7 +335,7 @@ export default {
                 .then((result) => {
                     if (result.isConfirmed) {
 
-                        Inertia.post(`/admin/registration/${id}/reject`);
+                        router.post(`/admin/registration/${id}/reject`);
 
                         Swal.fire({
                             title: 'Success!',
@@ -350,7 +350,7 @@ export default {
 
         const paidExport = () => {
 
-            Inertia.get(`/admin/registration/paid/export`);
+            router.get(`/admin/registration/paid/export`);
 
         }
 

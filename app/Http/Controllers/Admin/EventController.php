@@ -13,7 +13,7 @@ use App\Models\TemplateCertificate;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\EventParticipantsExport;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use F9WebLtd\QrCode\Facades\QrCode;
 
 class EventController extends Controller
 {
@@ -70,7 +70,7 @@ class EventController extends Controller
         'enddate' => 'required',
         'date' => 'required',
         'place' => 'required',
-        'image' => '|image|mimes:jpeg,png,jpg,gif,svg|max:5048|required',
+        'image' => '|image:allow_svg|mimes:jpeg,png,jpg,gif,svg|max:5048|required',
         'file' => 'required',
         'category' => 'required',
         'template' => 'required',

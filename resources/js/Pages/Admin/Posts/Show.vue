@@ -47,7 +47,7 @@ import LayoutAdmin from '../../../Layouts/Admin.vue';
 import {
     Head,
     Link
-} from '@inertiajs/inertia-vue3';
+} from '@inertiajs/vue3';
 
 
 //import ref from vue
@@ -56,7 +56,7 @@ import {
 } from 'vue';
 
 //import inertia adapter
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 
 
 

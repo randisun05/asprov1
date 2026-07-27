@@ -95,8 +95,8 @@
         //import layout
         import LayoutAdmin from '../../../Layouts/Admin.vue';
         import { ref } from 'vue';
-        import { Link, Head } from '@inertiajs/inertia-vue3';
-        import { Inertia } from '@inertiajs/inertia';
+        import { Link, Head } from '@inertiajs/vue3';
+        import { router } from '@inertiajs/vue3';
         //import tinyMCE
         import Editor from '@tinymce/tinymce-vue';
 
@@ -151,7 +151,7 @@
                 //     formData.append('category', form.value.category);
                 //     formData.append('date', form.value.date);
                 //     formData.append('template', form.value.template);
-                //     Inertia.post(`/admin/events/${props.event.id}/certificates/import`, formData);
+                //     router.post(`/admin/events/${props.event.id}/certificates/import`, formData);
                 // };
 
                 const submit = () => {
@@ -162,7 +162,7 @@
                     formData.append('category', form.value.category);
                     formData.append('date', form.value.date);
                     formData.append('template', form.value.template);
-                    Inertia.post(`/admin/events/${props.event.id}/certificates/store`, formData);
+                    router.post(`/admin/events/${props.event.id}/certificates/store`, formData);
                 };
 
                 return {

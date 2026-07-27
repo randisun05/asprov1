@@ -212,9 +212,9 @@
 
 <script>
 import { ref } from 'vue';
-import { Inertia } from '@inertiajs/inertia';
+import { router } from '@inertiajs/vue3';
 //import Link
-import { Link,  } from '@inertiajs/inertia-vue3';
+import { Link,  } from '@inertiajs/vue3';
 
 
 

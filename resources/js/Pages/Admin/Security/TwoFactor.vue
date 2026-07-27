@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { Head } from '@inertiajs/inertia-vue3';
+import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 const props = defineProps({

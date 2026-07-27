@@ -132,8 +132,11 @@ return [
     */
 
     'features' => [
-        Features::registration(),
-        Features::resetPasswords(),
+        // Registration and password resets are handled by this app's own
+        // Public\PublicController flows (/registration, /forget-password),
+        // not Fortify's defaults, which have no view bound and 500 if reachable.
+        // Features::registration(),
+        // Features::resetPasswords(),
         // Features::emailVerification(),
         Features::updateProfileInformation(),
         Features::updatePasswords(),
