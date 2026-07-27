@@ -289,6 +289,33 @@ class RegistrationController extends Controller
         //
     }
 
+    /**
+     * Show the Midtrans Snap payment page as an alternative to manually
+     * uploading proof of transfer. Requires MIDTRANS_SERVER_KEY and
+     * MIDTRANS_REGISTRATION_FEE to be configured.
+     */
+    public function payment($id, \App\Services\MidtransService $midtrans)
+    {
+        $register = Registration::findOrFail($id);
+
+        if ($register->paid) {
+            return redirect()->route('/')->with('error', 'Link pembayaran telah ditutup.');
+        }
+
+        try {
+            $snap = $midtrans->createSnapToken($register);
+        } catch (\RuntimeException $e) {
+            return back()->with('error', 'Pembayaran online belum tersedia. Silakan unggah bukti transfer manual.');
+        }
+
+        return inertia('Public/Registration/Payment', [
+            'register' => $register,
+            'snapToken' => $snap['token'],
+            'clientKey' => config('midtrans.client_key'),
+            'isProduction' => config('midtrans.is_production'),
+        ]);
+    }
+
     public function paid(Request $request, $id)
     {
 

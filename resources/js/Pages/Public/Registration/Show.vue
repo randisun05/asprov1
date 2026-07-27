@@ -75,6 +75,10 @@
                         <button type="submit" class="button btnprimary" style="width: 300px;">Submit</button>
                     </div>
 
+                    <div class="row d-flex justify-content-center mt-3">
+                        <a :href="`/registration/paid/${register.id}/payment`" class="button" style="width: 300px;">Atau Bayar Online</a>
+                    </div>
+
                   </div>
                </form>
             </div>

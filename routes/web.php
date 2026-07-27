@@ -276,6 +276,8 @@ Route::get('/registration/berhasil', [\App\Http\Controllers\Public\RegistrationC
 Route::post('/registration/store', [\App\Http\Controllers\Public\RegistrationController::class, 'store'])->middleware('throttle:6,1')->name('registration.store');
 Route::get('/registration/success', [\App\Http\Controllers\Public\RegistrationController::class, 'index'])->name('registration.success');
 Route::get('/registration/paid/{id}', [\App\Http\Controllers\Public\RegistrationController::class, 'show'])->name('registration.paid.show');
+Route::get('/registration/paid/{id}/payment', [\App\Http\Controllers\Public\RegistrationController::class, 'payment'])->name('registration.paid.payment');
+Route::post('/midtrans/notification', \App\Http\Controllers\Public\MidtransNotificationController::class)->name('midtrans.notification');
 Route::get('/registration/confirm/{id}/edit', [\App\Http\Controllers\Public\RegistrationController::class, 'edit'])->name('registration.confirm.edit');
 Route::post('/registration/confirm/{id}', [\App\Http\Controllers\Public\RegistrationController::class, 'update'])->name('registration.confirm.update');
 Route::post('/registration/paid/{id}', [\App\Http\Controllers\Public\RegistrationController::class, 'paid'])->name('registration.paid.success');
