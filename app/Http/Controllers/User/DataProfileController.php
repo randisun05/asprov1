@@ -197,8 +197,11 @@ class DataProfileController extends Controller
             return redirect()->route('login');
         }
 
+        $main = ProfileDataMain::where('nip',auth()->guard('member')->user()->nip)
+        ->first();
+
           $request->validate([
-                'nip' => ['required','string', 'regex:/^\d{18}$/'],
+                'nip' => ['required','string', 'regex:/^\d{18}$/', \Illuminate\Validation\Rule::unique('profile_data_mains', 'nip')->ignore($main->id)],
                 'name' => 'required',
                 'leveledu' => 'required',
                 'lastedu' => 'required',
@@ -206,8 +209,8 @@ class DataProfileController extends Controller
                 'dob' => 'required',
                 // 'docid' => 'required',
                 // 'nodocid' => 'required',
-                'email' => 'required|email|',
-                'contact' => 'required|string|',
+                'email' => ['required', 'email', \Illuminate\Validation\Rule::unique('profile_data_mains', 'email')->ignore($main->id)],
+                'contact' => ['required', 'string', \Illuminate\Validation\Rule::unique('profile_data_mains', 'contact')->ignore($main->id)],
                 'gender' => 'required',
                 // 'address' => 'required',
                 // 'villages' => 'required',
@@ -218,9 +221,9 @@ class DataProfileController extends Controller
                 'agency' => 'required',
         ],[
             'nip.regex' => 'NIP harus terdiri dari 18 angka.',
-            // 'nip.unique' => 'Data NIP sudah digunakan.',
-            // 'email.unique' => 'Data email sudah digunakan.',
-            // 'contact.unique' => 'Data kontak sudah digunakan.',
+            'nip.unique' => 'Data NIP sudah digunakan.',
+            'email.unique' => 'Data email sudah digunakan.',
+            'contact.unique' => 'Data kontak sudah digunakan.',
             'nip.required' => 'NIP harus diisi.',
             'name.required' => 'Nama harus diisi.',
             'email.required' => 'Email harus diisi.',
@@ -240,9 +243,6 @@ class DataProfileController extends Controller
             // 'province.required' => 'Provinsi harus diisi.',
             'religion.required' => 'Agama harus diisi.',
         ]);
-
-        $main = ProfileDataMain::where('nip',auth()->guard('member')->user()->nip)
-        ->first();
 
         //update data main
         $main->update([
@@ -270,6 +270,7 @@ class DataProfileController extends Controller
 
         Member::where('id',auth()->guard('member')->user()->id)
         ->update([
+            'nip' => $request->nip,
             'name' => $request->name,
             'email' => $request->email,
             'agency' => $request->agency,
