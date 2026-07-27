@@ -50,6 +50,15 @@
 
     </script>
 
-    <style>
-
+    <style scoped>
+    /* The member navbar (.userbg in Components/User/Navbar.vue) is
+       position: fixed, so it's out of document flow and overlays whatever
+       renders right after it. Give the content area the same top clearance
+       already used elsewhere in the app for this fixed-navbar pattern
+       (see .padding_top / .padding in the site stylesheet). Scoped so it
+       doesn't leak onto Admin.vue, which reuses the same .wrapper/.content
+       class names but already positions its navbar differently. */
+    .wrapper {
+        padding-top: 7.5rem;
+    }
     </style>
