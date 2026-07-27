@@ -1,4 +1,5 @@
 <template>
+        <FlashMessages />
      <!-- navbar -->
          <Navbar />
         <div class="wrapper">
@@ -33,13 +34,17 @@
         //import footer
         import Footer from '../Components/Footer.vue';
 
+        //import global flash message popups
+        import FlashMessages from '../Components/FlashMessages.vue';
+
         export default {
 
             //register components
             components: {
                 Navbar,
                 Sidebar,
-                Footer
+                Footer,
+                FlashMessages
             },
         }
 

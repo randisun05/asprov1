@@ -1,4 +1,5 @@
 <template>
+    <FlashMessages />
     <div class="main-layout">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
             <div class="container">
@@ -40,11 +41,13 @@
 <script>
 import Footer from '../Components/Footer.vue';
 import { Link } from '@inertiajs/inertia-vue3';
+import FlashMessages from '../Components/FlashMessages.vue';
 
 export default {
     components: {
         Footer,
-        Link
+        Link,
+        FlashMessages
     },
 }
 </script>

@@ -1,5 +1,7 @@
 <template>
 
+    <FlashMessages />
+
     <!-- navbar -->
     <Navbar />
 
@@ -21,12 +23,16 @@
    //import navbar
    import Footer from "../Components/Footer.vue";
 
+   //import global flash message popups
+   import FlashMessages from "../Components/FlashMessages.vue";
+
    export default {
 
        //register components
        components: {
            Navbar,
-           Footer
+           Footer,
+           FlashMessages
 
        },
    }

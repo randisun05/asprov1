@@ -2,6 +2,8 @@
 
 <div class="wrapper">
 
+    <FlashMessages />
+
     <!-- sidebar -->
     <Sidebar />
 
@@ -28,12 +30,16 @@
     //import sidebar
     import Sidebar from '../Components/Sidebar.vue';
 
+    //import global flash message popups
+    import FlashMessages from '../Components/FlashMessages.vue';
+
     export default {
 
         //register components
         components: {
             Navbar,
-            Sidebar
+            Sidebar,
+            FlashMessages
         },
     }
 
