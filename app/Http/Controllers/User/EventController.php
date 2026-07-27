@@ -49,6 +49,17 @@ class EventController extends Controller
         if (auth()->guard('member')->check()) {
             $event = Event::findOrFail($id);
 
+            if ($event->status !== 'active') {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Pendaftaran untuk kegiatan ini sudah ditutup',
+                    ], 403);
+                }
+
+                return redirect()->route('user.events.index')->with('error', 'Pendaftaran untuk kegiatan ini sudah ditutup.');
+            }
+
             if ($event->file == "Y") {
                 $request->validate([
                     'document' => 'required',
@@ -182,6 +193,12 @@ class EventController extends Controller
     {
         if (auth()->guard('member')->check()) {
 
+            $event = Event::findOrFail($id);
+
+            if ($event->absen !== 'Y') {
+                return redirect()->route('user.events.index')->with('error', 'Absensi untuk kegiatan ini belum dibuka.');
+            }
+
             $detailEvent = DetailEvent::where('event_id', $id)->where('member_id', auth()->guard('member')->user()->id)->first();
             if ($detailEvent) {
                 $detailEvent->update([
@@ -209,9 +226,13 @@ class EventController extends Controller
     public function certificatesIndex()
     {
         if (auth()->guard('member')->check()) {
-            $datas = Certificate::where('nip', auth()->guard('member')->user()->nip)
+            $datas = Certificate::with('event')
+                ->where('nip', auth()->guard('member')->user()->nip)
                 ->when(request()->q, function ($query) {
-                    $query->where('title', 'like', '%' . request()->q . '%');
+                    $query->where('category', 'like', '%' . request()->q . '%')
+                        ->orWhereHas('event', function ($eventQuery) {
+                            $eventQuery->where('title', 'like', '%' . request()->q . '%');
+                        });
                 })
                 ->latest()
                 ->paginate(10);
