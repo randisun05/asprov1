@@ -63,8 +63,20 @@
     <section id="member-card" class="padding_m mt-2">
         <div class="ms-5">
             <div class="row">
-                <div class="col-12 d-flex flex-wrap">
-                    <div class="card shadow top60 flex-fill me-4 mb-4" style="min-width:340px; max-width: 48%;">
+                <div class="col-12 d-flex flex-wrap align-items-start">
+                    <div class="card shadow mb-4 me-4 text-center" style="width:262px;">
+                        <div class="card-body">
+                            <h5 class="mb-3">Kartu Anggota</h5>
+                            <div class="member-card-preview-frame">
+                                <div class="member-card-preview-scaler">
+                                    <MemberCard :profile="user" :foto="foto" :qrCode="qrCode" />
+                                </div>
+                            </div>
+                            <Link href="/user/member-card" class="btn btnprimary btn-sm mt-3">Lihat Kartu Lengkap</Link>
+                        </div>
+                    </div>
+
+                    <div class="card shadow top60 flex-fill me-4 mb-4" style="min-width:300px; max-width: 46%;">
                         <div class="text-center">
                             <h4>Informasi Anggota</h4>
                             <h4>Aspro SDM Aparatur</h4>
@@ -139,7 +151,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card shadow top60 flex-fill mb-4" style="min-width:340px; max-width: 48%;">
+                    <div class="card shadow top60 flex-fill mb-4" style="min-width:300px; max-width: 46%;">
                         <div class="text-center">
                             <h4>Informasi Keuangan</h4>
                             <h4>Aspro SDM Aparatur</h4>
@@ -340,6 +352,9 @@ import {
 import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 
+//import member card component (same one used on the full Kartu Anggota page)
+import MemberCard from '../../../Components/User/MemberCard.vue';
+
 //import ref from vue
 import {
     ref, reactive, computed
@@ -358,7 +373,7 @@ export default {
 
     //register components
     components: {
-        Head, Carousel, Slide, Pagination, Navigation, Link
+        Head, Carousel, Slide, Pagination, Navigation, Link, MemberCard
     },
 
     //props
@@ -369,6 +384,8 @@ export default {
         posts: Object,
         formattedDate: Object,
         user: Object,
+        foto: Object,
+        qrCode: String,
         summary: Object,
         finance: Object,
     },
@@ -416,6 +433,20 @@ export default {
 .img-fluid {
     max-width: 100%;
     height: auto;
+}
+
+.member-card-preview-frame {
+    width: 220px;
+    height: 377px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.member-card-preview-scaler {
+    width: 441px;
+    height: 754px;
+    transform: scale(0.5);
+    transform-origin: top left;
 }
 
 .stat-icon {

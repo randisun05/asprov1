@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Models\Event;
 use App\Models\Member;
 use App\Models\Jurnal;
+use Illuminate\Support\Str;
 use App\Models\Merchan;
 use App\Models\Achievement;
 use App\Models\Certificate;
@@ -19,6 +20,7 @@ use App\Models\ProfileDataMain;
 use App\Models\ProfileDataPosition;
 use App\Http\Controllers\Controller;
 use Barryvdh\Snappy\Facades\SnappyImage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class DashboardController extends Controller
 {
@@ -80,12 +82,24 @@ class DashboardController extends Controller
 
         $finance = $this->financeSummary();
 
+        $foto = ProfileDataMain::where('nip', $main->nip)->first('image');
+
+        if (!$user->qr_link) {
+            $user->qr_link = (string) Str::uuid();
+            $user->save();
+        }
+        $qrCode = QrCode::format('svg')->size(75)->generate(
+            "https://asprosdma.id/identity-verification/" . $user->qr_link
+        );
+
         return inertia('User/Dashboard/Index', [
             'profile' => $profile,
             'events' => $events,
             'merchans' => $merchans,
             'posts' => $posts,
             'user' => $user,
+            'foto' => $foto,
+            'qrCode' => (string) $qrCode,
             'formattedDate' => $formattedDate,
             'summary' => $summary,
             'finance' => $finance,

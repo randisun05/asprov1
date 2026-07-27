@@ -53,6 +53,9 @@ class DashboardTest extends TestCase
             ->where('summary.certificates', 0)
             ->where('summary.achievements', 0)
             ->where('profile.position', 'Analis SDM Aparatur')
+            ->has('qrCode')
+            ->has('foto')
         );
+        $this->assertNotNull($member->fresh()->qr_link);
     }
 }
