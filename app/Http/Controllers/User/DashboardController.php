@@ -7,7 +7,11 @@ use Dompdf\Options;
 use App\Models\Post;
 use App\Models\Event;
 use App\Models\Member;
+use App\Models\Jurnal;
 use App\Models\Merchan;
+use App\Models\Achievement;
+use App\Models\Certificate;
+use App\Models\DetailEvent;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
@@ -67,6 +71,14 @@ class DashboardController extends Controller
         $merchans->appends(['q' => request()->q]);
         $posts->appends(['q' => request()->q]);
 
+        $summary = [
+            'eventsJoined' => DetailEvent::where('member_id', $user->id)->count(),
+            'certificates' => Certificate::where('nip', $main->nip)->count(),
+            'achievements' => Achievement::where('member_id', $user->id)->count(),
+            'memberSince' => $formattedDate,
+        ];
+
+        $finance = $this->financeSummary();
 
         return inertia('User/Dashboard/Index', [
             'profile' => $profile,
@@ -74,8 +86,28 @@ class DashboardController extends Controller
             'merchans' => $merchans,
             'posts' => $posts,
             'user' => $user,
-            'formattedDate' => $formattedDate
+            'formattedDate' => $formattedDate,
+            'summary' => $summary,
+            'finance' => $finance,
         ]);
+    }
+
+    /**
+     * Organization-wide balance snapshot shown to every member for
+     * financial transparency (mirrors the grouping in
+     * Admin/User JurnalController::show but only needs the latest totals).
+     */
+    private function financeSummary(): array
+    {
+        $thisMonth = Jurnal::whereYear('date', now()->year)
+            ->whereMonth('date', now()->month)
+            ->get();
+
+        return [
+            'saldoAkhir' => (int) Jurnal::orderBy('date', 'desc')->orderBy('id', 'desc')->value('saldo'),
+            'pemasukanBulanIni' => (int) $thisMonth->where('type', 'debit')->sum('nominal'),
+            'pengeluaranBulanIni' => (int) $thisMonth->where('type', 'kredit')->sum('nominal'),
+        ];
     }
 
     public function print(Request $request)

@@ -4,30 +4,95 @@
 <section id="dashboard" class="container-fluid px-5">
     <div class="container-fluid padding">
     <div class="row">
-      <div class="col-md-12">
-        <div class="row">
-          <div class="col-md-12 col-12 mb-2">
-            <h3 class="text-center">DATA MONITORING</h3>
-          </div>
-        </div>
+      <div class="col-md-8 col-8">
+        <h3>Data Monitoring</h3>
+      </div>
+      <div class="col-md-4 col-4 text-end">
+        <button class="btn btn-outline-secondary btn-sm" @click="exportToPDF"><i class="fa fa-file-pdf-o me-1"></i> Export PDF</button>
       </div>
     </div>
-    <div class="row mt-1">
-      <div class="col-md-12">
-        <div class="card border-0 shadow">
-          <div class="card-body" ref="reportContent">
-            <BarChart :chartData="chartRegistration" :chartOptions="chartOptions" />
-            <BarChart :chartData="chartPublication" :chartOptions="chartOptions" />
-            <h3 class="text-center mt-5">DATA ANGGOTA</h3>
-            <BarChart :chartData="chartDataByMonth" :chartOptions="chartOptions" />
-            <BarChart :chartData="chartDataByPosition" :chartOptions="chartOptions" />
-            <BarChart :chartData="chartDataByLevel" :chartOptions="chartOptions" />
-            <BarChart :chartData="chartDataByGender" :chartOptions="chartOptions" />
-            <BarChart :chartData="chartDataByType" :chartOptions="chartOptions" />
-            <BarChart :chartData="chartDataByRegion" :chartOptions="chartOptions" />
-          </div>
+
+    <div ref="reportContent">
+        <h5 class="text-muted mb-2">Registrasi Anggota</h5>
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-2" v-for="tile in registrationTiles" :key="tile.label">
+                <div class="card border-0 shadow h-100">
+                    <div class="card-body">
+                        <h3 class="mb-0">{{ tile.value }}</h3>
+                        <span class="text-muted small">{{ tile.label }}</span>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <h5 class="text-muted mb-2">Konten & Kegiatan</h5>
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-4" v-for="tile in publicationTiles" :key="tile.label">
+                <div class="card border-0 shadow h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="stat-icon me-3" :class="tile.colorClass">
+                            <i class="fa" :class="tile.icon" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0">{{ tile.value }}</h3>
+                            <span class="text-muted small">{{ tile.label }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="text-muted mb-2">Data Anggota</h5>
+        <div class="row g-3">
+            <div class="col-md-12">
+                <div class="card border-0 shadow">
+                    <div class="card-body">
+                        <h6 class="text-center">Pertumbuhan Anggota per Bulan</h6>
+                        <BarChart :chartData="chartDataByMonth" :chartOptions="chartOptions" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow h-100">
+                    <div class="card-body">
+                        <h6 class="text-center">Berdasarkan Jabatan</h6>
+                        <BarChart :chartData="chartDataByPosition" :chartOptions="chartOptions" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow h-100">
+                    <div class="card-body">
+                        <h6 class="text-center">Berdasarkan Jenjang</h6>
+                        <BarChart :chartData="chartDataByLevel" :chartOptions="chartOptions" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow h-100">
+                    <div class="card-body">
+                        <h6 class="text-center">Jenis Kelamin</h6>
+                        <BarChart :chartData="chartDataByGender" :chartOptions="chartOptions" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow h-100">
+                    <div class="card-body">
+                        <h6 class="text-center">Instansi Pusat / Daerah</h6>
+                        <BarChart :chartData="chartDataByType" :chartOptions="chartOptions" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow h-100">
+                    <div class="card-body">
+                        <h6 class="text-center">Penyebaran Wilayah</h6>
+                        <BarChart :chartData="chartDataByRegion" :chartOptions="chartOptions" />
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
   </div>
 </section>
@@ -40,7 +105,7 @@
     import LayoutAdmin from '../../../Layouts/Admin.vue';
 
     import { Head, Link } from '@inertiajs/inertia-vue3';
-    import { ref, reactive, onMounted } from 'vue';
+    import { ref, reactive, computed, onMounted } from 'vue';
     import { Inertia } from '@inertiajs/inertia';
     import Swal from 'sweetalert2';
     import BarChart from '../../../Components/BarChart.vue';
@@ -129,27 +194,30 @@
                 }
                 }
             });
-            const chartRegistration = reactive({
-                labels: Object.keys(props.registrationData).map(key => `${key}`),
-                datasets: [
-                {
-                    label: 'Data Registrasi',
-                    backgroundColor: '#DC143C',
-                    data: Object.values(props.registrationData)
-                }
-                ]
-            });
+            const registrationLabels = {
+                'total-registrasi': 'Total Registrasi',
+                'telah-dilakukan-verifikasi': 'Terverifikasi',
+                'upload-bukti-pembayaran': 'Bukti Bayar Diunggah',
+                'perbaikan': 'Perlu Perbaikan',
+                'selesai': 'Disetujui',
+                'ditolak': 'Ditolak',
+            };
+            const registrationTiles = computed(() => Object.entries(props.registrationData).map(([key, value]) => ({
+                label: registrationLabels[key] ?? key,
+                value,
+            })));
 
-            const chartPublication = reactive({
-                labels: Object.keys(props.publicationData).map(key => `${key}`),
-                datasets: [
-                {
-                    label: 'Data Publikasi',
-                    backgroundColor: '#00008B',
-                    data: Object.values(props.publicationData)
-                }
-                ]
-            });
+            const publicationMeta = {
+                'publikasi': { label: 'Publikasi', icon: 'fa-newspaper-o', colorClass: 'bg-primary bg-opacity-10 text-primary' },
+                'kegiatan': { label: 'Kegiatan', icon: 'fa-calendar', colorClass: 'bg-success bg-opacity-10 text-success' },
+                'merchan': { label: 'Merchandise', icon: 'fa-shopping-bag', colorClass: 'bg-warning bg-opacity-10 text-warning' },
+            };
+            const publicationTiles = computed(() => Object.entries(props.publicationData).map(([key, value]) => ({
+                label: publicationMeta[key]?.label ?? key,
+                icon: publicationMeta[key]?.icon ?? 'fa-circle',
+                colorClass: publicationMeta[key]?.colorClass ?? 'bg-secondary bg-opacity-10 text-secondary',
+                value,
+            })));
 
                 const chartDataByMonth = reactive({
                 labels: Object.keys(props.countsPerMonth).map(key => `${key}`),
@@ -281,8 +349,8 @@
                 chartDataAccumulated,
                 chartOptions,
                 chartDataByMonth,
-                chartRegistration,
-                chartPublication,
+                registrationTiles,
+                publicationTiles,
                 chartDataByGender,
                 chartDataByType,
                 chartDataByRegion,
@@ -295,5 +363,13 @@
 </script>
 
 <style>
-
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
 </style>

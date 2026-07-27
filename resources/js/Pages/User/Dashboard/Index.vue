@@ -1,6 +1,66 @@
 <template>
-    <!-- Our Blogs -->
-    <section id="member-card" class="padding_m mt-4">
+    <!-- Ringkasan Anggota -->
+    <section id="member-summary" class="padding_m mt-4">
+        <div class="mx-5">
+            <h3 class="mb-3">Selamat Datang, {{ profile.main.name }}</h3>
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3">
+                                <i class="fa fa-calendar-check-o fa-lg" aria-hidden="true"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0">{{ summary.eventsJoined }}</h3>
+                                <span class="text-muted small">Kegiatan Diikuti</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stat-icon bg-success bg-opacity-10 text-success me-3">
+                                <i class="fa fa-certificate fa-lg" aria-hidden="true"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0">{{ summary.certificates }}</h3>
+                                <span class="text-muted small">Sertifikat</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stat-icon bg-warning bg-opacity-10 text-warning me-3">
+                                <i class="fa fa-trophy fa-lg" aria-hidden="true"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0">{{ summary.achievements }}</h3>
+                                <span class="text-muted small">Penghargaan</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stat-icon me-3" :class="verified ? 'bg-success bg-opacity-10 text-success' : 'bg-secondary bg-opacity-10 text-secondary'">
+                                <i class="fa" :class="verified ? 'fa-check-circle' : 'fa-clock-o'" aria-hidden="true"></i>
+                            </div>
+                            <div>
+                                <span class="d-block fw-bold">{{ verified ? 'Terverifikasi' : 'Menunggu' }}</span>
+                                <span class="text-muted small">Status Kartu Anggota</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="member-card" class="padding_m mt-2">
         <div class="ms-5">
             <div class="row">
                 <div class="col-12 d-flex flex-wrap">
@@ -46,6 +106,30 @@
                                 </div>
                                 <div class="row py-1 ms-2">
                                     <div class="col-sm-4">
+                                        <h5>Jabatan</h5>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <h5>: {{ profile.position || '-' }}</h5>
+                                    </div>
+                                </div>
+                                <div class="row py-1 ms-2">
+                                    <div class="col-sm-4">
+                                        <h5>Jenjang</h5>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <h5>: {{ profile.level || '-' }}</h5>
+                                    </div>
+                                </div>
+                                <div class="row py-1 ms-2">
+                                    <div class="col-sm-4">
+                                        <h5>Status</h5>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <span class="badge bg-primary">{{ profile.main.statusmember || 'Anggota Biasa' }}</span>
+                                    </div>
+                                </div>
+                                <div class="row py-1 ms-2">
+                                    <div class="col-sm-4">
                                         <h5>Tanggal</h5>
                                     </div>
                                     <div class="col-sm-8">
@@ -61,7 +145,37 @@
                             <h4>Aspro SDM Aparatur</h4>
                             <hr class="mt-0">
                         </div>
-                        <iframe src="/user/jurnals/show" style="width:100%;height:150px;border:none;"></iframe>
+                        <div class="row mb-3 px-4">
+                            <div class="col-sm-12">
+                                <div class="row py-1">
+                                    <div class="col-sm-7">
+                                        <h5>Saldo Kas</h5>
+                                    </div>
+                                    <div class="col-sm-5 text-end">
+                                        <h5>Rp{{ formatRupiah(finance.saldoAkhir) }}</h5>
+                                    </div>
+                                </div>
+                                <div class="row py-1">
+                                    <div class="col-sm-7">
+                                        <h5>Pemasukan Bulan Ini</h5>
+                                    </div>
+                                    <div class="col-sm-5 text-end">
+                                        <h5 class="text-success">Rp{{ formatRupiah(finance.pemasukanBulanIni) }}</h5>
+                                    </div>
+                                </div>
+                                <div class="row py-1">
+                                    <div class="col-sm-7">
+                                        <h5>Pengeluaran Bulan Ini</h5>
+                                    </div>
+                                    <div class="col-sm-5 text-end">
+                                        <h5 class="text-danger">Rp{{ formatRupiah(finance.pengeluaranBulanIni) }}</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center pb-3">
+                            <a href="/user/jurnals/show" class="btn btnprimary btn-sm">Lihat Laporan Lengkap</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -228,7 +342,7 @@ import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 
 //import ref from vue
 import {
-    ref, reactive
+    ref, reactive, computed
 } from 'vue';
 
 //import inertia adapter
@@ -253,11 +367,14 @@ export default {
         events: Object,
         merchans: Object,
         posts: Object,
-        formattedDate: Object
+        formattedDate: Object,
+        user: Object,
+        summary: Object,
+        finance: Object,
     },
 
     //inisialisasi composition API
-    setup() {
+    setup(props) {
 
         //define state search
         const search = ref('' || (new URL(document.location)).searchParams.get('q'));
@@ -276,11 +393,17 @@ export default {
             return `/storage/${imageName}`;
         }
 
+        const verified = computed(() => !!props.user?.qr_link);
+
+        const formatRupiah = (value) => {
+            return new Intl.NumberFormat('id-ID').format(value || 0);
+        }
+
         //return
         return {
             getImageUrl,
-
-
+            verified,
+            formatRupiah,
         }
     }
 
@@ -293,5 +416,15 @@ export default {
 .img-fluid {
     max-width: 100%;
     height: auto;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 </style>
