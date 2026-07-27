@@ -68,6 +68,16 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         Fortify::authenticateUsing(function (Request $request) {
+            // Fortify's login pipeline calls this callback from two separate
+            // stages (RedirectIfTwoFactorAuthenticatable, then
+            // AttemptToAuthenticate) for a single login POST. A reCAPTCHA v3
+            // token can only be verified once - Google rejects it the second
+            // time - so without this cache every login failed on the second,
+            // redundant verification even with a perfectly valid token.
+            if ($request->attributes->has('fortify_authenticated_user')) {
+                return $request->attributes->get('fortify_authenticated_user');
+            }
+
             $request->validate([
                 'email' => 'required|string',
                 'password' => 'required|string',
@@ -89,12 +99,11 @@ class FortifyServiceProvider extends ServiceProvider
             }
 
             $user = User::where('email', $request->email)->first();
+            $authenticated = ($user && Hash::check($request->password, $user->password)) ? $user : null;
 
-            if ($user && Hash::check($request->password, $user->password)) {
-                return $user;
-            }
+            $request->attributes->set('fortify_authenticated_user', $authenticated);
 
-            return null;
+            return $authenticated;
         });
 
 
