@@ -1,6 +1,6 @@
 <template>
     <Head>
-        <title>Daftar Sertifikat</title>
+        <title>Sertifikat Saya</title>
     </Head>
     <div class="container-fluid padding px-5">
         <div class="row">
@@ -16,37 +16,50 @@
                             </div>
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>
+
         <div class="row mt-1">
             <div class="col-md-12">
-                <div class="card border-0 shadow">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-centered table-nowrap mb-0 rounded">
-                                <thead class="thead-dark">
-                                    <tr class="border-0 text-center">
-                                        <th class="border-0 rounded-start" style="width:5%">No.</th>
-                                        <th class="border-0">Kegiatan</th>
-                                        <th class="border-0 rounded-end" style="width:12%">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <div class="mt-2"></div>
-                                <tbody>
-                                    <tr v-for="(data, index) in datas.data" :key="index">
-                                        <td class="fw-bold text-center">{{ ++index + (datas.current_page - 1) * datas.per_page }}</td>
-                                        <td>{{ data.name }}</td>
-                                        <td><button  @click="downloadCard(data)" class="button btnprimary" type="button"> Download</button> </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <h3 class="mb-3">Sertifikat Saya</h3>
+            </div>
+        </div>
+
+        <div v-if="datas.data.length" class="row g-3">
+            <div class="col-md-4 col-sm-6" v-for="data in datas.data" :key="data.id">
+                <div class="card border-0 shadow h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="stat-icon bg-success bg-opacity-10 text-success me-3">
+                            <i class="fa fa-certificate fa-lg" aria-hidden="true"></i>
                         </div>
-                        <Pagination :links="datas.links" align="end" />
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">{{ data.event?.title || data.category }}</h6>
+                            <span class="text-muted small d-block">{{ data.no_certificate }}</span>
+                            <span class="text-muted small d-block">{{ data.date }}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 text-center pb-3">
+                        <button @click="downloadCard(data)" class="btn btnprimary btn-sm" type="button">
+                            <i class="fa fa-download me-1" aria-hidden="true"></i> Download
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
+        <div v-else class="row">
+            <div class="col-md-12">
+                <div class="card border-0 shadow">
+                    <div class="card-body text-center py-5 text-muted">
+                        <i class="fa fa-certificate fa-3x mb-3 d-block" aria-hidden="true"></i>
+                        Belum ada sertifikat. Sertifikat akan muncul di sini setelah Anda mengikuti kegiatan yang menerbitkan sertifikat.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <Pagination :links="datas.links" align="end" />
         </div>
     </div>
     <iframe id="downloadFrame" style="visibility: hidden;"></iframe>
@@ -144,5 +157,13 @@
 </script>
 
 <style>
-
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
 </style>

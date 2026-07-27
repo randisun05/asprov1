@@ -30,6 +30,10 @@
                 <div class="row text-center">
                     <h3>Daftar Merchandise</h3>
                 </div>
+                <div v-if="!merchans.data.length" class="text-center py-5 text-muted">
+                    <i class="fa fa-shopping-bag fa-3x mb-3 d-block" aria-hidden="true"></i>
+                    Belum ada merchandise yang tersedia saat ini.
+                </div>
                 <div class="row mb-4">
                     <div v-for="(merchan, index) in merchans.data" :key="index" class="col-md-4 mt-5">
                         <div class="news_item shadow">

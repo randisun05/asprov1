@@ -28,6 +28,10 @@
             <div class="row text-center">
                     <h3>Daftar Berita</h3>
                 </div>
+            <div v-if="!posts.data.length" class="text-center py-5 text-muted">
+                <i class="fa fa-newspaper-o fa-3x mb-3 d-block" aria-hidden="true"></i>
+                Belum ada berita yang tersedia saat ini.
+            </div>
             <div class="row mb-4">
                 <div v-for="(post, index) in posts.data" :key="index" class="col-md-4 py-3">
                     <div class="news_item shadow text-center">

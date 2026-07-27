@@ -28,6 +28,10 @@
                 <div class="row text-center">
                     <h3>Daftar Kegiatan</h3>
                 </div>
+                <div v-if="!events.data.length" class="text-center py-5 text-muted">
+                    <i class="fa fa-calendar-o fa-3x mb-3 d-block" aria-hidden="true"></i>
+                    Belum ada kegiatan yang tersedia saat ini.
+                </div>
                 <div class="row mb-4">
                     <div v-for="(event, index) in events.data" :key="index" class="col-md-4 mt-5">
                         <div class="news_item shadow">
