@@ -227,6 +227,20 @@
 
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <span class="text-black">
+                                            Biaya Poin untuk Ikut Kegiatan
+                                        </span>
+                                        <div class="form-group mt-1">
+                                            <input type="number" min="0" class="form-control"
+                                                placeholder="0 = gratis, tidak pakai poin" v-model="form.point_cost">
+                                        </div>
+                                        <div v-if="errors.point_cost" class="alert alert-danger mt-2">
+                                            {{ errors.point_cost }}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="row d-flex justify-content-center">
                                 <div class="col-md-2">
@@ -282,6 +296,7 @@ export default {
     props: {
         errors: Object,
         event: Object,
+        pointCost: [Number, String],
         templates: Array
     },
 
@@ -305,6 +320,7 @@ export default {
             duration: props.event.duration,
             start_at: props.event.start_at,
             end_at: props.event.end_at,
+            point_cost: props.pointCost,
         });
 
 
@@ -328,6 +344,7 @@ export default {
                 duration: form.duration,
                 start_at: form.start_at,
                 end_at: form.end_at,
+                point_cost: form.point_cost,
             }, {
                 onSuccess: () => {
                     //show success alert

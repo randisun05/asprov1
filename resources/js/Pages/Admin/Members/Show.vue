@@ -298,6 +298,78 @@
                     </div>
                 </div>
 
+                <div class="col-sm-12 card shadow mt-4" v-if="memberId">
+                    <div class="py-4">
+                        <span> Poin Anggota </span>
+                    </div>
+
+                    <div class="row ms-2 mb-3">
+                        <div class="col-md-6 col-sm-6">
+                            <span class="text-black"> Saldo Poin Saat Ini </span>
+                            <div class="form-group mt-1">
+                                <h4 class="mb-0">{{ points }}</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form @submit.prevent="submitReward" class="row ms-2 mb-3 align-items-end">
+                        <div class="col-md-3 col-sm-4">
+                            <span class="text-black"> Jumlah Poin </span>
+                            <div class="form-group mt-1">
+                                <input type="number" min="1" class="form-control" v-model="rewardForm.amount" required>
+                            </div>
+                            <div v-if="rewardForm.errors.amount" class="alert alert-danger mt-2 py-1 px-2">
+                                {{ rewardForm.errors.amount }}
+                            </div>
+                        </div>
+                        <div class="col-md-5 col-sm-4">
+                            <span class="text-black"> Keterangan (opsional) </span>
+                            <div class="form-group mt-1">
+                                <input type="text" class="form-control" v-model="rewardForm.description"
+                                    placeholder="Misal: reward keaktifan bulan ini">
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-4">
+                            <button type="submit" class="btn btn-md btn-primary border-0 shadow w-100"
+                                :disabled="rewardForm.processing">
+                                Beri Poin
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="row ms-2 mb-3" v-if="pointTransactions.length">
+                        <div class="col-12 table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Tipe</th>
+                                        <th>Jumlah</th>
+                                        <th>Saldo Setelah</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="trx in pointTransactions" :key="trx.id">
+                                        <td>{{ trx.created_at }}</td>
+                                        <td>
+                                            <span class="badge" :class="trx.type === 'reward' ? 'bg-success' : 'bg-danger'">
+                                                {{ trx.type === 'reward' ? 'Reward' : 'Redeem' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ trx.type === 'reward' ? '+' : '-' }}{{ trx.amount }}</td>
+                                        <td>{{ trx.balance_after }}</td>
+                                        <td>{{ trx.description ?? (trx.event ? trx.event.title : '-') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row ms-2 mb-3" v-else>
+                        <span class="text-muted">Belum ada riwayat transaksi poin.</span>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
@@ -317,7 +389,7 @@ import { reactive } from "vue";
 import Swal from "sweetalert2";
 
 //import inertia adapter
-import { router } from "@inertiajs/vue3";
+import { router, useForm } from "@inertiajs/vue3";
 
 export default {
     data() {
@@ -346,6 +418,9 @@ export default {
         errors: Object,
         session: Object,
         data: Object,
+        memberId: [Number, String],
+        points: [Number, String],
+        pointTransactions: Array,
     },
 
     //define composition API
@@ -396,10 +471,25 @@ export default {
             return `/storage/${imageName}`;
         }
 
+        // Point reward form
+        const rewardForm = useForm({
+            amount: '',
+            description: '',
+        });
+
+        const submitReward = () => {
+            rewardForm.post(`/admin/members/${props.memberId}/points/reward`, {
+                preserveScroll: true,
+                onSuccess: () => rewardForm.reset(),
+            });
+        };
+
         //return form state and submit method
         return {
             form,
-            getImageUrl
+            getImageUrl,
+            rewardForm,
+            submitReward,
         };
     },
 };

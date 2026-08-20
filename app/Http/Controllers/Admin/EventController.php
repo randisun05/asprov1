@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Event;
 use App\Models\Member;
+use App\Models\EventPoint;
 use App\Models\Certificate;
 use App\Models\DetailEvent;
 use Illuminate\Support\Str;
@@ -77,6 +78,7 @@ class EventController extends Controller
         'duration' => 'required|integer',
         'start_at' => 'required|date',
         'end_at' => 'required|date|after_or_equal:start_at',
+        'point_cost' => 'nullable|integer|min:0',
     ]);
 
     $slug = strtolower(str_replace(' ', '-', $request->title));
@@ -86,7 +88,7 @@ class EventController extends Controller
         $image = $request->file('image')->storePublicly('/images');
         // Proceed with storing or processing the uploaded file
     };
-        Event::create([
+        $event = Event::create([
             'title' => $request->title,
             'date' => $request->date,
             'participant' => $request->participant,
@@ -103,6 +105,11 @@ class EventController extends Controller
             'start_at' => $request->start_at,
             'end_at' => $request->end_at,
         ]);
+
+        EventPoint::updateOrCreate(
+            ['event_id' => $event->id],
+            ['point_cost' => $request->point_cost ?? 0]
+        );
 
      //redirect
      return redirect()->route('admin.events.index');
@@ -181,6 +188,7 @@ class EventController extends Controller
          $templates = TemplateCertificate::all();
         return inertia('Admin/Events/Edit', [
             'event' => $event,
+            'pointCost' => $event->point_cost,
             'templates' => $templates,
         ]);
 
@@ -212,6 +220,7 @@ class EventController extends Controller
         'duration' => 'required|integer',
         'start_at' => 'required|date',
         'end_at' => 'required|date|after_or_equal:start_at',
+        'point_cost' => 'nullable|integer|min:0',
 
     ]);
 
@@ -242,6 +251,11 @@ class EventController extends Controller
             'start_at' => $request->start_at,
             'end_at' => $request->end_at,
         ]);
+
+        EventPoint::updateOrCreate(
+            ['event_id' => $id],
+            ['point_cost' => $request->point_cost ?? 0]
+        );
 
 
      //redirect

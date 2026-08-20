@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Member;
 use App\Models\instansi;
+use App\Services\PointService;
 use App\Exports\RecapExport;
 use Illuminate\Http\Request;
 use App\Exports\MemberExport;
@@ -105,12 +106,25 @@ class DataMembersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, PointService $pointService)
     {
         if (auth()->user()->role === 'keanggotaan' || auth()->user()->role === 'administrator' || auth()->user()->role === 'pendanaan') {
             $data = ProfileDataPosition::where('id',$id)->with('main')->first();
+
+            $member = Member::where('nip', $data->main->nip)->first();
+            $points = null;
+            $pointTransactions = [];
+
+            if ($member) {
+                $points = $pointService->getBalance($member);
+                $pointTransactions = $member->pointTransactions()->with('event', 'creator')->limit(20)->get();
+            }
+
             return inertia('Admin/Members/Show', [
-               'data' => $data
+               'data' => $data,
+               'memberId' => $member?->id,
+               'points' => $points,
+               'pointTransactions' => $pointTransactions,
             ]);
             } else {
             return redirect()->route('admin.dashboard')->with('error','anda tidak memiliki akses ke halaman tersebut');

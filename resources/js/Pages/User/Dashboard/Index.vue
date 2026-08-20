@@ -114,6 +114,14 @@
                             <a href="/user/jurnals/show" class="btn btnprimary btn-sm">Lihat Laporan Lengkap</a>
                         </div>
                     </div>
+
+                    <div class="card shadow top60 mb-4 text-center" style="min-width:200px;">
+                        <div class="card-body">
+                            <h5 class="mb-3">Poin Anggota</h5>
+                            <h2 class="mb-3">{{ points }}</h2>
+                            <Link href="/user/points" class="btn btnprimary btn-sm">Lihat Riwayat</Link>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -313,6 +321,7 @@ export default {
         qrCode: String,
         summary: Object,
         finance: Object,
+        points: [Number, String],
     },
 
     //inisialisasi composition API

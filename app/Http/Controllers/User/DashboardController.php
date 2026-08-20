@@ -10,6 +10,7 @@ use App\Models\Member;
 use App\Models\Jurnal;
 use Illuminate\Support\Str;
 use App\Models\Merchan;
+use App\Services\PointService;
 use App\Models\Achievement;
 use App\Models\Certificate;
 use App\Models\DetailEvent;
@@ -82,6 +83,8 @@ class DashboardController extends Controller
 
         $finance = $this->financeSummary();
 
+        $points = app(PointService::class)->getBalance($user);
+
         $foto = ProfileDataMain::where('nip', $main->nip)->first('image');
 
         if (!$user->qr_link) {
@@ -103,6 +106,7 @@ class DashboardController extends Controller
             'formattedDate' => $formattedDate,
             'summary' => $summary,
             'finance' => $finance,
+            'points' => $points,
         ]);
     }
 

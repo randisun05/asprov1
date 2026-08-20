@@ -13,6 +13,12 @@
                                         <i class="fa fa-file-pdf" aria-hidden="true"></i>
                                         Report</Link>
                                     </div>
+                                    <div class="col-md-2 col-12 mb-2">
+                                        <Link href="/admin/points/reward-group" class="btn btn-md btn-primary border-0 shadow w-100"
+                                            type="button">
+                                        <i class="fa fa-star" aria-hidden="true"></i>
+                                        Reward Poin Massal</Link>
+                                    </div>
                                     <div class="col-md-6 col-12 mb-2">
                                         <form @submit.prevent="handleSearch">
                                             <div class="input-group">

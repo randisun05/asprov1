@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Models\Event;
 use App\Models\Member;
+use App\Services\PointService;
 use Barryvdh\DomPDF\PDF;
 use App\Models\Certificate;
 use App\Models\DetailEvent;
@@ -11,9 +12,11 @@ use App\Mail\SendEmailEvent;
 use Illuminate\Http\Request;
 use GuzzleHttp\Promise\Create;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
 use F9WebLtd\QrCode\Facades\QrCode;
+use App\Exceptions\InsufficientPointsException;
 
 class EventController extends Controller
 {
@@ -60,6 +63,8 @@ class EventController extends Controller
                 return redirect()->route('user.events.index')->with('error', 'Pendaftaran untuk kegiatan ini sudah ditutup.');
             }
 
+            $document = null;
+
             if ($event->file == "Y") {
                 $request->validate([
                     'document' => 'required',
@@ -68,19 +73,42 @@ class EventController extends Controller
                 $document = $request->file('document')->storePublicly('/documents');
             }
 
+            $member = auth()->guard('member')->user();
 
-            $detailEvent = DetailEvent::firstOrCreate(
-                [
-                    'event_id' => $id,
-                    'member_id' => auth()->guard('member')->user()->id,
-                ],
-                [
-                    'title' => "peserta",
-                    'status' => "approved",
-                    'desc' => $document ?? null,
-                    'duration' => $event->duration * 60000 ?? null,
-                ]
-            );
+            try {
+                $detailEvent = DB::transaction(function () use ($event, $member, $id, $document) {
+                    // Lock so a concurrent double-submit can't both pass the
+                    // "not yet joined" check and get charged points twice.
+                    $existing = DetailEvent::where('event_id', $id)
+                        ->where('member_id', $member->id)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if ($existing) {
+                        return $existing;
+                    }
+
+                    app(PointService::class)->redeemForEvent($member, $event);
+
+                    return DetailEvent::create([
+                        'event_id' => $id,
+                        'member_id' => $member->id,
+                        'title' => "peserta",
+                        'status' => "approved",
+                        'desc' => $document ?? null,
+                        'duration' => $event->duration * 60000 ?? null,
+                    ]);
+                });
+            } catch (InsufficientPointsException $e) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => $e->getMessage(),
+                    ], 422);
+                }
+
+                return redirect()->route('user.events.index')->with('error', $e->getMessage());
+            }
 
             if ($detailEvent->wasRecentlyCreated) {
                 if ($request->expectsJson()) {
@@ -139,7 +167,8 @@ class EventController extends Controller
     public function show(Event $event)
     {
         if (auth()->guard('member')->check()) {
-            $memberId = auth()->guard('member')->user()->id;
+            $member = auth()->guard('member')->user();
+            $memberId = $member->id;
             $status = $memberId ? 1 : 0;
 
             if ($memberId) {
@@ -160,6 +189,8 @@ class EventController extends Controller
                 'status' => $status,
                 'detailEvent' => $detailEvent,
                 'hadir' => $hadir ?? 0,
+                'pointCost' => $event->point_cost,
+                'memberPoints' => app(PointService::class)->getBalance($member),
             ]);
         } else {
             return redirect()->route('login');

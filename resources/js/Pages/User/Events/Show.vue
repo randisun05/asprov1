@@ -39,6 +39,8 @@
                                     <h5 class="darkcolor mb-2">Kuota Peserta : {{ event.participant }}</h5>
                                     <h5 class="darkcolor mb-2">Penutupan Pendaftaran : {{ event.enddate }}</h5>
                                     <h5 class="darkcolor mb-2">Pelaksanaan : {{ event.place }}</h5>
+                                    <h5 v-if="pointCost > 0" class="darkcolor mb-2">Biaya Poin : {{ pointCost }} poin (Saldo Anda: {{ memberPoints }})</h5>
+                                    <h5 v-else class="darkcolor mb-2">Biaya Poin : Gratis</h5>
                                 </ul>
 
                                 <div v-html="event.body" style="text-align:justify;text-justify: "></div>
@@ -59,8 +61,11 @@
 
                                     </div>
                                 <div class="text-center">
-                                    <button v-if="event.status === 'active' && status == 0" @click.prevent="join(event.id)"
+                                    <button v-if="event.status === 'active' && status == 0 && memberPoints >= pointCost" @click.prevent="join(event.id)"
                                         class="button btnprimary border-0 me-2 mt-4"> Join </button>
+                                        <div v-if="event.status === 'active' && status == 0 && memberPoints < pointCost" class="alert alert-danger d-inline-block mt-4">
+                                            Poin Anda tidak cukup untuk mengikuti kegiatan ini.
+                                        </div>
                                         <button v-if="event.status === 'active' && status == 1"
                                         class="button btnthrid border-0 me-2 mt-4"> Anda Sudah Terdaftar</button>
                                         <button v-if="event.status === 'active' && status == 1"
@@ -127,6 +132,8 @@ export default {
         status: Object,
         detailEvent: Object,
         hadir: Object,
+        pointCost: [Number, String],
+        memberPoints: [Number, String],
     },
 
     //inisialisasi composition API

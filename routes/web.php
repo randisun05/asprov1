@@ -127,6 +127,9 @@ Route::prefix('admin')->group(function() {
         Route::get('/members/report', [\App\Http\Controllers\Admin\DataMembersController::class, 'indexReport'])->name('admin.member.report');
         Route::get('/members/report/recap', [\App\Http\Controllers\Admin\DataMembersController::class, 'recapitulation'])->name('admin.member.report.recap');
         Route::resource('/members', \App\Http\Controllers\Admin\DataMembersController::class, ['as' => 'admin']);
+        Route::post('/members/{id}/points/reward', [\App\Http\Controllers\Admin\PointController::class, 'reward'])->name('admin.members.points.reward');
+        Route::get('/points/reward-group', [\App\Http\Controllers\Admin\PointController::class, 'rewardGroupForm'])->name('admin.points.reward-group');
+        Route::post('/points/reward-group', [\App\Http\Controllers\Admin\PointController::class, 'rewardGroup'])->name('admin.points.reward-group.store');
 
         Route::middleware('role:administrator')->group(function () {
             Route::resource('/achievements', \App\Http\Controllers\Admin\AchievementController::class, ['as' => 'admin']);
@@ -243,6 +246,7 @@ Route::prefix('user')->group(function() {
         Route::get('/certificates', [\App\Http\Controllers\User\EventController::class, 'certificatesIndex'])->name('user.certificates.index');
         Route::get('/certificates/{id}', [\App\Http\Controllers\User\EventController::class, 'certificateView'])->name('admin.events.certificates.view');
          Route::get('/jurnals/show', [\App\Http\Controllers\User\JurnalController::class, 'show'])->name('user.jurnals.show');
+        Route::get('/points', [\App\Http\Controllers\User\PointController::class, 'index'])->name('user.points.index');
 
         //route exam confirmation
         Route::get('/tryouts', [App\Http\Controllers\User\TryoutController::class, 'index'])->name('user.tryouts.index');

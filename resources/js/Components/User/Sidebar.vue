@@ -72,6 +72,17 @@
                   </Link>
               </li>
 
+              <li class="nav-item" :class="{ 'active': $page.url.startsWith('/user/points') }">
+                  <Link href="/user/points" class="nav-link d-flex justify-content-between">
+                  <span>
+                      <span class="sidebar-icon">
+                        <i class="fa fa-star"></i>
+                      </span>
+                      <span class="sidebar-text ms-3">Poin</span>
+                  </span>
+                  </Link>
+              </li>
+
        </ul>
     </div>
  </nav>

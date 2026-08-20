@@ -52,4 +52,14 @@ class Event extends Model
         return $this->hasMany(DetailEvent::class);
     }
 
+    public function eventPoint()
+    {
+        return $this->hasOne(EventPoint::class);
+    }
+
+    public function getPointCostAttribute(): int
+    {
+        return $this->eventPoint?->point_cost ?? 0;
+    }
+
 }

@@ -37,5 +37,9 @@ class Member extends Authenticatable
         return $this->hasOne(ProfileDataMain::class, 'nip', 'nip');
     }
 
+    public function pointTransactions()
+    {
+        return $this->hasMany(PointTransaction::class)->latest();
+    }
 
 }
