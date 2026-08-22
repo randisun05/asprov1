@@ -7,7 +7,7 @@
                         <div class="col-md-12 mb-3">
                             <button class="btn btn-primary" @click="openAddModal"><i
                                 class="fa fa-plus-circle"></i>Tambah</button>
-                                <a v-if="$page.props.auth.user.role === 'bendahara' || $page.props.auth.user.role === 'administrator'" href="/admin/jurnals/export" class="btn btn-success ms-2"><i class="fa fa-excel"></i> Report</a>
+                                <a v-if="$page.props.auth.user.role === 'pendanaan' || $page.props.auth.user.role === 'administrator'" href="/admin/jurnals/export" class="btn btn-success ms-2"><i class="fa fa-excel"></i> Report</a>
                             </div>
                         </div>
                     <div class="row mt-1">
@@ -39,7 +39,7 @@
                                                     <td>{{ jurnal.type === 'debit' ? formatCurrency(jurnal.nominal) : 0 }}</td>
                                                     <td :class="{ 'text-danger': jurnal.type === 'kredit' }">{{ jurnal.type === 'kredit' ? formatCurrency(jurnal.nominal) : 0 }}</td>
                                                     <td>{{ formatCurrency(jurnal.saldo) }}</td>
-                                                           <td class="text-center" v-if="$page.props.auth.user.role === 'bendahara' || $page.props.auth.user.role === 'administrator'">
+                                                           <td class="text-center" v-if="$page.props.auth.user.role === 'pendanaan' || $page.props.auth.user.role === 'administrator'">
                                                         <button @click.prevent="openEditModal(jurnal)" class="btn btn-sm btn-primary border-0 me-2">
                                                             <i class="fa fa-pencil" title="edit"></i>
                                                         </button>
@@ -141,11 +141,6 @@
                         form.value.bukti = event.target.files[0];
                     };
 
-                    const updateImage = (event) => {
-                        form.media = event.target.files[0];
-                    };
-
-
                     const openAddModal = () => {
                         isEdit.value = false;
                         form.value = {
@@ -193,13 +188,6 @@
                                 });
                             },
                             onSuccess: () => {
-                                Swal.fire({
-                                    title: 'Success!',
-                                    text: 'Data berhasil disimpan.',
-                                    icon: 'success',
-                                    timer: 2000,
-                                    showConfirmButton: false,
-                                });
                                 const modal = bootstrap.Modal.getInstance(document.getElementById('formModal'));
                                 if (modal) modal.hide();
                                 form.value = {
@@ -254,13 +242,6 @@
             });
         },
         onSuccess: () => {
-            Swal.fire({
-                title: 'Success!',
-                text: 'Data berhasil diperbarui.',
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false,
-            });
             const modal = bootstrap.Modal.getInstance(document.getElementById('formModal'));
             if (modal) modal.hide();
             form.value = {
@@ -288,13 +269,6 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 router.delete(`/admin/jurnals/${id}`);
-                                Swal.fire({
-                                    title: 'Deleted!',
-                                    text: 'Pencatatan Berhasil Dihapus!.',
-                                    icon: 'success',
-                                    timer: 2000,
-                                    showConfirmButton: false,
-                                });
                             }
                         });
                     };

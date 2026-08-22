@@ -7,6 +7,7 @@ use App\Models\Jurnal;
 use Illuminate\Http\Request;
 use App\Exports\KeuanganReport;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 
@@ -62,32 +63,38 @@ class JurnalController extends Controller
         'bukti' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
     ]);
 
-        $saldo = Jurnal::latest()->first()->saldo ?? 0;
-        $lastJurnal = Jurnal::latest()->first();
-        $nomor = $lastJurnal ? $lastJurnal->nomor + 1 : 1;
-
         if ($request->hasFile('bukti')) {
             $bukti = $request->file('bukti')->storePublicly('/jurnal');
             } else {
             $bukti = null;
         }
 
+        // Locked so two concurrent submissions can't read the same "last"
+        // row and compute the same nomor/saldo - there's no unique
+        // constraint on nomor to catch that, so it would fail silently.
+        DB::transaction(function () use ($request, $bukti) {
+            DB::table('jurnal_ledger_locks')->lockForUpdate()->first();
 
-        Jurnal::create([
-            'title' => $request->title,
-            'nominal' => $request->nominal,
-            'type' => $request->type,
-            'saldo' => $request->type === 'kredit' ? $saldo - $request->nominal : $saldo + $request->nominal,
-            'nomor' => $nomor,
-            'coa' => $request->coa,
-            'keterangan' => $request->keterangan,
-            'kategori' => 'pusat',
-            'date' => $request->date,
-            'bukti' => $bukti,
-        ]);
+            $lastJurnal = Jurnal::orderBy('nomor', 'desc')->first();
+            $saldo = $lastJurnal->saldo ?? 0;
+            $nomor = $lastJurnal ? $lastJurnal->nomor + 1 : 1;
+
+            Jurnal::create([
+                'title' => $request->title,
+                'nominal' => $request->nominal,
+                'type' => $request->type,
+                'saldo' => $request->type === 'kredit' ? $saldo - $request->nominal : $saldo + $request->nominal,
+                'nomor' => $nomor,
+                'coa' => $request->coa,
+                'keterangan' => $request->keterangan,
+                'kategori' => 'pusat',
+                'date' => $request->date,
+                'bukti' => $bukti,
+            ]);
+        });
 
      //redirect
-     return redirect()->route('admin.jurnals.index');
+     return redirect()->route('admin.jurnals.index')->with('success', 'Transaksi jurnal berhasil ditambahkan.');
         } else {
             return redirect()->route('admin.jurnals.index')->with('error', 'anda tidak memiliki akses ke halaman tersebut');
         }
@@ -167,6 +174,7 @@ class JurnalController extends Controller
             'nominal' => 'required|numeric',
             'type' => 'required',
             'date' => 'required|date',
+            'bukti' => 'file|mimes:jpg,jpeg,png,pdf|max:2048|nullable',
 
             ]);
 
@@ -175,33 +183,40 @@ class JurnalController extends Controller
             if ($jurnal->bukti) {
                 Storage::delete($jurnal->bukti);
             }
-            $bukti = $request->file('bukti')->storePublicly('/documents');
+            $bukti = $request->file('bukti')->storePublicly('/jurnal');
             } else {
             $bukti = $jurnal->bukti;
             }
 
-            $jurnal->update([
-            'title' => $request->title,
-            'nominal' => $request->nominal,
-            'type' => $request->type,
-            'coa' => $request->coa,
-            'keterangan' => $request->keterangan,
-            'kategori' => 'pusat',
-            'bukti' => $bukti,
-            'date' => $request->date,
-            ]);
+            // Locked so this recalculation can't interleave with a
+            // concurrent store()/destroy() touching the same saldo chain.
+            DB::transaction(function () use ($request, $jurnal, $bukti) {
+                DB::table('jurnal_ledger_locks')->lockForUpdate()->first();
 
-            // Recalculate saldo starting from the updated record
-            $jurnals = Jurnal::where('nomor', '>=', $jurnal->nomor)->orderBy('nomor', 'asc')->get();
-            $saldo = $jurnal->nomor > 1
-            ? optional(Jurnal::where('nomor', '<', $jurnal->nomor)->orderBy('nomor', 'desc')->first())->saldo ?? 0
-            : 0;
+                $jurnal->update([
+                'title' => $request->title,
+                'nominal' => $request->nominal,
+                'type' => $request->type,
+                'coa' => $request->coa,
+                'keterangan' => $request->keterangan,
+                'kategori' => 'pusat',
+                'bukti' => $bukti,
+                'date' => $request->date,
+                ]);
 
-            foreach ($jurnals as $item) {
-            $saldo = $item->type === 'kredit' ? $saldo - $item->nominal : $saldo + $item->nominal;
-            $item->update(['saldo' => $saldo]);
-            }
-            return redirect()->route('admin.jurnals.index');
+                // Recalculate saldo starting from the updated record
+                $jurnals = Jurnal::where('nomor', '>=', $jurnal->nomor)->orderBy('nomor', 'asc')->get();
+                $saldo = $jurnal->nomor > 1
+                ? optional(Jurnal::where('nomor', '<', $jurnal->nomor)->orderBy('nomor', 'desc')->first())->saldo ?? 0
+                : 0;
+
+                foreach ($jurnals as $item) {
+                $saldo = $item->type === 'kredit' ? $saldo - $item->nominal : $saldo + $item->nominal;
+                $item->update(['saldo' => $saldo]);
+                }
+            });
+
+            return redirect()->route('admin.jurnals.index')->with('success', 'Transaksi jurnal berhasil diperbarui.');
         } else {
             return redirect()->route('admin.jurnals.index')->with('error', 'anda tidak memiliki akses ke halaman tersebut');
         }
@@ -219,25 +234,32 @@ class JurnalController extends Controller
     {
         if (auth()->check() && (auth()->user()->role === 'administrator' || auth()->user()->role === 'pendanaan')) {
             $jurnal = Jurnal::findOrFail($id);
-        // Get the previous transaction's saldo
-        $previousSaldo = $jurnal->nomor > 1
-            ? optional(Jurnal::where('nomor', '<', $jurnal->nomor)->orderBy('nomor', 'desc')->first())->saldo ?? 0
-            : 0;
 
-        // Delete the current transaction
-        $jurnal->delete();
+            // Locked so this recalculation can't interleave with a
+            // concurrent store()/update() touching the same saldo chain.
+            DB::transaction(function () use ($jurnal) {
+                DB::table('jurnal_ledger_locks')->lockForUpdate()->first();
 
-        // Recalculate saldo for subsequent transactions
-        $jurnals = Jurnal::where('nomor', '>', $jurnal->nomor)->orderBy('nomor', 'asc')->get();
-        $saldo = $previousSaldo;
+                // Get the previous transaction's saldo
+                $previousSaldo = $jurnal->nomor > 1
+                    ? optional(Jurnal::where('nomor', '<', $jurnal->nomor)->orderBy('nomor', 'desc')->first())->saldo ?? 0
+                    : 0;
 
-        foreach ($jurnals as $item) {
-            $saldo = $item->type === 'kredit' ? $saldo - $item->nominal : $saldo + $item->nominal;
-            $item->update(['saldo' => $saldo]);
-        }
+                // Delete the current transaction
+                $jurnal->delete();
+
+                // Recalculate saldo for subsequent transactions
+                $jurnals = Jurnal::where('nomor', '>', $jurnal->nomor)->orderBy('nomor', 'asc')->get();
+                $saldo = $previousSaldo;
+
+                foreach ($jurnals as $item) {
+                    $saldo = $item->type === 'kredit' ? $saldo - $item->nominal : $saldo + $item->nominal;
+                    $item->update(['saldo' => $saldo]);
+                }
+            });
 
         //redirect
-        return redirect()->route('admin.jurnals.index');
+        return redirect()->route('admin.jurnals.index')->with('success', 'Transaksi jurnal berhasil dihapus.');
         } else {
             return redirect()->route('admin.jurnals.index')->with('error', 'anda tidak memiliki akses ke halaman tersebut');
         }

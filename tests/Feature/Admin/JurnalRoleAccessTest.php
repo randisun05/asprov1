@@ -38,9 +38,15 @@ class JurnalRoleAccessTest extends TestCase
         Storage::fake('public');
         $humas = $this->makeAdminUser('humas');
 
+        // The jurnal routes are now gated by role:administrator,pendanaan
+        // middleware (previously only store/update/destroy/exportReport
+        // checked the role, and only inside the controller - index/show/
+        // create/edit were readable by any admin regardless of role), so
+        // an unrelated role is rejected before it ever reaches the
+        // controller.
         $response = $this->actingAs($humas)->post('/admin/jurnals', $this->payload());
 
-        $response->assertSessionHas('error');
+        $response->assertForbidden();
         $this->assertDatabaseMissing('jurnals', ['title' => 'Iuran Anggota']);
     }
 }
