@@ -108,6 +108,8 @@ Route::prefix('admin')->group(function() {
             Route::post('/events/{id}/absenall', [\App\Http\Controllers\Admin\EventController::class, 'absenAll'])->name('admin.events.absenall');
             Route::get('/members/find/{nip}', [\App\Http\Controllers\Admin\EventController::class, 'findMemberByNip']);
             Route::post('/events/{id}/enroll', [\App\Http\Controllers\Admin\EventController::class, 'enrollMember'])->name('admin.events.enroll');
+            Route::get('/events/{id}/questions', [\App\Http\Controllers\Admin\EventController::class, 'questionBank'])->name('admin.events.questions');
+            Route::post('/events/{id}/questions/sync', [\App\Http\Controllers\Admin\EventController::class, 'syncQuestions'])->name('admin.events.questions.sync');
             Route::resource('/events', \App\Http\Controllers\Admin\EventController::class, ['as' => 'admin']);
             Route::post('/medias/{id}', [\App\Http\Controllers\Admin\MediaController::class, 'update'])->name('admin.medias.update');
             Route::resource('/medias', \App\Http\Controllers\Admin\MediaController::class, ['as' => 'admin']);
@@ -183,6 +185,9 @@ Route::prefix('admin')->group(function() {
 
             //soal
             Route::resource('/questions', \App\Http\Controllers\Admin\QuestionsController::class, ['as' => 'admin']);
+
+            //kelompok soal (bank soal)
+            Route::resource('/question-categories', \App\Http\Controllers\Admin\QuestionCategoriesController::class, ['as' => 'admin']);
         });
 
     });

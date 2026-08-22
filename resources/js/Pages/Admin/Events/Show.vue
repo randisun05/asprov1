@@ -137,6 +137,12 @@
                                         </li>
 
                                         <li class="nav-item ms-2">
+                                            <Link :href="`/admin/events/${event.id}/questions`" class="btn btn-primary w-100">
+                                                Kelola Soal
+                                            </Link>
+                                        </li>
+
+                                        <li class="nav-item ms-2">
                                             <button class="btn btn-primary w-100" @click="GenerateQuests">
                                                 Generate Soal
                                             </button>

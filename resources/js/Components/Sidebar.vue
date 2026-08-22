@@ -169,6 +169,17 @@
                     </Link>
                 </li>
 
+                <li class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/question-categories') }">
+                    <Link href="/admin/question-categories" class="nav-link d-flex justify-content-between">
+                    <span>
+                        <span class="sidebar-icon">
+                           <i class="fa fa-layer-group fa-lg" aria-hidden="true"></i>
+                        </span>
+                        <span class="sidebar-text ms-3">Kelompok Soal</span>
+                    </span>
+                    </Link>
+                </li>
+
 
          </ul>
       </div>

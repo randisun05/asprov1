@@ -29,16 +29,16 @@
                             <div class="row py-4 ms-5">
                                 <div class="col-md-5">
                                     <span class="text-black">
-                                        Pilih Event
+                                        Kelompok Soal
                                     </span>
-                                    <select class="form-select" v-model="form.event_id">
-                                        <option value="" disabled>Pilih Event</option>
-                                        <option :value="event.id" v-for="(event, index) in $page.props.events" :key="index">
-                                            {{ event.title }}
+                                    <select class="form-select" v-model="form.question_category_id">
+                                        <option value="" disabled>Pilih Kelompok Soal</option>
+                                        <option :value="category.id" v-for="(category, index) in $page.props.categories" :key="index">
+                                            {{ category.title }}
                                         </option>
                                     </select>
-                                <div v-if="errors.event_id" class="alert alert-danger mt-2">
-                                    {{ errors.event_id }}
+                                <div v-if="errors.question_category_id" class="alert alert-danger mt-2">
+                                    {{ errors.question_category_id }}
                                 </div>
                             </div>
 
@@ -105,7 +105,7 @@ export default {
     //props
     props: {
         errors: Object,
-        events: Array,
+        categories: Array,
     },
 
 
@@ -115,6 +115,7 @@ export default {
         //define form state
         const form = reactive({
             file: null,
+            question_category_id: '',
         });
 
 
@@ -122,7 +123,7 @@ export default {
         const submit = () => {
 
             //send data to server
-            router.post('/admin/questions/' + form.event_id + '/import', {
+            router.post('/admin/questions/' + form.question_category_id + '/import', {
 
                 //data
                 file: form.file,

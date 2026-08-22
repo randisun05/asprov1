@@ -8,11 +8,11 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class QuestionsImport implements ToModel, WithHeadingRow
 {
-    protected $event_id;
+    protected $question_category_id;
 
-    public function __construct($event_id)
+    public function __construct($question_category_id)
     {
-        $this->event_id = $event_id;
+        $this->question_category_id = $question_category_id;
     }
 
     /**
@@ -23,7 +23,7 @@ class QuestionsImport implements ToModel, WithHeadingRow
     public function model(array $row)
     {
         return new Question([
-            'event_id'  => (int) $this->event_id,
+            'question_category_id'  => (int) $this->question_category_id,
             'text'  => $row['text'],
             'a'  => $row['a'],
             'b'  => $row['b'],

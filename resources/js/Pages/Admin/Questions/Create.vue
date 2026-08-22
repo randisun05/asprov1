@@ -28,16 +28,16 @@
                             <div class="row py-4 ms-5">
                                  <div class="col-md-11">
                                     <span class="text-black">
-                                        Pilih Sesi Tryout
+                                        Kelompok Soal
                                     </span>
-                                    <select class="form-control" v-model="form.event_id">
-                                        <option value="" disabled>Pilih Sesi Tryout</option>
-                                        <option :value="event.id" v-for="(event, index) in $page.props.events" :key="index">
-                                            {{ event.title }}
+                                    <select class="form-control" v-model="form.question_category_id">
+                                        <option value="" disabled>Pilih Kelompok Soal</option>
+                                        <option :value="category.id" v-for="(category, index) in $page.props.categories" :key="index">
+                                            {{ category.title }}
                                         </option>
                                     </select>
-                                    <div v-if="errors.event_id" class="alert alert-danger mt-2">
-                                        {{ errors.event_id }}
+                                    <div v-if="errors.question_category_id" class="alert alert-danger mt-2">
+                                        {{ errors.question_category_id }}
                                     </div>
                                 </div>
                                 <div class="col-md-11">
@@ -199,7 +199,7 @@ export default {
     //props
     props: {
         errors: Object,
-        events: Array,
+        categories: Array,
     },
 
 
@@ -215,7 +215,7 @@ export default {
             d: '',
             e: '',
             answer: '',
-            event_id: '',
+            question_category_id: '',
         });
 
 
@@ -233,7 +233,7 @@ export default {
                 d: form.d,
                 e: form.e,
                 answer: form.answer,
-                event_id: form.event_id,
+                question_category_id: form.question_category_id,
             }, {
                 onSuccess: () => {
                     //show success alert

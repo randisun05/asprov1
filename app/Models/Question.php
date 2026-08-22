@@ -11,6 +11,7 @@ class Question extends Model
 
     protected $fillable = [
         'event_id',
+        'question_category_id',
         'text',
         'a',
         'b',
@@ -23,5 +24,15 @@ class Question extends Model
     public function event()
     {
         return $this->belongsTo(Event::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(QuestionCategory::class, 'question_category_id');
+    }
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_question')->withTimestamps();
     }
 }

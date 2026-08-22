@@ -220,8 +220,8 @@ public function index()
             ]);
         }
 
-        // ambil soal
-        $questions = Question::where('event_id', $event->id)->get();
+        // ambil soal yang sudah dipilih untuk event/tryout ini
+        $questions = $event->questions;
 
         if ($questions->isEmpty()) {
             return response()->json([

@@ -45,7 +45,7 @@ class Event extends Model
 
     public function questions()
     {
-        return $this->hasMany(Question::class);
+        return $this->belongsToMany(Question::class, 'event_question')->withTimestamps();
     }
     public function detailEvents()
     {

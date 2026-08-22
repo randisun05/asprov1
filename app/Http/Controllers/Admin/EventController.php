@@ -7,6 +7,8 @@ use App\Models\Member;
 use App\Models\EventPoint;
 use App\Models\Certificate;
 use App\Models\DetailEvent;
+use App\Models\Question;
+use App\Models\QuestionCategory;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Imports\CertificateImport;
@@ -808,6 +810,71 @@ public function enrollMember(Request $request, $id)
         ]);
 
         return redirect()->back()->with('success', 'Berhasil menambahkan peserta ke event.');
+    }
+
+    /**
+     * Show the question-bank picker for a Tryout/Event: pick a Kelompok Soal,
+     * then choose which of its questions this event uses.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function questionBank($id)
+    {
+        $event = Event::findOrFail($id);
+        $categories = QuestionCategory::withCount('questions')->get();
+
+        $selectedCategoryId = request()->category_id;
+        $questions = collect();
+
+        if ($selectedCategoryId) {
+            $attachedIds = $event->questions()
+                ->where('question_category_id', $selectedCategoryId)
+                ->pluck('questions.id')
+                ->toArray();
+
+            $questions = Question::where('question_category_id', $selectedCategoryId)
+                ->get()
+                ->map(function ($question) use ($attachedIds) {
+                    $question->attached = in_array($question->id, $attachedIds);
+                    return $question;
+                });
+        }
+
+        return inertia('Admin/Events/Questions', [
+            'event' => $event,
+            'categories' => $categories,
+            'selectedCategoryId' => $selectedCategoryId ? (int) $selectedCategoryId : null,
+            'questions' => $questions,
+            'attachedTotal' => $event->questions()->count(),
+        ]);
+    }
+
+    /**
+     * Attach/detach the chosen questions of one Kelompok Soal to this event.
+     * Only the selected category's questions are touched; other categories'
+     * selections for this event are left as-is.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function syncQuestions(Request $request, $id)
+    {
+        $request->validate([
+            'question_category_id' => 'required|exists:question_categories,id',
+            'question_ids' => 'array',
+            'question_ids.*' => 'integer|exists:questions,id',
+        ]);
+
+        $event = Event::findOrFail($id);
+
+        $categoryQuestionIds = Question::where('question_category_id', $request->question_category_id)->pluck('id');
+        $event->questions()->detach($categoryQuestionIds);
+        $event->questions()->attach($request->question_ids ?? []);
+
+        return redirect()->route('admin.events.questions', [$id, 'category_id' => $request->question_category_id])
+            ->with('success', 'Soal untuk tryout ini berhasil diperbarui');
     }
 
     // Tambahkan di controller yang menangani Event

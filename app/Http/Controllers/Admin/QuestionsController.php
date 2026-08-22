@@ -9,6 +9,7 @@ use App\Models\DetailEvent;
 use App\Models\Event;
 use App\Models\Member;
 use App\Models\Question;
+use App\Models\QuestionCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -26,7 +27,7 @@ class QuestionsController extends Controller
         //get exams
         $datas = Question::when(request()->q, function($datas) {
             $datas = $datas->where('text', 'like', '%'. request()->q . '%');
-        })->with('event')->latest()->paginate(5);
+        })->with('category')->latest()->paginate(5);
 
         //append query string to pagination links
         $datas->appends(['q' => request()->q]);
@@ -45,9 +46,9 @@ class QuestionsController extends Controller
      */
     public function create()
     {
-        $events = Event::all();
+        $categories = QuestionCategory::all();
         return inertia('Admin/Questions/Create', [
-            'events' => $events
+            'categories' => $categories
         ]);
 
     }
@@ -69,12 +70,11 @@ class QuestionsController extends Controller
             'd'          => 'nullable',
             'e'          => 'nullable',
             'answer'            => 'required',
-            'event_id'          => 'required',
+            'question_category_id' => 'required|exists:question_categories,id',
         ]);
 
         //create question
         Question::create([
-            'event_id'           => $request->id,
             'text'          => $request->text,
             'a'          => $request->a,
             'b'          => $request->b,
@@ -82,7 +82,7 @@ class QuestionsController extends Controller
             'd'          => $request->d,
             'e'          => $request->e,
             'answer'            => $request->answer,
-            'event_id'          => $request->event_id,
+            'question_category_id' => $request->question_category_id,
         ]);
 
         //redirect
@@ -108,13 +108,13 @@ class QuestionsController extends Controller
      */
     public function edit($id)
     {
-         $events = Event::all();
+         $categories = QuestionCategory::all();
          $data = Question::findOrFail($id);
 
          return inertia('Admin/Questions/Edit',
          [
             'data' => $data,
-            'events' => $events
+            'categories' => $categories
             ]);
     }
 
@@ -136,7 +136,7 @@ class QuestionsController extends Controller
             'd'          => 'nullable',
             'e'          => 'nullable',
             'answer'            => 'required',
-            'event_id'          => 'required',
+            'question_category_id' => 'required|exists:question_categories,id',
         ]);
 
         //update question
@@ -148,7 +148,7 @@ class QuestionsController extends Controller
             'd'          => $request->d,
             'e'          => $request->e,
             'answer'            => $request->answer,
-            'event_id'          => $request->event_id,
+            'question_category_id' => $request->question_category_id,
         ]);
 
         //redirect
@@ -172,10 +172,10 @@ class QuestionsController extends Controller
 
     public function import()
     {
-        $events = Event::all();
+        $categories = QuestionCategory::all();
 
         return inertia('Admin/Questions/Import', [
-            'events' => $events
+            'categories' => $categories
         ]);
     }
 
@@ -230,8 +230,8 @@ class QuestionsController extends Controller
             ]);
         }
 
-        // ambil semua soal
-        $questions = Question::where('event_id', $event->id)->get();
+        // ambil semua soal yang sudah dipilih untuk event/tryout ini
+        $questions = $event->questions;
 
         if ($questions->isEmpty()) {
             return response()->json([

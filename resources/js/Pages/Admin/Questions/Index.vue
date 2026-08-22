@@ -46,6 +46,7 @@
                                                             datas.per_page }}</td>
                                                        
                                                         <td>
+    <span class="badge bg-secondary mb-1">{{ data.category ? data.category.title : 'Tanpa Kelompok' }}</span>
     <div v-html="data.text"></div>
 
     <ol type="A" class="ps-3">
