@@ -226,9 +226,6 @@ import { Head, Link } from "@inertiajs/vue3";
 //import reactive
 import { reactive } from "vue";
 
-//import sweet alert2
-import Swal from "sweetalert2";
-
 //import inertia adapter
 import { router } from "@inertiajs/vue3";
 
@@ -335,18 +332,6 @@ export default {
                     // wyear: form.wyear,
                     // wmonth: form.wmonth,
 
-                },
-                {
-                    onSuccess: () => {
-                        //show success alert
-                        Swal.fire({
-                            title: "Success!",
-                            text: "Data Anggota Berhasil Diupdate.",
-                            icon: "success",
-                            showConfirmButton: false,
-                            timer: 2000,
-                        });
-                    },
                 }
             );
         };

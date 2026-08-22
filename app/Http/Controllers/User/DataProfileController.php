@@ -7,9 +7,6 @@ use App\Models\instansi;
 use App\Models\Member;
 use App\Models\ProfileDataMain;
 use App\Models\ProfileDataPosition;
-use App\Models\refCity;
-use App\Models\refProvince;
-use FontLib\Table\Type\name;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Intervention\Image\ImageManager;
@@ -344,7 +341,7 @@ class DataProfileController extends Controller
                 // 'wmonth' => $request->wmonth,
              ]);
 
-             return redirect()->route('user.profile.jabatan');
+             return redirect()->route('user.profile.jabatan')->with('success', 'Data jabatan berhasil diupdate');
     }
 
         public function updateImage(Request $request)
@@ -354,17 +351,17 @@ class DataProfileController extends Controller
             return redirect()->route('login');
         }
 
-            $image = $request->file('image');
-            if ($image) {
-                $image = $request->file('image')->storePublicly('/images');
-                // Proceed with storing or processing the uploaded file
-            };
             $main = ProfileDataMain::where('nip',auth()->guard('member')->user()->nip)
             ->first();
-            //update data main
-            $main->update([
-                    'image' => $image,
-            ]);
+
+            $image = $request->file('image');
+            if ($image) {
+                // Keep the existing photo when no new file is uploaded
+                // instead of wiping it.
+                $main->update([
+                    'image' => $image->storePublicly('/images'),
+                ]);
+            }
 
             return Inertia::location('/user/profile/edit');
     }

@@ -307,9 +307,6 @@ import { Head, Link } from "@inertiajs/vue3";
 //import reactive
 import { reactive, watch, ref, computed } from "vue";
 
-//import sweet alert2
-import Swal from "sweetalert2";
-
 //import inertia adapter
 import { router } from "@inertiajs/vue3";
 
@@ -362,9 +359,6 @@ export default {
 
         openFileInput() {
             this.$refs.fileInput.click();
-        },
-        updateImage(event) {
-            this.form.image = event.target.files[0];
         },
     },
 
@@ -434,19 +428,6 @@ export default {
                     religion: form.religion,
                     agency: form.agency,
 
-
-                },
-                {
-                    onSuccess: () => {
-                        //show success alert
-                        Swal.fire({
-                            title: "Success!",
-                            text: "Data Anggota Berhasil Diupdate.",
-                            icon: "success",
-                            showConfirmButton: false,
-                            timer: 2000,
-                        });
-                    },
                 }
             );
         };

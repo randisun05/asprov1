@@ -155,6 +155,7 @@ class ProfileUpdateTest extends TestCase
 
         $response->assertRedirect(route('user.profile.jabatan'));
         $response->assertSessionHasNoErrors();
+        $response->assertSessionHas('success');
 
         $main = ProfileDataMain::where('nip', $member->nip)->first();
         $position = ProfileDataPosition::where('main_id', $main->id)->first();
