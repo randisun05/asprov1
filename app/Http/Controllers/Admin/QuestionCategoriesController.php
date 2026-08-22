@@ -54,7 +54,7 @@ class QuestionCategoriesController extends Controller
             'title' => $request->title,
         ]);
 
-        return redirect()->route('admin.question-categories.index');
+        return redirect()->route('admin.question-categories.index')->with('success', 'Kelompok soal berhasil ditambahkan.');
     }
 
     /**
@@ -91,7 +91,7 @@ class QuestionCategoriesController extends Controller
             'title' => $request->title,
         ]);
 
-        return redirect()->route('admin.question-categories.index');
+        return redirect()->route('admin.question-categories.index')->with('success', 'Kelompok soal berhasil diperbarui.');
     }
 
     /**
@@ -104,6 +104,6 @@ class QuestionCategoriesController extends Controller
     {
         QuestionCategory::findOrFail($id)->delete();
 
-        return redirect()->route('admin.question-categories.index');
+        return redirect()->route('admin.question-categories.index')->with('success', 'Kelompok soal berhasil dihapus.');
     }
 }

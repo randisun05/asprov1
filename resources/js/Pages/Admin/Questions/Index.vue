@@ -11,7 +11,7 @@
                                          <Link :href="`/admin/questions/create`" class="btn btn-md btn-primary border-0 shadow me-2" type="button"><i class="fa fa-plus-circle"></i> Tambah</Link>
                                         <Link :href="`/admin/questions/import`" class="btn btn-md btn-success border-0 shadow text-white" type="button"><i class="fa fa-file-excel"></i> Import</Link>
                                     </div>
-                                    <div class="col-md-6 col-12 mb-2">
+                                    <div class="col-md-4 col-12 mb-2">
                                         <form @submit.prevent="handleSearch">
                                             <div class="input-group">
                                                 <input type="text" class="form-control border-0 shadow" v-model="search"
@@ -21,6 +21,14 @@
                                                 </span>
                                             </div>
                                         </form>
+                                    </div>
+                                    <div class="col-md-4 col-12 mb-2">
+                                        <select class="form-control border-0 shadow" v-model="categoryId" @change="handleSearch">
+                                            <option value="">Semua Kelompok Soal</option>
+                                            <option :value="category.id" v-for="(category, index) in categories" :key="index">
+                                                {{ category.title }}
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -121,6 +129,8 @@
                     props: {
                         errors: Object,
                         datas: Object,
+                        categories: Array,
+                        filters: Object,
 
                     },
 
@@ -132,7 +142,8 @@
 
 
                         //define state search
-                        const search = ref('' || (new URL(document.location)).searchParams.get('q'));
+                        const search = ref(props.filters?.q || '');
+                        const categoryId = ref(props.filters?.category_id || '');
 
                         //define method search
                         const handleSearch = () => {
@@ -140,6 +151,22 @@
 
                                 //send params "q" with value from state "search"
                                 q: search.value,
+                                category_id: categoryId.value,
+                            });
+                        }
+
+                        //define method destroy
+                        const destroy = (id) => {
+                            Swal.fire({
+                                title: 'Yakin ingin menghapus soal ini?',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Ya, hapus',
+                                cancelButtonText: 'Batal',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    router.delete(`/admin/questions/${id}`);
+                                }
                             });
                         }
 
@@ -147,7 +174,9 @@
                         //return
                         return {
                             search,
+                            categoryId,
                             handleSearch,
+                            destroy,
 
 
                         }

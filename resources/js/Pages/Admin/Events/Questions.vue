@@ -88,9 +88,6 @@ import {
 //import inertia adapter
 import { router } from '@inertiajs/vue3';
 
-//import sweet alert2
-import Swal from 'sweetalert2';
-
 export default {
     //layout
     layout: LayoutAdmin,
@@ -134,16 +131,6 @@ export default {
             router.post(`/admin/events/${props.event.id}/questions/sync`, {
                 question_category_id: categoryId.value,
                 question_ids: checkedIds.value,
-            }, {
-                onSuccess: () => {
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Soal tryout berhasil diperbarui.',
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                },
             });
         }
 

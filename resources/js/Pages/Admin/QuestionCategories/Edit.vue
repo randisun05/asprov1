@@ -65,9 +65,6 @@ import {
 //import inertia adapter
 import { router } from '@inertiajs/vue3';
 
-//import sweet alert2
-import Swal from 'sweetalert2';
-
 export default {
     //layout
     layout: LayoutAdmin,
@@ -96,16 +93,6 @@ export default {
         const submit = () => {
             router.put('/admin/question-categories/' + props.data.id, {
                 title: form.title,
-            }, {
-                onSuccess: () => {
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Kelompok Soal Berhasil Diupdate.',
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                },
             });
         }
 

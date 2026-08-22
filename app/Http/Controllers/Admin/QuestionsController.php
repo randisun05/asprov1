@@ -27,14 +27,21 @@ class QuestionsController extends Controller
         //get exams
         $datas = Question::when(request()->q, function($datas) {
             $datas = $datas->where('text', 'like', '%'. request()->q . '%');
+        })->when(request()->category_id, function($datas) {
+            $datas = $datas->where('question_category_id', request()->category_id);
         })->with('category')->latest()->paginate(5);
 
         //append query string to pagination links
-        $datas->appends(['q' => request()->q]);
+        $datas->appends(['q' => request()->q, 'category_id' => request()->category_id]);
 
         //render with inertia
         return inertia('Admin/Questions/Index', [
             'datas' => $datas,
+            'categories' => QuestionCategory::all(),
+            'filters' => [
+                'q' => request()->q,
+                'category_id' => request()->category_id ? (int) request()->category_id : null,
+            ],
         ]);
 
     }
@@ -86,7 +93,7 @@ class QuestionsController extends Controller
         ]);
 
         //redirect
-        return redirect()->route('admin.questions.index');
+        return redirect()->route('admin.questions.index')->with('success', 'Soal berhasil ditambahkan.');
     }
 
     /**
@@ -152,7 +159,7 @@ class QuestionsController extends Controller
         ]);
 
         //redirect
-        return redirect()->route('admin.questions.index');
+        return redirect()->route('admin.questions.index')->with('success', 'Soal berhasil diperbarui.');
     }
 
     /**
@@ -167,7 +174,7 @@ class QuestionsController extends Controller
         Question::findOrFail($id)->delete();
 
         //redirect
-        return redirect()->route('admin.questions.index');
+        return redirect()->route('admin.questions.index')->with('success', 'Soal berhasil dihapus.');
     }
 
     public function import()
@@ -195,7 +202,7 @@ class QuestionsController extends Controller
         Excel::import(new QuestionsImport($id), $request->file('file'));
 
         //redirect
-        return redirect()->route('admin.questions.index');
+        return redirect()->route('admin.questions.index')->with('success', 'Soal berhasil diimport.');
     }
 
    public function EnrollQuestion($id)
