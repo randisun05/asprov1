@@ -447,16 +447,40 @@ class RegistrationController extends Controller
         return $this->lockedNextNumber($suffix, $padLength);
     }
 
+    /**
+     * Draw the next number for a suffix from its dedicated counter row in
+     * member_number_sequences, rather than scanning/locking `members`
+     * itself. That old approach used `LIKE '%suffix'`, a leading wildcard
+     * that can't use the unique index on nomember - it full-table-scanned
+     * (and lockForUpdate() locked across) the entire members table on
+     * every single approval, and had nothing to lock at all for the very
+     * first member of a suffix. Both made concurrent approvals collide or
+     * block far more than they needed to. Locking one indexed row per
+     * suffix confines contention to approvals racing for that exact
+     * suffix, and the row always exists so there's no phantom-lock gap.
+     */
     private function lockedNextNumber(string $suffix, int $padLength): string
     {
-        // Lock the row the number is derived from so a concurrent approval
-        // can't read the same "last number" before this transaction commits.
-        $lastMember = Member::where('nomember', 'LIKE', '%' . $suffix)
-            ->orderBy('nomember', 'desc')
+        DB::table('member_number_sequences')->insertOrIgnore([
+            'suffix' => $suffix,
+            'last_number' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $sequence = DB::table('member_number_sequences')
+            ->where('suffix', $suffix)
             ->lockForUpdate()
             ->first();
 
-        $nextNumber = $lastMember ? ((int) substr($lastMember->nomember, 0, $padLength)) + 1 : 1;
+        $nextNumber = $sequence->last_number + 1;
+
+        DB::table('member_number_sequences')
+            ->where('suffix', $suffix)
+            ->update([
+                'last_number' => $nextNumber,
+                'updated_at' => now(),
+            ]);
 
         return str_pad($nextNumber, $padLength, '0', STR_PAD_LEFT) . $suffix;
     }
