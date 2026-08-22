@@ -16,7 +16,6 @@ use App\Models\Member;
 use App\Models\Post;
 use App\Models\ProfileDataMain;
 use App\Models\ProfileDataPosition;
-use App\Models\Question;
 use App\Models\ReactDetail;
 use App\Models\Registration;
 use App\Models\RegistrationGroup;
@@ -1054,8 +1053,7 @@ average waktu pengerjaan
 heatmap soal
 */
 
-        $heatmap = Question::where('event_id', $event_id)
-        ->get()
+        $heatmap = $event->questions
         ->map(function ($q) {
 
             $total = Answer::where('question_id', $q->id)->count();
