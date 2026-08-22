@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\instansi;
 use App\Models\Post;
 use Illuminate\Http\Request;
-use PhpParser\Node\Expr\AssignOp\Pow;
 use Illuminate\Support\Carbon;
 
 
@@ -64,14 +63,25 @@ class PostsController extends Controller
 
     // Validate request including file validation
       $request->validate([
-        'title' => 'required|string',
+        'title' => 'required|string|unique:posts,title',
         'body' => 'required|',
         'document' => 'file|mimes:pdf|max:2048|nullable',
-        'image' => '|image:allow_svg|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
+        'picture' => 'image:allow_svg|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
     ]);
 
     $slug = strtolower(str_replace(' ', '-', $request->title));
      $slug = preg_replace('/[^a-z0-9-]/', '', $slug);
+
+    // Ensure the slug stays unique since `posts.slug` has a unique
+    // constraint - two different titles can still slugify to the same
+    // value once punctuation is stripped.
+    $originalSlug = $slug;
+    $counter = 1;
+    while (Post::where('slug', $slug)->exists()) {
+        $slug = $originalSlug . '-' . $counter;
+        $counter++;
+    }
+
     $body = $request->body;
 
     // Ambil 100 kata pertama dari body
@@ -115,7 +125,7 @@ class PostsController extends Controller
 
 
      //redirect
-     return redirect()->route('user.posts.index');
+     return redirect()->route('user.posts.index')->with('success', 'Cerita berhasil ditambahkan.');
 
 
     }
@@ -173,10 +183,18 @@ class PostsController extends Controller
     public function update(Request $request, $id)
     {
 
+    $post = Post::findOrFail($id);
+
+    if ($post->member_id != auth()->guard('member')->user()->id) {
+        return redirect()->route('user.posts.index')->with('error', 'You are not authorized to update this post');
+    }
+
     // Validate request including file validation
       $request->validate([
-        'title' => 'required|string',
+        'title' => ['required', 'string', \Illuminate\Validation\Rule::unique('posts', 'title')->ignore($id)],
         'body' => 'required|',
+        'document' => 'file|mimes:pdf|max:2048|nullable',
+        'picture' => 'image:allow_svg|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
     ]);
 
     $slug = strtolower(str_replace(' ', '-', $request->title));
@@ -227,7 +245,7 @@ class PostsController extends Controller
 
 
      //redirect
-     return redirect()->route('user.posts.index');
+     return redirect()->route('user.posts.index')->with('success', 'Cerita berhasil diperbarui.');
 
 
     }
@@ -240,24 +258,16 @@ class PostsController extends Controller
      */
     public function destroy($id)
     {
-
-        return $id;
         $post = Post::findOrFail($id);
         if ($post->member_id == auth()->guard('member')->user()->id) {
 
             $post->delete();
 
             //redirect
-            return redirect()->route('user.posts.index');
+            return redirect()->route('user.posts.index')->with('success', 'Cerita berhasil dihapus.');
         } else {
             return redirect()->route('user.posts.index')->with('error', 'You are not authorized to delete this post');
         }
-        $post = Post::findOrFail($id);
-
-        $post->delete();
-
-        //redirect
-        return redirect()->route('user.posts.index');
     }
 
     public function submission($id)
@@ -275,7 +285,7 @@ class PostsController extends Controller
 
 
         //redirect
-        return redirect()->route('user.posts.index');
+        return redirect()->route('user.posts.index')->with('success', 'Cerita berhasil diajukan untuk publikasi.');
     }
 
     public function list()

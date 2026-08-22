@@ -8,8 +8,6 @@ use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\PublicPost;
-use GuzzleHttp\RetryMiddleware;
-use PhpParser\Node\Stmt\Return_;
 
 class PostController extends Controller
 {
@@ -84,10 +82,10 @@ class PostController extends Controller
 
        // Validate request including file validation
       $request->validate([
-        'title' => 'required|string',
+        'title' => 'required|string|unique:posts,title',
         'body' => 'required|',
         'document' => 'file|mimes:pdf|max:2048|nullable',
-        'image' => '|image:allow_svg|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
+        'picture' => 'image:allow_svg|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
     ]);
 
     // Generate initial slug from title
@@ -193,10 +191,11 @@ class PostController extends Controller
         $this->cekAuth();
        // Validate request including file validation
       $request->validate([
-        'title' => 'required|string',
+        'title' => ['required', 'string', \Illuminate\Validation\Rule::unique('posts', 'title')->ignore($id)],
         'body' => 'required|',
-        'docstatus' => 'required|'
-
+        'docstatus' => 'required|',
+        'document' => 'file|mimes:pdf|max:2048|nullable',
+        'picture' => 'image:allow_svg|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
     ]);
 
     $slug = strtolower(str_replace(' ', '-', $request->title));

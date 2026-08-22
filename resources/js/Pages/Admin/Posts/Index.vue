@@ -7,7 +7,7 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-md-1 col-12 mb-2">
-                        <Link href="/admin/admin/posts" class="btn btn-md btn-primary border-0 shadow w-100" type="button">
+                        <Link href="/admin/posts/create" class="btn btn-md btn-primary border-0 shadow w-100" type="button">
                             <i class="fa fa-plus-circle"></i>  Post
                         </Link>
                     </div>

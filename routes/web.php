@@ -79,7 +79,7 @@ Route::prefix('admin')->group(function() {
             Route::post('/posts/{id}/reject', [\App\Http\Controllers\Admin\PostController::class, 'reject'])->name('admin.posts.reject');
             Route::post('/posts/{id}/cancel', [\App\Http\Controllers\Admin\PostController::class, 'cancel'])->name('admin.posts.cancel');
             Route::post('/posts/{id}/cancelLimited', [\App\Http\Controllers\Admin\PostController::class, 'cancelLimited'])->name('admin.posts.cancellimited');
-            Route::post('/posts/{id}/submission', [\App\Http\Controllers\Admin\PostController::class, 'cancel'])->name('admin.posts.submission');
+            Route::post('/posts/{id}/submission', [\App\Http\Controllers\Admin\PostController::class, 'submission'])->name('admin.posts.submission');
             Route::get('/category/create', [\App\Http\Controllers\Admin\PostController::class, 'categoryCreate'])->name('admin.category.create');
             Route::post('/category/store', [\App\Http\Controllers\Admin\PostController::class, 'categoryStore'])->name('admin.category.store');
             Route::get('/category/{id}/edit', [\App\Http\Controllers\Admin\PostController::class, 'categoryEdit'])->name('admin.category.edit');
@@ -233,8 +233,15 @@ Route::prefix('user')->group(function() {
         Route::get('/posts/list', [\App\Http\Controllers\User\PostsController::class, 'list'])->name('user.posts.list');
         Route::get('/posts/list/{post:slug}', [\App\Http\Controllers\User\PostsController::class, 'showlist'])->name('user.posts.showlist');
         Route::post('/posts/{id}', [\App\Http\Controllers\User\PostsController::class, 'update'])->name('user.posts.update');
-        Route::resource('/posts', \App\Http\Controllers\User\PostsController::class, ['as' => 'user']);
-        Route::get('/posts/{id}/submission', [\App\Http\Controllers\User\PostsController::class, 'submission'])->name('user.posts.submission');
+        // show/edit are bound by slug (the frontend builds these URLs from
+        // post.slug), so they're excluded from the resource() below and
+        // declared explicitly. destroy/update use a plain $id and stay on
+        // the resource - binding {post} globally would hand them a Post
+        // object instead of a scalar id.
+        Route::get('/posts/{post:slug}', [\App\Http\Controllers\User\PostsController::class, 'show'])->name('user.posts.show');
+        Route::get('/posts/{post:slug}/edit', [\App\Http\Controllers\User\PostsController::class, 'edit'])->name('user.posts.edit');
+        Route::resource('/posts', \App\Http\Controllers\User\PostsController::class, ['as' => 'user'])->except(['show', 'edit']);
+        Route::post('/posts/{id}/submission', [\App\Http\Controllers\User\PostsController::class, 'submission'])->name('user.posts.submission');
         Route::resource('/events', \App\Http\Controllers\User\EventController::class, ['as' => 'user']);
         Route::get('/events/{event:slug}', [\App\Http\Controllers\User\EventController::class, 'show'])->name('user.events.join');
         Route::post('/events/{id}/join', [\App\Http\Controllers\User\EventController::class, 'join'])->name('user.events.join');

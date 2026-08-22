@@ -142,16 +142,7 @@
                     })
                     .then((result) => {
                         if (result.isConfirmed) {
-
                             router.delete(`/user/posts/${id}`);
-
-                            Swal.fire({
-                                title: 'Deleted!',
-                                text: 'Peserta Berhasil Dihapus!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }
@@ -168,14 +159,7 @@
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
-                        router.get(`/user/posts/${id}/submission`);
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Returned!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
+                        router.post(`/user/posts/${id}/submission`);
                     }
                 })
             }
