@@ -790,24 +790,36 @@ public function enrollMember(Request $request, $id)
         $event = Event::findOrFail($id);
         $memberId = $request->member_id;
 
-        // 2. Cek apakah member sudah terdaftar di event ini
-        $exists = DetailEvent::where('event_id', $id)
-            ->where('member_id', $memberId)
-            ->exists();
+        try {
+            $detail = \DB::transaction(function () use ($id, $memberId, $request) {
+                // Lock so a double-submitted "daftarkan member" (double click,
+                // retried request) can't create two detail_events rows for
+                // the same event+member.
+                $existing = DetailEvent::where('event_id', $id)
+                    ->where('member_id', $memberId)
+                    ->lockForUpdate()
+                    ->first();
 
-        if ($exists) {
+                if ($existing) {
+                    return $existing;
+                }
+
+                return DetailEvent::create([
+                    'event_id'  => $id,
+                    'member_id' => $memberId,
+                    'title'     => $request->title ?? 'peserta', // Default title jika tidak disediakan
+                    'status'    => "approved", // Otomatis approved karena didaftarkan admin
+                ]);
+            });
+        } catch (\Illuminate\Database\QueryException $e) {
+            // race slipped past the lock; the unique constraint on
+            // (event_id, member_id) still caught it
             return redirect()->back()->with('error', 'Member ini sudah terdaftar di event tersebut.');
         }
 
-
-        // 4. Daftarkan Member
-        DetailEvent::create([
-            'event_id'  => $id,
-            'member_id' => $memberId,
-            'title'     => $request->title ?? 'peserta', // Default title jika tidak disediakan
-            'status'    => "approved", // Otomatis approved karena didaftarkan admin
-
-        ]);
+        if (!$detail->wasRecentlyCreated) {
+            return redirect()->back()->with('error', 'Member ini sudah terdaftar di event tersebut.');
+        }
 
         return redirect()->back()->with('success', 'Berhasil menambahkan peserta ke event.');
     }

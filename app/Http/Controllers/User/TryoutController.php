@@ -189,95 +189,95 @@ public function index()
 
    public function EnrollQuestion($id)
 {
-    DB::beginTransaction();
+    $memberId = auth()->guard('member')->user()->id;
 
     try {
         $event = Event::findOrFail($id);
 
-        $memberId = auth()->guard('member')->user()->id;
+        return DB::transaction(function () use ($event, $memberId) {
 
-        // ambil detail event khusus member ini
-        $detail = DetailEvent::where('event_id', $event->id)
-            ->where('member_id', $memberId)
-            ->first();
+            // Lock the member's registration row so a concurrent double-submit
+            // (double click, retried request, a second tab) can't both pass
+            // the "belum punya soal" check below and insert duplicate soal.
+            $detail = DetailEvent::where('event_id', $event->id)
+                ->where('member_id', $memberId)
+                ->lockForUpdate()
+                ->first();
 
-        if (!$detail) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Member tidak terdaftar di event ini'
-            ]);
-        }
-
-        // cek apakah sudah punya soal
-        $already = Answer::where('event_id', $event->id)
-            ->where('member_id', $memberId)
-            ->exists();
-
-        if ($already) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Member sudah memiliki soal'
-            ]);
-        }
-
-        // ambil soal yang sudah dipilih untuk event/tryout ini
-        $questions = $event->questions;
-
-        if ($questions->isEmpty()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Soal belum tersedia'
-            ]);
-        }
-
-        // random soal jika aktif
-        $memberQuestions = $event->random_question == 'Y'
-            ? $questions->shuffle()
-            : $questions;
-
-        $batchInsert = [];
-        $order = 1;
-
-        foreach ($memberQuestions as $question) {
-
-            // opsi jawaban
-            $options = [1,2];
-
-            if ($question->c) $options[] = 3;
-            if ($question->d) $options[] = 4;
-            if ($question->e) $options[] = 5;
-
-            if ($event->random_answer == 'Y') {
-                shuffle($options);
+            if (!$detail) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Member tidak terdaftar di event ini'
+                ]);
             }
 
-            $batchInsert[] = [
-                'event_id'        => $event->id,
-                'detail_event_id' => $detail->id,
-                'question_id'     => $question->id,
-                'member_id'       => $memberId,
-                'question_order'  => $order,
-                'answer_order'    => implode(',', $options),
-                'answer'          => 0,
-                'is_correct'      => 'N',
-            ];
+            // cek apakah sudah punya soal
+            $already = Answer::where('event_id', $event->id)
+                ->where('member_id', $memberId)
+                ->exists();
 
-            $order++;
-        }
+            if ($already) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Member sudah memiliki soal'
+                ]);
+            }
 
-        // insert sekali saja (karena 1 member)
-        Answer::insert($batchInsert);
+            // ambil soal yang sudah dipilih untuk event/tryout ini
+            $questions = $event->questions;
 
-        DB::commit();
+            if ($questions->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Soal belum tersedia'
+                ]);
+            }
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Generate soal berhasil'
-        ]);
+            // random soal jika aktif
+            $memberQuestions = $event->random_question == 'Y'
+                ? $questions->shuffle()
+                : $questions;
+
+            $batchInsert = [];
+            $order = 1;
+
+            foreach ($memberQuestions as $question) {
+
+                // opsi jawaban
+                $options = [1,2];
+
+                if ($question->c) $options[] = 3;
+                if ($question->d) $options[] = 4;
+                if ($question->e) $options[] = 5;
+
+                if ($event->random_answer == 'Y') {
+                    shuffle($options);
+                }
+
+                $batchInsert[] = [
+                    'event_id'        => $event->id,
+                    'detail_event_id' => $detail->id,
+                    'question_id'     => $question->id,
+                    'member_id'       => $memberId,
+                    'question_order'  => $order,
+                    'answer_order'    => implode(',', $options),
+                    'answer'          => 0,
+                    'is_correct'      => 'N',
+                ];
+
+                $order++;
+            }
+
+            // insert sekali saja (karena 1 member)
+            Answer::insert($batchInsert);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Generate soal berhasil'
+            ]);
+        });
 
     } catch (\Throwable $e) {
-
-        DB::rollBack();
 
         return response()->json([
             'status' => false,
