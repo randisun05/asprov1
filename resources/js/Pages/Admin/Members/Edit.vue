@@ -447,9 +447,6 @@ import { Head, Link } from "@inertiajs/vue3";
 //import reactive
 import { reactive, watch, ref, computed } from "vue";
 
-//import sweet alert2
-import Swal from "sweetalert2";
-
 //import inertia adapter
 import { router } from "@inertiajs/vue3";
 
@@ -568,52 +565,37 @@ export default {
         //submit method
         const submit = () => {
             //send data to server
-            router.put(`/admin/members/${props.data.id}`,
-                {
-                    //data
-                    nip: form.nip,
-                    // name: form.name,
-                    // fname: form.fname,
-                    // lname: form.lname,
-                    // leveledu: form.leveledu,
-                    // lastedu: form.lastedu,
-                    // place: form.place,
-                    // dob: form.dob,
-                    // docid: form.docid,
-                    // nodocid: form.nodocid,
-                    // email: form.email,
-                    // contact: form.contact,
-                    // gender: form.gender,
-                    // religion: form.religion,
+            router.put(`/admin/members/${props.data.id}`, {
+                //data
+                nip: form.nip,
+                name: form.name,
+                fname: form.fname,
+                lname: form.lname,
+                leveledu: form.leveledu,
+                lastedu: form.lastedu,
+                place: form.place,
+                dob: form.dob,
+                docid: form.docid,
+                nodocid: form.nodocid,
+                email: form.email,
+                contact: form.contact,
+                gender: form.gender,
+                religion: form.religion,
 
-                    // level: form.level,
-                    // type: form.type,
-                    // status: form.status,
-                    // agency: form.agency,
-                    // unit: form.unit,
-                    // subunit: form.subunit,
-                    // location: form.location,
-                    // position: form.position,
-                    // tmtpos: form.tmtpos,
-                    // golru: form.golru,
-                    // tmtgolru: form.tmtgolru,
-                    // wyear: form.wyear,
-                    // wmonth: form.wmonth,
-
-                },
-                {
-                    onSuccess: () => {
-                        //show success alert
-                        Swal.fire({
-                            title: "Success!",
-                            text: "Data Anggota Berhasil Diupdate.",
-                            icon: "success",
-                            showConfirmButton: false,
-                            timer: 2000,
-                        });
-                    },
-                }
-            );
+                level: form.level,
+                type: form.type,
+                status: form.status,
+                agency: form.agency,
+                unit: form.unit,
+                subunit: form.subunit,
+                location: form.location,
+                position: form.position,
+                tmtpos: form.tmtpos,
+                golru: form.golru,
+                tmtgolru: form.tmtgolru,
+                wyear: form.wyear,
+                wmonth: form.wmonth,
+            });
         };
 
 
@@ -631,7 +613,7 @@ export default {
             // Tambahkan file gambar yang dipilih ke FormData
             formData.append('image', event.target.files[0]);
             // Kirim permintaan dengan Inertia
-            router.post(`/user/profile/image`, formData);
+            router.post(`/admin/members/${props.data.id}/image`, formData);
         };
 
 

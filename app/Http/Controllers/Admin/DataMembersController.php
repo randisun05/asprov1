@@ -109,7 +109,7 @@ class DataMembersController extends Controller
     public function show($id, PointService $pointService)
     {
         if (auth()->user()->role === 'keanggotaan' || auth()->user()->role === 'administrator' || auth()->user()->role === 'pendanaan') {
-            $data = ProfileDataPosition::where('id',$id)->with('main')->first();
+            $data = ProfileDataPosition::with('main')->findOrFail($id);
 
             $member = Member::where('nip', $data->main->nip)->first();
             $points = null;
@@ -141,7 +141,7 @@ class DataMembersController extends Controller
     public function edit($id)
     {
         if (auth()->user()->role === 'keanggotaan' || auth()->user()->role === 'administrator') {
-            $data = ProfileDataPosition::where('id',$id)->with('main')->first();
+            $data = ProfileDataPosition::with('main')->findOrFail($id);
             $instansis = instansi::get();
             return inertia('Admin/Members/Edit', [
             'data' => $data,
@@ -168,10 +168,8 @@ class DataMembersController extends Controller
         ],[
             'nip.regex' => 'NIP harus terdiri dari 18 angka.',
         ]);
-        $id = ProfileDataPosition::where('id', $id)
-        ->first();
-        $main = ProfileDataMain::where('id', $id->main_id)
-        ->first();
+        $id = ProfileDataPosition::findOrFail($id);
+        $main = ProfileDataMain::findOrFail($id->main_id);
         //update data main
         $main->update([
                 'nip' => $request->nip,
@@ -212,6 +210,36 @@ class DataMembersController extends Controller
         } else {
             return redirect()->route('admin.dashboard')->with('error','anda tidak memiliki akses ke halaman tersebut');
         }
+    }
+
+    /**
+     * Update the member's photo from the admin edit page. Separate from
+     * User\DataProfileController::updateImage, which identifies the member
+     * via the "member" auth guard - that route can't be used here since an
+     * admin session has no member guard identity.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateImage(Request $request, $id)
+    {
+        if (auth()->user()->role !== 'keanggotaan' && auth()->user()->role !== 'administrator') {
+            return redirect()->route('admin.dashboard')->with('error', 'anda tidak memiliki akses ke halaman tersebut');
+        }
+
+        $request->validate([
+            'image' => 'required|image|max:2048',
+        ]);
+
+        $position = ProfileDataPosition::findOrFail($id);
+        $main = ProfileDataMain::findOrFail($position->main_id);
+
+        $main->update([
+            'image' => $request->file('image')->storePublicly('/images'),
+        ]);
+
+        return redirect()->route('admin.members.edit', $id)->with('success', 'Foto anggota berhasil diperbarui.');
     }
 
     /**
