@@ -433,7 +433,7 @@ class EventController extends Controller
             'status' => '1',
         ]);
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Template sertifikat berhasil ditambahkan.');
 
     }
 

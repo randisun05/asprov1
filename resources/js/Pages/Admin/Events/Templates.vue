@@ -158,14 +158,6 @@
                                     if (result.isConfirmed) {
 
                                         router.delete(`/admin/events/certificates/templates/${id}`);
-
-                                        Swal.fire({
-                                            title: 'Deleted!',
-                                            text: 'Media Berhasil Dihapus!.',
-                                            icon: 'success',
-                                            timer: 2000,
-                                            showConfirmButton: false,
-                                        });
                                     }
                                 })
                         }
