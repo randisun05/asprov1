@@ -61,9 +61,6 @@
         reactive
     } from 'vue';
 
-    //import sweet alert2
-    import Swal from 'sweetalert2';
-
     //import inertia adapter
     import { router } from '@inertiajs/vue3';
 
@@ -99,17 +96,6 @@
                 router.post('/admin/registration/import', {
                     //data
                     file: form.file,
-                } ,{
-                    onSuccess: () => {
-                        //show success alert
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Data Registrasi Berhasil Dikirim, Silakan Cek Email Anda.',
-                            icon: 'success',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    },
                 });
 
             }

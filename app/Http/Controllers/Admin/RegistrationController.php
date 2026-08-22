@@ -126,7 +126,7 @@ class RegistrationController extends Controller
     }
 
      //redirect
-     return redirect()->route('admin.registration.index');
+     return redirect()->route('admin.registration.index')->with('success', 'Data registrasi berhasil ditambahkan.');
     }
 
     /**
@@ -216,36 +216,21 @@ class RegistrationController extends Controller
             $document_jab = $request->file('document_jab');
             $paid = $request->file('paid');
 
-            if ($document_jab && $paid) {
-                // Jika keduanya diisi, update semua
-                $document_jab = $document_jab->storePublicly('/document');
-                $paid = $paid->storePublicly('/images');
-                Registration::where('id',$id)->update(array_merge($validatedData, [
-                    'document_jab' => $document_jab,
-                    'paid' => $paid,
-                    'status' => "paid"
-                ]));
-            } elseif ($document_jab) {
-                $document_jab = $document_jab->storePublicly('/images');
-                // Jika hanya document_jab diisi, update semua kecuali paid
-                Registration::where('id',$id)->update(array_merge($validatedData, [
-                    'document_jab' => $document_jab,
-                ]));
-            } elseif ($paid) {
-                $paid = $paid->storePublicly('/images');
-                // Jika hanya paid diisi, update semua kecuali document_jab
-                Registration::where('id',$id)->update(array_merge($validatedData, [
-                    'paid' => $paid,
-                    'status' => "paid"
-                ]));
+            $extra = [];
+
+            if ($document_jab) {
+                $extra['document_jab'] = $document_jab->storePublicly('/document');
             }
 
-            // Buat registration
-            Registration::where('id',$id)->update(array_merge($validatedData, [
-            ]));
+            if ($paid) {
+                $extra['paid'] = $paid->storePublicly('/images');
+                $extra['status'] = 'paid';
+            }
+
+            Registration::where('id', $id)->update(array_merge($validatedData, $extra));
 
        //redirect
-       return redirect()->route('admin.registration.index');
+       return redirect()->route('admin.registration.index')->with('success', 'Data registrasi berhasil diperbarui.');
     }
 
     /**
@@ -263,7 +248,7 @@ class RegistrationController extends Controller
         $register->delete();
 
         //redirect
-        return redirect()->route('admin.registration.index');
+        return redirect()->route('admin.registration.index')->with('success', 'Data registrasi berhasil dihapus.');
     }
 
     public function paid($id)
@@ -274,7 +259,7 @@ class RegistrationController extends Controller
         ]);
 
         //redirect
-        return redirect()->route('admin.registration.index');
+        return redirect()->route('admin.registration.index')->with('success', 'Status pembayaran berhasil diperbarui.');
     }
 
     public function hadlecode()
@@ -508,7 +493,7 @@ class RegistrationController extends Controller
         Registration::where('id', $id)->increment('emailstatus');
 
         //redirect
-        return redirect()->route('admin.registration.index');
+        return redirect()->route('admin.registration.index')->with('success', 'Pendaftaran berhasil ditolak.');
     }
 
     public function sendEmail($id)
@@ -519,7 +504,7 @@ class RegistrationController extends Controller
 
         Registration::where('id', $id)->increment('emailstatus');
         //redirect
-        return redirect()->route('admin.registration.index');
+        return redirect()->route('admin.registration.index')->with('success', 'Email permintaan pembayaran berhasil dikirim.');
     }
 
     public function confirm($id, Request $request)
@@ -540,7 +525,7 @@ class RegistrationController extends Controller
         Registration::where('id', $id)->increment('emailstatus');
 
         //redirect
-        return redirect()->route('admin.registration.index');
+        return redirect()->route('admin.registration.index')->with('success', 'Link perbaikan berhasil dikirim.');
     }
 
     public function import()
@@ -576,7 +561,7 @@ class RegistrationController extends Controller
         // }
 
         //redirect
-        return redirect()->route('admin.registration.index');
+        return redirect()->route('admin.registration.index')->with('success', 'Data registrasi berhasil diimport.');
     }
 
     public function group()
@@ -607,7 +592,7 @@ class RegistrationController extends Controller
         ]);
 
         //redirect
-        return redirect()->route('admin.registration.group');
+        return redirect()->route('admin.registration.group')->with('success', 'Grup registrasi berhasil diselesaikan.');
     }
 
     public function rejectGroup($id)
@@ -617,7 +602,7 @@ class RegistrationController extends Controller
         ]);
 
         //redirect
-        return redirect()->route('admin.registration.group');
+        return redirect()->route('admin.registration.group')->with('success', 'Grup registrasi berhasil ditolak.');
     }
 
     public function confirmGroup($id)
@@ -627,7 +612,7 @@ class RegistrationController extends Controller
         ]);
 
         //redirect
-        return redirect()->route('admin.registration.group');
+        return redirect()->route('admin.registration.group')->with('success', 'Grup registrasi berhasil dikonfirmasi.');
     }
 
         public function generatePassword($length = 10) {
@@ -672,7 +657,7 @@ class RegistrationController extends Controller
 
         Registration::where('id', $id)->increment('emailstatus');
         //redirect
-        return redirect()->route('admin.registration.index');
+        return redirect()->route('admin.registration.index')->with('success', 'Email berhasil dikirim ulang.');
     }
 
 

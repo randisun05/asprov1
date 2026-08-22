@@ -155,13 +155,6 @@
                 .then((result) => {
                     if (result.isConfirmed) {
                         router.post(`/admin/registration/group/${id}/done`);
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Done!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
             }
@@ -179,13 +172,6 @@
                 .then((result) => {
                     if (result.isConfirmed) {
                         router.post(`/admin/registration/group/${id}/confirm`);
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Conirmed!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
             }
@@ -204,14 +190,6 @@
                     if (result.isConfirmed) {
 
                         router.post(`/admin/registration/group/${id}/reject`);
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Rejected!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
             }

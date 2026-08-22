@@ -10,11 +10,6 @@
                 <Link href="/admin/registration" class="btn btn-md btn-primary border-0 shadow mb-3" type="button"><i
                     class="fa fa-arrow-left" aria-hidden="true"></i>
                 Kembali</Link>
-                <Link v-if="register.status !== 'approved' && register.status !== 'rejected'"
-                    :href="`/registration/confirm/${register.id}/edit`"
-                    class="btn btn-md btn-warning border-0 shadow mb-3 ms-3" type="button"><i class="fa fa-pencil"
-                    aria-hidden="true"></i>
-                Edit</Link>
                 <div class="card border-0 shadow">
                     <div class="card-body">
                         <h5><i class="fa fa-bookmark"></i> Data Pengusul</h5>
@@ -29,7 +24,8 @@
                                     NIP
                                 </span>
                                 <div class="form-group bottom35 mt-1">
-                                    <input type="text" class="form-control" v-model="form.nip" disabled>
+                                    <input type="text" class="form-control" v-model="form.nip" :disabled="!canEdit">
+                                    <div v-if="errors.nip" class="alert alert-danger mt-2">{{ errors.nip }}</div>
                                 </div>
                             </div>
 
@@ -38,7 +34,8 @@
                                     Nama
                                 </span>
                                 <div class="form-group bottom35 mt-1">
-                                    <input type="text" class="form-control" v-model="form.name" disabled>
+                                    <input type="text" class="form-control" v-model="form.name" :disabled="!canEdit">
+                                    <div v-if="errors.name" class="alert alert-danger mt-2">{{ errors.name }}</div>
                                 </div>
                             </div>
 
@@ -47,7 +44,8 @@
                                     Email
                                 </span>
                                 <div class="form-group bottom35 mt-1">
-                                    <input type="email" class="form-control" v-model="form.email" disabled>
+                                    <input type="email" class="form-control" v-model="form.email" :disabled="!canEdit">
+                                    <div v-if="errors.email" class="alert alert-danger mt-2">{{ errors.email }}</div>
                                 </div>
                             </div>
 
@@ -56,7 +54,8 @@
                                     Nomor Kontak
                                 </span>
                                 <div class="form-group bottom35 mt-1">
-                                    <input type="text" class="form-control" v-model="form.contact" disabled>
+                                    <input type="text" class="form-control" v-model="form.contact" :disabled="!canEdit">
+                                    <div v-if="errors.contact" class="alert alert-danger mt-2">{{ errors.contact }}</div>
                                 </div>
                             </div>
 
@@ -65,7 +64,8 @@
                                     Instansi
                                 </span>
                                 <div class="form-group bottom35 mt-1">
-                                    <input type="text" class="form-control" v-model="form.agency" disabled>
+                                    <input type="text" class="form-control" v-model="form.agency" :disabled="!canEdit">
+                                    <div v-if="errors.agency" class="alert alert-danger mt-2">{{ errors.agency }}</div>
                                 </div>
                             </div>
 
@@ -85,7 +85,11 @@
                                     Jabatan
                                 </span>
                                 <div class="form-group bottom35 mt-1">
-                                    <input type="text" class="form-control" v-model="form.position" disabled>
+                                    <select class="form-control" v-model="form.position" :disabled="!canEdit">
+                                        <option value="Analis SDM Aparatur">Analis SDM Aparatur</option>
+                                        <option value="Pranata SDM Aparatur">Pranata SDM Aparatur</option>
+                                    </select>
+                                    <div v-if="errors.position" class="alert alert-danger mt-2">{{ errors.position }}</div>
                                 </div>
                             </div>
 
@@ -95,10 +99,33 @@
                                 </span>
                                 <div class="form-group bottom35">
                                     <div class="form-group bottom35 mt-1">
-                                        <input type="text" class="form-control" v-model="form.level" disabled>
+                                        <select class="form-control" v-model="form.level" :disabled="!canEdit">
+                                            <template v-if="form.position === 'Analis SDM Aparatur'">
+                                                <option value="Ahli Pertama">Ahli Pertama</option>
+                                                <option value="Ahli Muda">Ahli Muda</option>
+                                                <option value="Ahli Madya">Ahli Madya</option>
+                                                <option value="Ahli Utama">Ahli Utama</option>
+                                            </template>
+                                            <template v-else-if="form.position === 'Pranata SDM Aparatur'">
+                                                <option value="Terampil">Terampil</option>
+                                                <option value="Mahir">Mahir</option>
+                                                <option value="Penyelia">Penyelia</option>
+                                            </template>
+                                            <template v-else>
+                                                <option :value="form.level">{{ form.level }}</option>
+                                            </template>
+                                        </select>
+                                        <div v-if="errors.level" class="alert alert-danger mt-2">{{ errors.level }}</div>
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="col-12" v-if="canEdit">
+                                <button @click.prevent="handleUpdate(register.id)"
+                                    class="btn btn-sm btn-primary border-0 shadow mb-3"><i
+                                        class="fa fa-save me-1" aria-hidden="true"></i>Simpan Perubahan Data</button>
+                            </div>
+
                             <div class="col-md-6 col-sm-6 mt-4">
                                 <a :href="getDocumentUrl(form.document_jab)" target="_blank"
                                     class="badge bg-primary fs-5 border-0 shadow me-4 fs-5" type="button">
@@ -186,7 +213,7 @@ import {
 } from '@inertiajs/vue3';
 
 //import reactive from vue
-import { reactive, ref } from 'vue';
+import { reactive, ref, computed } from 'vue';
 
 //import inertia adapter
 import { router } from '@inertiajs/vue3';
@@ -236,6 +263,20 @@ export default {
             sendemail: props.register.email,
         });
 
+        const canEdit = computed(() => props.register.status !== 'approved' && props.register.status !== 'rejected');
+
+        const handleUpdate = (id) => {
+            router.put(`/admin/registration/${id}`, {
+                nip: form.nip,
+                name: form.name,
+                email: form.email,
+                contact: form.contact,
+                agency: form.agency,
+                position: form.position,
+                level: form.level,
+            });
+        }
+
         const handleApprove = (id) => {
             Swal.fire({
                 title: 'Apakah Anda yakin?',
@@ -253,14 +294,6 @@ export default {
                             {
                                 'info': form.info
                             });
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Approved!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
         }
@@ -282,17 +315,9 @@ export default {
                             'info': form.info,
                             'email': form.sendemail
                         });
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Conirmed!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
-            ref.showModalEmail = false;
+            showModalEmail.value = false;
         }
 
         const handleReject = (id) => {
@@ -309,14 +334,6 @@ export default {
                     if (result.isConfirmed) {
 
                         router.post(`/admin/registration/${id}/reject`);
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Rejected!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
         }
@@ -335,14 +352,6 @@ export default {
                     if (result.isConfirmed) {
 
                         router.post(`/admin/registration/${id}/email`);
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Email Sent!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
         }
@@ -361,14 +370,6 @@ export default {
                     if (result.isConfirmed) {
 
                         router.post(`/admin/registration/${id}/email-approve`);
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Sent!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
         }
@@ -395,14 +396,6 @@ export default {
                 'info': form.info,
                 'position': result.value // Mengirim jabatan inputan admin ke controller
             });
-
-            Swal.fire({
-                title: 'Success!',
-                text: 'Anggota LB Berhasil Disetujui.',
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false,
-            });
         }
     })
 }
@@ -421,6 +414,8 @@ export default {
         //return
         return {
             form,
+            canEdit,
+            handleUpdate,
             getDocumentUrl,
             handleApprove,
             handleReject,

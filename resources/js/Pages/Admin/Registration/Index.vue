@@ -255,13 +255,6 @@ export default {
                 .then((result) => {
                     if (result.isConfirmed) {
                         router.post(`/admin/registration/${id}/approve`);
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Approved!.',
-                            icon: 'success',
-                            timer: 5000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
         }
@@ -285,18 +278,9 @@ export default {
                         router.post(`/admin/registration/group/approve`, {
                             registration_ids: form.registration_ids
                         });
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Approved!.',
-                            icon: 'success',
-                            timer: 5000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
         }
-
-        console.log("Approving these IDs:", form.registration_ids);
 
         const handleConfirm = (id) => {
             Swal.fire({
@@ -311,13 +295,6 @@ export default {
                 .then((result) => {
                     if (result.isConfirmed) {
                         router.post(`/admin/registration/${id}/confirm`);
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Conirmed!.',
-                            icon: 'success',
-                            timer: 5000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
         }
@@ -336,14 +313,6 @@ export default {
                     if (result.isConfirmed) {
 
                         router.post(`/admin/registration/${id}/reject`);
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Rejected!.',
-                            icon: 'success',
-                            timer: 5000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
         }

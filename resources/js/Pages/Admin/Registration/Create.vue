@@ -193,9 +193,6 @@
         reactive
     } from 'vue';
 
-    //import sweet alert2
-    import Swal from 'sweetalert2';
-
     //import inertia adapter
     import { router } from '@inertiajs/vue3';
 
@@ -294,17 +291,6 @@
                     level: form.level,
                     document_jab: form.document_jab,
                     paid: form.paid,
-                } ,{
-                    onSuccess: () => {
-                        //show success alert
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Data Registrasi Berhasil Dikirim',
-                            icon: 'success',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    },
                 });
 
             }
