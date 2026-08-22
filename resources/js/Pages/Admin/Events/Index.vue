@@ -159,19 +159,11 @@
                         if (result.isConfirmed) {
 
                             router.delete(`/admin/events/${id}`);
-
-                            Swal.fire({
-                                title: 'Deleted!',
-                                text: 'Event Berhasil Dihapus!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }
 
-            //define method destroy
+            //define method changeStatus
             const changeStatus = (id) => {
                 Swal.fire({
                         title: 'Apakah Anda yakin?',
@@ -186,20 +178,12 @@
                         if (result.isConfirmed) {
 
                             router.post(`/admin/events/${id}/change`);
-
-                            Swal.fire({
-                                title: 'Changed!',
-                                text: 'Status Event Berhasil Dirubah!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }
 
 
-              //define method destroy
+              //define method changeAbsen
               const changeAbsen = (id) => {
                 Swal.fire({
                         title: 'Apakah Anda yakin?',
@@ -214,14 +198,6 @@
                         if (result.isConfirmed) {
 
                             router.post(`/admin/events/${id}/absen`);
-
-                            Swal.fire({
-                                title: 'Changed!',
-                                text: 'Status Absen Berhasil Dirubah!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }

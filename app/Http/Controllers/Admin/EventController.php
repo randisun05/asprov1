@@ -17,6 +17,7 @@ use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\EventParticipantsExport;
 use F9WebLtd\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
@@ -114,7 +115,7 @@ class EventController extends Controller
         );
 
      //redirect
-     return redirect()->route('admin.events.index');
+     return redirect()->route('admin.events.index')->with('success', 'Event berhasil ditambahkan.');
     }
 
     /**
@@ -143,8 +144,6 @@ class EventController extends Controller
             'event' => $event,
             'details' => $details
         ]);
-        //redirect
-        return redirect()->route('admin.events.index');
     }
 
     public function absenAll($id)
@@ -167,7 +166,7 @@ class EventController extends Controller
             'title' => 'required',
         ]);
 
-        $detail = DetailEvent::where('id', $id)->first();
+        $detail = DetailEvent::findOrFail($id);
 
         $detail->update([
             'title' => $request->title,
@@ -193,9 +192,6 @@ class EventController extends Controller
             'pointCost' => $event->point_cost,
             'templates' => $templates,
         ]);
-
-        //redirect
-        return redirect()->route('admin.events.index');
     }
 
     /**
@@ -261,7 +257,7 @@ class EventController extends Controller
 
 
      //redirect
-     return redirect()->route('admin.events.index');
+     return redirect()->route('admin.events.index')->with('success', 'Event berhasil diperbarui.');
     }
 
     /**
@@ -277,7 +273,7 @@ class EventController extends Controller
         $event->delete();
 
         //redirect
-        return redirect()->route('admin.events.index');
+        return redirect()->route('admin.events.index')->with('success', 'Event berhasil dihapus.');
     }
 
     public function change($id)
@@ -296,7 +292,7 @@ class EventController extends Controller
         }
 
      //redirect
-     return redirect()->route('admin.events.index');
+     return redirect()->route('admin.events.index')->with('success', 'Status event berhasil diubah.');
     }
 
     public function absen($id)
@@ -315,7 +311,7 @@ class EventController extends Controller
         }
 
      //redirect
-     return redirect()->route('admin.events.index');
+     return redirect()->route('admin.events.index')->with('success', 'Status absen berhasil diubah.');
     }
 
 
@@ -537,31 +533,27 @@ class EventController extends Controller
             return response()->json(['message' => 'Semua anggota sudah memiliki sertifikat.'], 409);
         }
 
-        // Ambil nomor terakhir
-        $lastCertificate = Certificate::where('category', $request->category)
-            ->whereYear('date', date('Y', strtotime($request->date)))
-            ->whereMonth('date', date('m', strtotime($request->date)))
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        $lastNumber = $lastCertificate ? intval(explode('/', $lastCertificate->no_certificate)[0]) : 0;
+        $bulan = date('m', strtotime($request->date));
+        $tahun = date('Y', strtotime($request->date));
+        $sequenceKey = "import:{$request->category}:{$tahun}:{$bulan}";
 
         $errors = [];
 
         foreach ($filteredMembers as $member) {
             try {
-                $attempts = 0;
-                do {
-                    $newNumber = str_pad(++$lastNumber, 4, '0', STR_PAD_LEFT);
-                    $kodeKegiatan = $request->category;
-                    $bulan = date('m', strtotime($request->date));
-                    $tahun = date('Y', strtotime($request->date));
-                    $nomor = "{$newNumber}/{$kodeKegiatan}/PP Aspro SDMA/{$bulan}/{$tahun}";
-                    $attempts++;
-                } while (
-                    Certificate::where('no_certificate', $nomor)->exists()
-                    && $attempts < 5
-                );
+                $nextNumber = $this->lockedNextCertificateNumber($sequenceKey, function () use ($request, $tahun, $bulan) {
+                    $lastCertificate = Certificate::where('category', $request->category)
+                        ->whereYear('date', $tahun)
+                        ->whereMonth('date', $bulan)
+                        ->orderBy('created_at', 'desc')
+                        ->first();
+
+                    return $lastCertificate ? intval(explode('/', $lastCertificate->no_certificate)[0]) : 0;
+                });
+
+                $newNumber = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+                $kodeKegiatan = $request->category;
+                $nomor = "{$newNumber}/{$kodeKegiatan}/PP Aspro SDMA/{$bulan}/{$tahun}";
 
                 if (Certificate::where('no_certificate', $nomor)->exists()) {
                     $errors[] = [
@@ -609,6 +601,46 @@ class EventController extends Controller
     }
 
 
+    /**
+     * Draw the next certificate number for a numbering scope, locked by
+     * exact key match instead of the previous pattern (read the current
+     * max no_certificate, add one, no lock) that let two concurrent
+     * certificate creations for the same category/period silently produce
+     * the same number - no_certificate has no unique constraint to catch
+     * that after the fact, unlike member numbering.
+     *
+     * $seed is only invoked the first time this key is used - it should
+     * replicate whatever "find the current max" query this scope used
+     * before, so numbering continues from real historical data instead of
+     * restarting at 1 and colliding with already-issued numbers.
+     */
+    private function lockedNextCertificateNumber(string $key, \Closure $seed): int
+    {
+        return DB::transaction(function () use ($key, $seed) {
+            if (!DB::table('certificate_number_sequences')->where('key', $key)->exists()) {
+                DB::table('certificate_number_sequences')->insertOrIgnore([
+                    'key' => $key,
+                    'last_number' => $seed(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            $sequence = DB::table('certificate_number_sequences')
+                ->where('key', $key)
+                ->lockForUpdate()
+                ->first();
+
+            $nextNumber = $sequence->last_number + 1;
+
+            DB::table('certificate_number_sequences')
+                ->where('key', $key)
+                ->update(['last_number' => $nextNumber, 'updated_at' => now()]);
+
+            return $nextNumber;
+        });
+    }
+
     public function certificatesStore($id, Request $request)
 {
     $event = Event::findOrFail($id);
@@ -629,21 +661,19 @@ class EventController extends Controller
         $bulan = date('m', $dateObj);
         $tahun = date('Y', $dateObj);
 
-        // 3. Ambil nomor terakhir dengan filter yang lebih stabil
-        // Pastikan order by no_certificate atau ID untuk akurasi
-        $lastCertificate = Certificate::whereYear('date', $tahun)
-            ->where('category', $request->category)
-            ->orderBy('no_certificate', 'desc') // Urutkan berdasarkan nomornya
-            ->first();
+        $nextNumber = $this->lockedNextCertificateNumber(
+            "single:{$request->category}:{$tahun}",
+            function () use ($request, $tahun) {
+                $lastCertificate = Certificate::whereYear('date', $tahun)
+                    ->where('category', $request->category)
+                    ->orderBy('no_certificate', 'desc')
+                    ->first();
 
-        $lastNumber = 0;
-        if ($lastCertificate) {
-            // Pecah string nomor: "0002/KODE/..." ambil bagian indeks [0]
-            $parts = explode('/', $lastCertificate->no_certificate);
-            $lastNumber = intval($parts[0]);
-        }
+                return $lastCertificate ? intval(explode('/', $lastCertificate->no_certificate)[0]) : 0;
+            }
+        );
 
-        $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+        $newNumber = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
         $nomor = "{$newNumber}/{$request->category}/PP Aspro SDMA/{$bulan}/{$tahun}";
 
         $link = (string) \Illuminate\Support\Str::uuid();
@@ -712,18 +742,7 @@ class EventController extends Controller
     $month = date('m', strtotime($targetDate));
     $year = date('Y', strtotime($targetDate));
 
-    // PERBAIKAN 2: Ambil nomor urut tertinggi saja (integer) agar lebih akurat
-    $lastCertificate = Certificate::where('category', 'Kombel-Panitia')
-        ->whereYear('date', $year)
-        ->whereMonth('date', $month)
-        ->where('no_certificate', 'like', "%/Kombel-Panitia/PP Aspro SDMA/{$month}/{$year}")
-        ->get()
-        ->map(function($cert) {
-            return (int) explode('/', $cert->no_certificate)[0];
-        })
-        ->max(); // Ambil angka tertinggi
-
-    $currentNumber = $lastCertificate ?? 0;
+    $sequenceKey = "excel:Kombel-Panitia:{$year}:{$month}";
     $failedImports = [];
 
     foreach ($rows as $row) {
@@ -733,22 +752,18 @@ class EventController extends Controller
         }
 
         try {
-            // PERBAIKAN 3: Increment dilakukan di luar do-while agar angka selalu naik
-            $currentNumber++;
+            $nextNumber = $this->lockedNextCertificateNumber($sequenceKey, function () use ($year, $month) {
+                return Certificate::where('category', 'Kombel-Panitia')
+                    ->whereYear('date', $year)
+                    ->whereMonth('date', $month)
+                    ->where('no_certificate', 'like', "%/Kombel-Panitia/PP Aspro SDMA/{$month}/{$year}")
+                    ->get()
+                    ->map(fn ($cert) => (int) explode('/', $cert->no_certificate)[0])
+                    ->max() ?? 0;
+            });
 
-            $attempts = 0;
-            do {
-                $newNumber = str_pad($currentNumber, 4, '0', STR_PAD_LEFT);
-                $nomor = "{$newNumber}/kombel/PP Aspro SDMA/{$month}/{$year}";
-
-                // Jika ternyata nomor ini sudah ada (karena input manual atau data lama), naikkan terus
-                if (Certificate::where('no_certificate', $nomor)->exists()) {
-                    $currentNumber++;
-                    $attempts++;
-                } else {
-                    break;
-                }
-            } while ($attempts < 100);
+            $newNumber = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            $nomor = "{$newNumber}/kombel/PP Aspro SDMA/{$month}/{$year}";
 
             $link = (string) Str::uuid();
 
