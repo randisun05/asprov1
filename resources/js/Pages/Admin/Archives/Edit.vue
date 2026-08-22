@@ -147,7 +147,6 @@ import { router } from '@inertiajs/vue3';
 
 //import sweet alert2
 import Swal from 'sweetalert2';
-import { DatasetController } from 'chart.js';
 
 export default {
     //layout
@@ -192,117 +191,6 @@ export default {
     }
 }
 
-        const handleApprove = (id) => {
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Anda akan menyetujui usulan ini!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Approve it!'
-            })
-                .then((result) => {
-                    if (result.isConfirmed) {
-
-                        router.post(`/admin/registration/${id}/approve`,
-                            {
-                                'info': form.info
-                            });
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Approved!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
-                    }
-                })
-        }
-
-        const handleConfirm = (id) => {
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Anda akan mengkonfirmasi ulang usulan ini!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Confirm it!'
-            })
-                .then((result) => {
-                    if (result.isConfirmed) {
-
-                        router.post(`/admin/registration/${id}/confirm`, {
-                            'info': form.info,
-                            'email': form.sendemail
-                        });
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Conirmed!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
-                    }
-                })
-            ref.showModalEmail = false;
-        }
-
-        const handleReject = (id) => {
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Anda akan menolak usulan ini!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Reject it!'
-            })
-                .then((result) => {
-                    if (result.isConfirmed) {
-
-                        router.post(`/admin/registration/${id}/reject`);
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Rejected!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
-                    }
-                })
-        }
-
-        const sendEmail = (id) => {
-            Swal.fire({
-                title: 'Pastikan data sudah sesuai.!',
-                text: "Anda akan mengirim email konfirmasi?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Send it!'
-            })
-                .then((result) => {
-                    if (result.isConfirmed) {
-
-                        router.post(`/admin/registration/${id}/email`);
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Email Sent!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
-                    }
-                })
-        }
-
         const submitDisposisi = (id) => {
             Swal.fire({
                 title: 'Apakah Anda yakin?',
@@ -316,14 +204,6 @@ export default {
             .then((result) => {
                 if (result.isConfirmed) {
                     router.post(`/admin/archives/disposition/${id}`, { user_id: form.user_id });
-
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Status Sent!.',
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false,
-                    });
                 }
             })
         }
@@ -331,10 +211,6 @@ export default {
         //return
         return {
             form,
-            handleApprove,
-            handleReject,
-            handleConfirm,
-            sendEmail,
             submitDisposisi,
             selectAll
         }

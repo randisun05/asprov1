@@ -350,14 +350,6 @@
                                                                     user_id: form.user_id,
                                                                     isi: form.isi
                                                                 });
-
-                                                                Swal.fire({
-                                                                    title: 'Success!',
-                                                                    text: 'Status Sent!.',
-                                                                    icon: 'success',
-                                                                    timer: 2000,
-                                                                    showConfirmButton: false,
-                                                                });
                                                             }
                                                         })
                                                 }

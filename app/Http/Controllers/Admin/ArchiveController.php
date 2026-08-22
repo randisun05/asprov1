@@ -39,12 +39,7 @@ class ArchiveController extends Controller
             )
             ->latest()
             ->paginate(10);
-        // Tambahkan pengecekan ini jika Anda ingin $archives menjadi null saat kosong
-        if ($isNotAdminOrSekretariat && $archives->isEmpty()) {
-            $archives = null;
-        } else {
-            $archives->appends(['q' => request()->q]);
-        }
+        $archives->appends(['q' => request()->q]);
 
         return inertia('Admin/Archives/Index', [
             'archives' => $archives,
@@ -301,9 +296,9 @@ class ArchiveController extends Controller
     {
 
         $instansis = instansi::get();
-        $archive = Archive::where('id', $id)->first();
+        $archive = Archive::findOrFail($id);
         return inertia('Admin/Archives/EditArchive', [
-            'archive' => $archive ? $archive : null,
+            'archive' => $archive,
             'instansis' => $instansis,
         ]);
     }
@@ -342,27 +337,37 @@ class ArchiveController extends Controller
 
     ]);
 
- // Store the file using Laravel's file storage system
+ // Update registration
+    $archive = Archive::findOrFail($id);
+
+    // Store the file using Laravel's file storage system; keep the
+    // existing document when no new file is uploaded instead of wiping it.
      if ($request->hasFile('document')) {
         $document = $request->file('document')->storePublicly('/documents');
         } else {
-        $document = null;
+        $document = $archive->document;
         }
 
-    // Update registration
-    $archive = Archive::findOrFail($id);
     $archive->update(array_merge($validatedData, ['document' => $document]));
 
      //redirect
-     return redirect()->route('admin.archives.index');
+     return redirect()->route('admin.archives.index')->with('success', 'Data berhasil diupdate');
     }
 
     public function updateInbox(Request $request, $id)
     {
+        $request->validate([
+            'detail' => 'nullable|string',
+            'status' => 'required',
+        ]);
 
         $detailarchive = DetailArchive::findOrFail($id);
-        $detailarchive->update($request->all());
-        $archive = Archive::where('id', $detailarchive->archive_id)->first();
+        $detailarchive->update([
+            'detail' => $request->detail,
+            'status' => $request->status,
+        ]);
+
+        $archive = Archive::findOrFail($detailarchive->archive_id);
 
         $archive->update([
             'status' => $request->status,

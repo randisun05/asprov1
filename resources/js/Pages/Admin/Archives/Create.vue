@@ -201,9 +201,6 @@
             reactive
         } from 'vue';
 
-        //import sweet alert2
-        import Swal from 'sweetalert2';
-
         //import inertia adapter
         import { router } from '@inertiajs/vue3';
 
@@ -305,17 +302,6 @@
                         title: form.title,
                         document: form.document,
                         category: form.category
-                    }, {
-                        onSuccess: () => {
-                            //show success alert
-                            Swal.fire({
-                                title: 'Success!',
-                                text: 'Permintaan Berhasil Dikirim, Silakan Cek Email Anda.',
-                                icon: 'success',
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                        },
                     });
 
                 }

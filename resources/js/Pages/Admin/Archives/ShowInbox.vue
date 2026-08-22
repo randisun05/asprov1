@@ -338,14 +338,6 @@
                                                         'detail': form.detail,
                                                         'status': form.status
                                                     });
-
-                                                Swal.fire({
-                                                    title: 'Success!',
-                                                    text: 'Status Approved!.',
-                                                    icon: 'success',
-                                                    timer: 2000,
-                                                    showConfirmButton: false,
-                                                });
                                             }
                                         })
                                 }
@@ -365,14 +357,6 @@
                                         .then((result) => {
                                             if (result.isConfirmed) {
                                                 router.post(`/admin/archives/disposition/inbox/${id}`, { user_id: form.user_id });
-
-                                                Swal.fire({
-                                                    title: 'Success!',
-                                                    text: 'Status Sent!.',
-                                                    icon: 'success',
-                                                    timer: 2000,
-                                                    showConfirmButton: false,
-                                                });
                                             }
                                         })
                                 }

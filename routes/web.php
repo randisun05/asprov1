@@ -336,7 +336,8 @@ Route::put('/user/forget-password/{id}/reset', [\App\Http\Controllers\Public\Pub
 Route::get('/identity-verification/{member:qr_link}', [\App\Http\Controllers\Public\PublicController::class, 'profileView'])->name('profile.view');
 Route::get('/identity-verification/{member:qr_link}/{event}/download', [\App\Http\Controllers\Public\PublicController::class, 'downloadSertifikat'])->name('profile.sertifikat.download');
 Route::get('/verification/{id}', [\App\Http\Controllers\Public\PublicController::class, 'documentVerif'])->name('documentVerif');
-Route::resource('/hubungi-aspro', \App\Http\Controllers\Public\ArchiveController::class);
+Route::post('/hubungi-aspro', [\App\Http\Controllers\Public\ArchiveController::class, 'store'])->middleware('throttle:6,1')->name('hubungi-aspro.store');
+Route::resource('/hubungi-aspro', \App\Http\Controllers\Public\ArchiveController::class)->except(['store']);
 // Route::post('/hubungi-aspro/store', [\App\Http\Controllers\Public\ArchiveController::class, 'store'])->name('hubungi-aspro.store');
 // Route::post('/hubungi-aspro/tiket', [\App\Http\Controllers\Public\ArchiveController::class, 'show'])->name('hubungi-aspro.show');
 Route::get('/certificates/{id}/view', [\App\Http\Controllers\Public\PublicController::class, 'certificatesShow'])->name('certificate.show');
