@@ -82,6 +82,9 @@ Route::prefix('admin')->group(function() {
             Route::post('/posts/{id}/submission', [\App\Http\Controllers\Admin\PostController::class, 'cancel'])->name('admin.posts.submission');
             Route::get('/category/create', [\App\Http\Controllers\Admin\PostController::class, 'categoryCreate'])->name('admin.category.create');
             Route::post('/category/store', [\App\Http\Controllers\Admin\PostController::class, 'categoryStore'])->name('admin.category.store');
+            Route::get('/category/{id}/edit', [\App\Http\Controllers\Admin\PostController::class, 'categoryEdit'])->name('admin.category.edit');
+            Route::put('/category/{id}', [\App\Http\Controllers\Admin\PostController::class, 'categoryUpdate'])->name('admin.category.update');
+            Route::delete('/category/{id}', [\App\Http\Controllers\Admin\PostController::class, 'categoryDestroy'])->name('admin.category.destroy');
         });
 
           Route::post('/events/{id}/generate-question', [\App\Http\Controllers\Admin\QuestionsController::class, 'EnrollQuestion'])->name('event.generate.question');
@@ -326,9 +329,9 @@ Route::get('/certificates/search', [\App\Http\Controllers\Public\PublicControlle
 Route::get('/certificates/filter', [\App\Http\Controllers\Public\PublicController::class, 'certificateFilter'])->name('certificateFilter');
 Route::resource('/merchans', \App\Http\Controllers\Public\MerchansController::class);
 Route::get('/forget-password', [\App\Http\Controllers\Public\PublicController::class, 'forgetPassword'])->name('forget.password');
-Route::get('/forget-password/email', [\App\Http\Controllers\Public\PublicController::class, 'emailforgetPassword'])->name('forget.password.email');
+Route::post('/forget-password/email', [\App\Http\Controllers\Public\PublicController::class, 'emailforgetPassword'])->middleware('throttle:6,1')->name('forget.password.email');
 Route::get('/user/forget-password/{id}', [\App\Http\Controllers\Public\PublicController::class, 'IndexforgetPassword'])->name('forget.password.index');
-Route::put('/user/forget-password/{id}/reset', [\App\Http\Controllers\Public\PublicController::class, 'ResetPassword'])->name('forget.password.reset');
+Route::put('/user/forget-password/{id}/reset', [\App\Http\Controllers\Public\PublicController::class, 'ResetPassword'])->middleware('throttle:6,1')->name('forget.password.reset');
 Route::get('/identity-verification/{member:qr_link}', [\App\Http\Controllers\Public\PublicController::class, 'profileView'])->name('profile.view');
 Route::get('/identity-verification/{member:qr_link}/{event}/download', [\App\Http\Controllers\Public\PublicController::class, 'downloadSertifikat'])->name('profile.sertifikat.download');
 Route::get('/verification/{id}', [\App\Http\Controllers\Public\PublicController::class, 'documentVerif'])->name('documentVerif');

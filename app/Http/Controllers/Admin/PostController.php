@@ -144,7 +144,7 @@ class PostController extends Controller
 
 
      //redirect
-     return redirect()->route('admin.posts.index');
+     return redirect()->route('admin.posts.index')->with('success', 'Post berhasil ditambahkan.');
     }
 
     /**
@@ -249,7 +249,7 @@ class PostController extends Controller
 
 
      //redirect
-     return redirect()->route('admin.posts.index');
+     return redirect()->route('admin.posts.index')->with('success', 'Post berhasil diperbarui.');
     }
 
     /**
@@ -267,7 +267,7 @@ class PostController extends Controller
         $post->delete();
 
         //redirect
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('success', 'Post berhasil dihapus.');
     }
 
     public function approve($id)
@@ -286,7 +286,7 @@ class PostController extends Controller
         ]);
 
         //redirect
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('success', 'Post berhasil dipublikasikan.');
     }
 
     public function return($id)
@@ -300,7 +300,7 @@ class PostController extends Controller
             'status' => 'perlu ada perbaikan'
         ]);
         //redirect
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('success', 'Post dikembalikan untuk diperbaiki.');
     }
 
     public function reject($id)
@@ -313,7 +313,7 @@ class PostController extends Controller
             'status' => 'rejected'
         ]);
         //redirect
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('success', 'Post berhasil ditolak.');
     }
 
     public function cancel($id)
@@ -329,7 +329,7 @@ class PostController extends Controller
         $public->delete();
 
         //redirect
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('success', 'Publikasi berhasil dibatalkan.');
 
     }
 
@@ -343,7 +343,7 @@ class PostController extends Controller
             ]);
 
         //redirect
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('success', 'Publikasi terbatas berhasil dibatalkan.');
 
     }
 
@@ -358,7 +358,7 @@ class PostController extends Controller
 
 
         //redirect
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('success', 'Post berhasil dipublikasikan secara terbatas.');
 
     }
 
@@ -373,7 +373,7 @@ class PostController extends Controller
 
 
         //redirect
-        return redirect()->route('admin.posts.list');
+        return redirect()->route('admin.posts.list')->with('success', 'Post berhasil diajukan untuk publikasi.');
 
     }
 
@@ -382,9 +382,6 @@ class PostController extends Controller
         $this->cekAuth();
         return inertia('Admin/Posts/CreateCategory', [
          ]);
-        //redirect
-        return redirect()->route('admin.posts.index');
-
     }
 
     public function categoryStore(Request $request)
@@ -400,8 +397,50 @@ class PostController extends Controller
             'title' => $request->title
         ]);
 
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('success', 'Kategori berhasil ditambahkan.');
 
+    }
+
+    public function categoryEdit($id)
+    {
+        $this->cekAuth();
+
+        $category = Category::findOrFail($id);
+
+        return inertia('Admin/Posts/EditCategory', [
+            'category' => $category,
+        ]);
+    }
+
+    public function categoryUpdate(Request $request, $id)
+    {
+        $this->cekAuth();
+
+        $request->validate([
+            'title' => 'required|unique:categories,title,' . $id,
+        ], [
+            'title.unique' => 'Kategori sudah tersedia'
+        ]);
+
+        Category::findOrFail($id)->update([
+            'title' => $request->title,
+        ]);
+
+        return redirect()->route('admin.posts.index')->with('success', 'Kategori berhasil diperbarui.');
+    }
+
+    public function categoryDestroy($id)
+    {
+        $this->cekAuth();
+
+        try {
+            Category::findOrFail($id)->delete();
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->route('admin.posts.index')
+                ->with('error', 'Kategori tidak bisa dihapus karena masih dipakai oleh post yang ada.');
+        }
+
+        return redirect()->route('admin.posts.index')->with('success', 'Kategori berhasil dihapus.');
     }
 
     public function list()
@@ -431,7 +470,11 @@ class PostController extends Controller
     {
         if(!auth()->check()) {
             auth()->logout(); // Log out the user programmatically
-            return redirect()->route('login')->with('warning', 'Anda tidak memiliki akses');
+            // Every caller invokes cekAuth() without returning its result, so
+            // a plain `return redirect(...)` here was silently discarded and
+            // execution continued as if the user were authenticated. Aborting
+            // with the response makes the check actually stop the request.
+            abort(redirect()->route('login')->with('warning', 'Anda tidak memiliki akses'));
         }
     }
 

@@ -167,6 +167,8 @@
                                         <td class="fw-bold text-center">{{ ++index + (categories.current_page - 1) * categories.per_page }}</td>
                                         <td>{{ category.title }}</td>
                                         <td class="text-center">
+                                            <Link :href="`/admin/category/${category.id}/edit`" class="btn btn-sm btn-info border-0 shadow me-2"
+                                                type="button"><i class="fa fa-pencil-alt" title="edit"></i></Link>
                                             <button @click.prevent="destroy(category.id)" class="btn btn-sm btn-danger border-0 me-2"><i class="fa fa-trash" title="hapus"></i></button>
                                         </td>
                                     </tr>
@@ -274,13 +276,6 @@
                 .then((result) => {
                     if (result.isConfirmed) {
                         router.post(`/admin/posts/${id}/approve`);
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Approved!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
             }
@@ -298,13 +293,6 @@
                 .then((result) => {
                     if (result.isConfirmed) {
                         router.post(`/admin/posts/${id}/return`);
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Returned!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
             }
@@ -325,14 +313,6 @@
                     if (result.isConfirmed) {
 
                         router.post(`/admin/posts/${id}/reject`);
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Rejected!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
             }
@@ -351,14 +331,6 @@
                     if (result.isConfirmed) {
 
                         router.post(`/admin/posts/${id}/cancel`);
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Cancelled!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
             }
@@ -377,14 +349,6 @@
                     if (result.isConfirmed) {
 
                         router.post(`/admin/posts/${id}/limited`);
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Limited!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
             }
@@ -403,16 +367,25 @@
                     if (result.isConfirmed) {
 
                         router.post(`/admin/posts/${id}/cancelLimited`);
-
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Cancelled!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
+            }
+
+            //define method destroy for categories
+            const destroy = (id) => {
+                Swal.fire({
+                    title: 'Yakin ingin menghapus kategori ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        router.delete(`/admin/category/${id}`);
+                    }
+                });
             }
              // Method to count reactions
              const countReactions = (publishs) => {
@@ -458,7 +431,8 @@
                 handleCancel,
                 handleLimited,
                 countReactions,
-                handleCancelLimited
+                handleCancelLimited,
+                destroy,
 
 
         }

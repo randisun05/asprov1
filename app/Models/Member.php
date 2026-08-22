@@ -18,12 +18,17 @@ class Member extends Authenticatable
         'nomember',
         'agency',
         'code-password',
+        'code_password_expires_at',
         'qr_link'
     ];
 
     protected $hidden = [
         'email',
         'password',
+    ];
+
+    protected $casts = [
+        'code_password_expires_at' => 'datetime',
     ];
 
      public function position()

@@ -48,7 +48,7 @@
                                 <thead class="thead-dark">
                                     <tr class="border-0 text-center">
                                         <th class="border-0 rounded-start" style="width:5%">No.</th>
-                                        <th class="border-0">Titleee</th>
+                                        <th class="border-0">Title</th>
                                         <th class="border-0">Author</th>
                                         <th class="border-0">Kategori</th>
                                         <th class="border-0">Status</th>
@@ -70,8 +70,8 @@
                                             <span v-else-if="post.status === 'return'" class="badge bg-danger" title="ditolak untuk publish">{{ post.status }}</span>
                                             <span v-else-if="post.status === 'limited'" class="badge bg-secondary">{{ post.status }}</span></td>
                                         <td class="text-center">
-                                            <Link :href="`/admin/posts/${encodeURIComponent(post.slug)}/edit`" class="btn btn-sm btn-warning border-0 shadow me-2" type="button" title="edit"><i class="fa fa-pencil"></i></Link>
-                                            <Link :href="`/admin/posts/${encodeURIComponent(post.slug)}`" class="btn btn-sm btn-info border-0 shadow me-2" type="button"><i class="fa fa-eye" title="lihat detail"></i></Link>
+                                            <Link :href="`/admin/posts/${post.id}/edit`" class="btn btn-sm btn-warning border-0 shadow me-2" type="button" title="edit"><i class="fa fa-pencil"></i></Link>
+                                            <Link :href="`/admin/posts/${post.id}`" class="btn btn-sm btn-info border-0 shadow me-2" type="button"><i class="fa fa-eye" title="lihat detail"></i></Link>
                                             <Link  v-if="post.status !== 'submission' && post.status !== 'approved' && post.status !== 'limited'" @click.prevent="handleSubmission(post.id)" class="btn btn-sm btn-success border-0 shadow me-2" type="button" title="pengajuan publish"><i class="fa fa-envelope"></i></Link>
                                             <button v-if="post.status !== 'rejected' && post.status !== 'approved' && post.status !== 'limited'" @click.prevent="destroy(post.id)" class="btn btn-sm btn-danger border-0 me-2"><i class="fa fa-trash" title="hapus"></i></button>
                                         </td>
@@ -166,14 +166,6 @@
                         if (result.isConfirmed) {
 
                             router.delete(`/admin/posts/${id}`);
-
-                            Swal.fire({
-                                title: 'Deleted!',
-                                text: 'Peserta Berhasil Dihapus!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }
@@ -191,13 +183,6 @@
                 .then((result) => {
                     if (result.isConfirmed) {
                         router.post(`/admin/posts/${id}/submission`);
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Status Returned!.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false,
-                        });
                     }
                 })
             }

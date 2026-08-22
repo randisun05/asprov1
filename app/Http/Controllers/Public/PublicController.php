@@ -579,6 +579,7 @@ class PublicController extends Controller
             $passwordCode = \Illuminate\Support\Str::uuid()->toString();
             $data->update([
                 'code-password' => $passwordCode,
+                'code_password_expires_at' => now()->addMinutes(60),
             ]);
 
             Mail::to($data->email)->send(new SendEmailForgetPassword($data));
@@ -592,9 +593,10 @@ class PublicController extends Controller
     public function IndexforgetPassword(Member $member, $id)
     {
         $member = $member->where('code-password', $id)->first();
-        if (!$member || $member->{'code-password'} === null)
-            // Jika status registrasi bukan 'confirm', arahkan pengguna kembali atau tampilkan pesan kesalahan
+
+        if (!$member || $member->{'code-password'} === null || !$this->resetCodeStillValid($member)) {
             return redirect()->route('user.login')->with('error', 'Link telah ditutup.');
+        }
 
         return inertia('User/Auth/Index', [
             'member' => $member
@@ -618,14 +620,30 @@ class PublicController extends Controller
             'oldpassword.min:8' => 'Password baru minimal 8 karakter'
         ]);
 
-        $member = Member::Where('code-password', $id)->first();
+        $member = Member::where('code-password', $id)->first();
+
+        if (!$member || !$this->resetCodeStillValid($member)) {
+            return redirect()->route('user.login')->with('error', 'Link reset password sudah tidak berlaku, silakan minta link baru.');
+        }
 
         $member->update([
             'password' => Hash::make($request->password),
             'code-password' => null,
+            'code_password_expires_at' => null,
         ]);
 
         return redirect()->route('user.login')->with('success', 'Password berhasil direset.');
+    }
+
+    /**
+     * A code-password issued before this expiry column existed has a null
+     * expiry - treat those as still valid rather than locking out members
+     * whose reset email predates the migration.
+     */
+    private function resetCodeStillValid(Member $member): bool
+    {
+        return $member->code_password_expires_at === null
+            || now()->lt($member->code_password_expires_at);
     }
 
     public function profileView($qr_link)

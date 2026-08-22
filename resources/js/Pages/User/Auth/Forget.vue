@@ -132,7 +132,7 @@
             const submit = () => {
 
                 //send data to server
-                router.get('/forget-password/email', {
+                router.post('/forget-password/email', {
                     //data
                     nip: form.nip,
                     email: form.email,
