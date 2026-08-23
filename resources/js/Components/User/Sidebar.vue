@@ -17,6 +17,17 @@
                   </Link>
               </li>
 
+              <li class="nav-item" :class="{ 'active': $page.url.startsWith('/user/notifications') }">
+                  <Link href="/user/notifications" class="nav-link d-flex justify-content-between">
+                  <span>
+                      <span class="sidebar-icon">
+                          <i class="fa fa-bell fa-lg" aria-hidden="true"></i>
+                      </span>
+                      <span class="sidebar-text ms-3">Notifikasi</span>
+                  </span>
+                  </Link>
+              </li>
+
               <li class="nav-item" :class="{ 'active': $page.url.startsWith('/user/member-card') }">
                   <Link href="/user/member-card" class="nav-link d-flex justify-content-between">
                   <span>

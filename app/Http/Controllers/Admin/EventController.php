@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Event;
 use App\Models\Member;
 use App\Models\EventPoint;
+use App\Models\MemberNotification;
 use App\Models\Certificate;
 use App\Models\DetailEvent;
 use App\Models\Question;
@@ -107,11 +108,25 @@ class EventController extends Controller
             'duration' => $request->duration,
             'start_at' => $request->start_at,
             'end_at' => $request->end_at,
+            // events.status is NOT NULL with no DB default, and this create()
+            // never set it - every event creation was failing with a DB
+            // integrity error before this fix. New events start 'active'
+            // (open), matching the toggle() action's two valid states.
+            'status' => 'active',
         ]);
 
         EventPoint::updateOrCreate(
             ['event_id' => $event->id],
             ['point_cost' => $request->point_cost ?? 0]
+        );
+
+        $isTryout = $event->category === 'Tryout';
+        MemberNotification::broadcast(
+            $isTryout ? 'tryout' : 'event',
+            ($isTryout ? 'Tryout baru: ' : 'Kegiatan baru: ') . $event->title,
+            $event->body,
+            $isTryout ? '/user/tryouts' : "/user/events/{$event->slug}",
+            $event
         );
 
      //redirect

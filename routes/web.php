@@ -70,6 +70,9 @@ Route::prefix('admin')->group(function() {
         });
 
         Route::middleware('role:administrator,humas')->group(function () {
+            Route::post('/announcements/{id}/status', [\App\Http\Controllers\Admin\AnnouncementController::class, 'status'])->name('admin.announcements.status');
+            Route::resource('/announcements', \App\Http\Controllers\Admin\AnnouncementController::class, ['as' => 'admin']);
+
             Route::get('/admin/posts/', [\App\Http\Controllers\Admin\PostController::class, 'list'])->name('admin.posts.list');
             Route::post('/posts/{id}', [\App\Http\Controllers\Admin\PostController::class, 'update'])->name('admin.posts.update');
             Route::resource('/posts', \App\Http\Controllers\Admin\PostController::class, ['as' => 'admin']);
@@ -228,6 +231,9 @@ Route::prefix('user')->group(function() {
     Route::group(['middleware' => ['member']], function () {
         //route dashboard
         Route::get('/dashboard', App\Http\Controllers\User\DashboardController::class)->name('user.dashboard');
+        Route::get('/notifications', [\App\Http\Controllers\User\NotificationController::class, 'index'])->name('user.notifications.index');
+        Route::post('/notifications/{id}/read', [\App\Http\Controllers\User\NotificationController::class, 'read'])->name('user.notifications.read');
+        Route::post('/notifications/read-all', [\App\Http\Controllers\User\NotificationController::class, 'readAll'])->name('user.notifications.read-all');
         Route::get('/profile', [\App\Http\Controllers\User\DataProfileController::class, 'index'])->name('user.profile');
         Route::get('/profile/data-utama', [\App\Http\Controllers\User\DataProfileController::class, 'indexIndiv'])->name('user.profile.data-utama');
         Route::post('/profile/image', [\App\Http\Controllers\User\DataProfileController::class, 'updateImage'])->name('user.profile.data-utama.image');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Merchan;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\MemberNotification;
 
 
 
@@ -68,7 +69,7 @@ class MerchanController extends Controller
         // Proceed with storing or processing the uploaded file
     };
 
-        Merchan::create([
+        $merchan = Merchan::create([
             'title' => $request->title,
             'image' =>  $image,
             'body' => $request->body,
@@ -78,6 +79,8 @@ class MerchanController extends Controller
             'price' => $request->price,
             'status' => "active",
         ]);
+
+        MemberNotification::broadcast('merchan', 'Merchandise baru: ' . $merchan->title, $merchan->body, "/user/merchans/{$merchan->id}", $merchan);
 
      //redirect
      return redirect()->route('admin.merchans.index')->with('success', 'Merchandise berhasil ditambahkan.');

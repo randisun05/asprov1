@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\PublicPost;
+use App\Models\MemberNotification;
 
 class PostController extends Controller
 {
@@ -284,6 +285,8 @@ class PostController extends Controller
             'post_id' => $post->id
         ]);
 
+        MemberNotification::broadcast('post', 'Berita baru: ' . $post->title, $post->excerpt, "/user/posts/{$post->slug}", $post);
+
         //redirect
         return redirect()->route('admin.posts.index')->with('success', 'Post berhasil dipublikasikan.');
     }
@@ -355,6 +358,7 @@ class PostController extends Controller
             'status' => 'limited'
         ]);
 
+        MemberNotification::broadcast('post', 'Berita baru: ' . $post->title, $post->excerpt, "/user/posts/{$post->slug}", $post);
 
         //redirect
         return redirect()->route('admin.posts.index')->with('success', 'Post berhasil dipublikasikan secara terbatas.');

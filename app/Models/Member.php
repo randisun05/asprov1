@@ -47,4 +47,9 @@ class Member extends Authenticatable
         return $this->hasMany(PointTransaction::class)->latest();
     }
 
+    public function notificationReads()
+    {
+        return $this->hasMany(MemberNotificationRead::class);
+    }
+
 }

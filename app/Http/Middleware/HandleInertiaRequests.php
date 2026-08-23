@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\MemberNotification;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -49,6 +50,33 @@ class HandleInertiaRequests extends Middleware
                 'user'          => auth()->user() ?   auth()->user() : null,
                 'member'          => auth()->guard('member')->user() ?   auth()->guard('member')->user() : null,
             ],
+            'notifications' => fn () => $this->notificationsForNavbar(),
         ]);
+    }
+
+    /**
+     * Unread count + latest few, for the bell icon in the member navbar.
+     * Cheap indexed queries, only run when a member is actually logged in.
+     */
+    private function notificationsForNavbar(): array
+    {
+        $member = auth()->guard('member')->user();
+
+        if (!$member) {
+            return ['unreadCount' => 0, 'latest' => []];
+        }
+
+        $readIds = $member->notificationReads()->pluck('member_notification_id');
+
+        return [
+            'unreadCount' => MemberNotification::whereNotIn('id', $readIds)->count(),
+            'latest' => MemberNotification::latest('id')->take(5)->get()->map(fn ($n) => [
+                'id' => $n->id,
+                'title' => $n->title,
+                'link' => $n->link,
+                'is_read' => $readIds->contains($n->id),
+                'created_at' => $n->created_at,
+            ]),
+        ];
     }
 }

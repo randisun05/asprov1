@@ -77,6 +77,31 @@
                         </ul>
                     </div>
                 </div>
+                <!--notification bell-->
+                <div class="dropdown me-2">
+                    <a href="#" class="btn position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                        id="notification_toggle">
+                        <i class="fa fa-bell fa-lg" aria-hidden="true"></i>
+                        <span v-if="unreadCount > 0"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="font-size:0.6rem;">
+                            {{ unreadCount > 9 ? '9+' : unreadCount }}
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notification_toggle" style="min-width: 300px;">
+                        <li v-if="latestNotifications.length === 0" class="dropdown-item-text text-muted">Belum ada notifikasi.</li>
+                        <li v-for="notification in latestNotifications" :key="notification.id">
+                            <Link class="dropdown-item" :class="{ 'fw-bold': !notification.is_read }"
+                                :href="`/user/notifications/${notification.id}/read`" method="POST" as="button">
+                            {{ notification.title }}
+                            </Link>
+                        </li>
+                        <li><hr class="dropdown-divider" v-if="latestNotifications.length > 0"></li>
+                        <li>
+                            <Link class="dropdown-item text-center" href="/user/notifications">Lihat semua notifikasi</Link>
+                        </li>
+                    </ul>
+                </div>
                 <!--side menu open button-->
                 <div class="dropdown">
                     <a href="#" class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false"
@@ -137,8 +162,14 @@ export default {
         };
     },
 
-
-
+    computed: {
+        unreadCount() {
+            return this.$page.props.notifications?.unreadCount ?? 0;
+        },
+        latestNotifications() {
+            return this.$page.props.notifications?.latest ?? [];
+        },
+    },
 
 }
 </script>
