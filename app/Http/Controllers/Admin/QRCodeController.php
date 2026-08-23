@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Faker\Core\Uuid;
 use Illuminate\Support\Str;
 use App\Models\Member;
 use Illuminate\Http\Request;
@@ -10,7 +9,6 @@ use App\Http\Controllers\Controller;
 use App\Models\ProfileDataMain;
 use App\Models\ProfileDataPosition;
 use F9WebLtd\QrCode\Facades\QrCode;
-use Intervention\Image\Facades\Image;
 
 class QRCodeController extends Controller
 {
@@ -51,7 +49,10 @@ class QRCodeController extends Controller
     {
 
         // Retrieve the member where no_member matches the request text
-        $data = ProfileDataPosition::where('id', $id)->with('main')->first();
+        $data = ProfileDataPosition::with('main')->find($id);
+        if (!$data || !$data->main) {
+            return response('Data anggota tidak ditemukan', 404);
+        }
         $nomember = $data->main->nomember;
         $member = Member::where('nomember', $nomember)->first();
 

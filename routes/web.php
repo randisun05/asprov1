@@ -143,7 +143,7 @@ Route::prefix('admin')->group(function() {
             Route::post('/achievements/{id}/change', [\App\Http\Controllers\Admin\AchievementController::class, 'change'])->name('admin.achievements.change');
         });
 
-        Route::get('/generate-qr', [\App\Http\Controllers\Admin\QRCodeController::class, 'generateQRCode']);
+        Route::post('/generate-qr', [\App\Http\Controllers\Admin\QRCodeController::class, 'generateQRCode'])->name('admin.qrcode.generate');
         Route::get('/members/qrcode/{id}', [\App\Http\Controllers\Admin\QRCodeController::class, 'generateQRCode1']);
         Route::get('/member-card/download/{id}', [\App\Http\Controllers\Admin\DataMembersController::class, 'downloadMemberCard'])->name('admin.card.download');
 
