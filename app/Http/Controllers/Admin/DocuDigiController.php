@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use TCPDF;
-use App\Models\Member;
-use setasign\Fpdi\Fpdi;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Smalot\PdfParser\Parser;
 use App\Models\DocumentDigital;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 use F9WebLtd\QrCode\Facades\QrCode;
 
 class DocuDigiController extends Controller
@@ -69,20 +65,32 @@ class DocuDigiController extends Controller
     public function paraf($id, Request $request)
     {
         $docu = DocumentDigital::findOrFail($id);
-        $user_id = auth()->user()->id;
-        $user = Member::where('id',$user_id)->first();
 
+        $isTargetSigner = $docu->nipparaf && $docu->nipparaf === auth()->user()->nip;
+        $isOverseer = in_array(auth()->user()->role, ['administrator', 'sekretariat'], true);
 
-            $docu->update([
-                'status' => "paraf",
-            ]);
+        if (!$isTargetSigner && !$isOverseer) {
+            return redirect()->route('admin.docudigi.index')->with('error', 'Anda tidak memiliki akses untuk memparaf dokumen ini.');
+        }
 
-            return redirect()->route('admin.docudigi.index');
+        $docu->update([
+            'status' => "paraf",
+        ]);
+
+        return redirect()->route('admin.docudigi.index')->with('success', 'Dokumen berhasil diparaf.');
     }
 
     public function approve($id, Request $request)
     {
         $docu = DocumentDigital::findOrFail($id);
+
+        $isTargetSigner = $docu->nipttd && $docu->nipttd === auth()->user()->nip;
+        $isOverseer = in_array(auth()->user()->role, ['administrator', 'sekretariat'], true);
+
+        if (!$isTargetSigner && !$isOverseer) {
+            return redirect()->route('admin.docudigi.index')->with('error', 'Anda tidak memiliki akses untuk menandatangani dokumen ini.');
+        }
+
         $fullPath = storage_path('app/public/' . $docu->document);
         $filename = Str::beforeLast(basename($docu->document), '.');
 
@@ -99,31 +107,41 @@ class DocuDigiController extends Controller
             " " . escapeshellarg($anchor);
              shell_exec($command);
 
-        $user_id = auth()->user()->id;
-        $user = Member::where('id',$user_id)->first();
+        // find_text_position.py only writes the stamped _ttd.pdf when it
+        // actually locates the anchor text; if it doesn't, marking the
+        // document "approved" here would point it at a file that was
+        // never created.
+        $stampedPath = str_replace('.pdf', '_ttd.pdf', $fullPath);
+        if (!file_exists($stampedPath)) {
+            return redirect()->route('admin.docudigi.index')->with('error', 'Gagal menyisipkan QR Code: teks anchor tidak ditemukan pada dokumen.');
+        }
 
             $docu->update([
                 'status' => "approved",
                 'qrcode' => $qrLink,
-                'status' => "approved",
                 'document' => str_replace('.pdf', '_ttd.pdf', $docu->document),
             ]);
 
-            return redirect()->route('admin.docudigi.index');
+            return redirect()->route('admin.docudigi.index')->with('success', 'Dokumen berhasil ditandatangani.');
     }
 
     public function cancel($id, Request $request)
     {
         $docu = DocumentDigital::findOrFail($id);
-        $user_id = auth()->user()->id;
-        $user = Member::where('id',$user_id)->first();
 
-        if ($request->password === $user->password) {
-            $docu->update([
-                'status' => "cancelled",
-            ]);
+        $request->validate([
+            'password' => 'required',
+        ]);
+
+        if (!Hash::check($request->password, auth()->user()->password)) {
+            return redirect()->route('admin.docudigi.index')->with('error', 'Password salah, dokumen tidak dibatalkan.');
         }
-            return redirect()->route('admin.docudigi.index');
+
+        $docu->update([
+            'status' => "cancelled",
+        ]);
+
+        return redirect()->route('admin.docudigi.index')->with('success', 'Dokumen berhasil dibatalkan.');
     }
 
 
@@ -137,15 +155,15 @@ class DocuDigiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            // 'perihal' => 'required',
-            // 'speciment' => 'required',
-            // 'nipttd' => 'required',
-            // 'anchor' => 'required',
-            // 'nipparaf' => '',
-            // 'tujuan' => 'required',
-            // 'jenis' => 'required',
-            // 'document' => 'document',
-            // 'description' => 'required',
+            'perihal' => 'required',
+            'speciment' => 'required',
+            'nipttd' => 'required',
+            'anchor' => 'required',
+            'nipparaf' => 'nullable',
+            'tujuan' => 'required',
+            'jenis' => 'required',
+            'document' => 'required|file|mimes:pdf|max:2048',
+            'description' => 'required',
         ]);
 
         // Simpan dokumen asli
@@ -172,7 +190,7 @@ class DocuDigiController extends Controller
 
         // ]);
 
-        return redirect()->route('admin.docudigi.index');
+        return redirect()->route('admin.docudigi.index')->with('success', 'Dokumen berhasil diajukan.');
     }
 
 
@@ -185,7 +203,7 @@ class DocuDigiController extends Controller
     public function show($id)
     {
         $docu = DocumentDigital::findOrFail($id);
-        return inertia('Admin/DocumentDigital/Index', [
+        return inertia('Admin/DocumentDigital/Edit', [
             'docu' => $docu,
             ]);
     }
@@ -200,7 +218,7 @@ class DocuDigiController extends Controller
     public function edit($id)
     {
         $docu = DocumentDigital::findOrFail($id);
-        return inertia('Admin/DocumentDigital/Index', [
+        return inertia('Admin/DocumentDigital/Edit', [
             'docu' => $docu,
             ]);
     }
@@ -216,18 +234,38 @@ class DocuDigiController extends Controller
     {
         $docu = DocumentDigital::findOrFail($id);
         $request->validate([
-            // 'perihal' => 'required',
-            // 'speciment' => 'required',
-            // 'nipttd' => 'required',
-            // 'anchor' => 'required',
-            // 'nipparaf' => 'required',
-            // 'tujuan' => 'required',
-            // 'jenis' => 'required',
-            // 'document' => 'required',
-            // 'description' => 'required',
+            'perihal' => 'required',
+            'speciment' => 'required',
+            'nipttd' => 'required',
+            'anchor' => 'required',
+            'nipparaf' => 'nullable',
+            'tujuan' => 'required',
+            'jenis' => 'required',
+            'document' => 'nullable|file|mimes:pdf|max:2048',
+            'description' => 'required',
         ]);
-        $docu->update($request->all());
-        return redirect()->route('admin.docudigi.index');
+
+        if ($request->hasFile('document')) {
+            $documentPath = $request->file('document')->store('documents');
+        } else {
+            $documentPath = $docu->document;
+        }
+
+        $docu->update([
+            'perihal' => $request->perihal,
+            'speciment' => $request->speciment,
+            'nipttd' => $request->nipttd,
+            'anchor' => $request->anchor,
+            'nipparaf' => $request->nipparaf,
+            'tujuan' => $request->tujuan,
+            'jenis' => $request->jenis,
+            'document' => $documentPath,
+            'description' => $request->description,
+            'no_surat' => $request->no_surat,
+            'kategori' => $request->kategori,
+        ]);
+
+        return redirect()->route('admin.docudigi.index')->with('success', 'Dokumen berhasil diperbarui.');
     }
 
     /**
@@ -240,6 +278,6 @@ class DocuDigiController extends Controller
     {
         $docu = DocumentDigital::findOrFail($id);
         $docu->delete();
-        return redirect()->route('admin.docudigi.index');
+        return redirect()->route('admin.docudigi.index')->with('success', 'Dokumen berhasil dihapus.');
     }
 }

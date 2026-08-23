@@ -53,15 +53,17 @@
                                         <td>{{ docu.perihal }}</td>
                                         <td>{{ docu.tujuan }}</td>
                                         <td>{{ docu.nipttd }} / {{ docu.nipparaf }}</td>
-                                        <td><span class="badge bg-secondary" v-if="docu.status === 'submitted' && docu.ttdparaf != '' "> Belum Paraf</span>
+                                        <td><span class="badge bg-secondary" v-if="docu.status === 'submitted'"> Belum Paraf</span>
                                             <span class="badge bg-warning" v-if="docu.status === 'paraf' "> Belum TTD</span>
                                             <span class="badge bg-success" v-if="docu.status === 'approved'"> Approved</span>
+                                            <span class="badge bg-dark" v-if="docu.status === 'cancelled'"> Dibatalkan</span>
                                         </td>
                                         <td class="text-center" >
-                                            <!-- <Link :href="`/admin/docidigi/${docu.id}/edit`" class="btn btn-sm btn-warning border-0 shadow me-2" type="button" title="edit"><i class="fa fa-pencil"></i></Link> -->
+                                            <Link :href="`/admin/docudigi/${docu.id}/edit`" class="btn btn-sm btn-warning border-0 shadow me-1" type="button" title="edit"><i class="fa fa-pencil"></i></Link>
                                             <a class="btn btn-sm btn-primary border-0 me-1" data-fancybox="" :href="getDocumentUrl(docu.document)"><i class="fa fa-eye"></i></a>
-                                            <button v-if="docu.status === 'submitted' && docu.ttdparaf != '' && ($page.props.auth.user.role === 'administrator' || $page.props.auth.user.role === 'sekretariat')" @click.prevent="paraf(docu.id)" class="btn btn-sm btn-warning border-0 me-1">Paraf</button>
-                                            <button v-if="docu.status === 'paraf'" @click.prevent="approve(docu.id) && ($page.props.auth.user.role === 'administrator' || $page.props.auth.user.role === 'sekretariat')" class="btn btn-sm btn-success border-0 me-1">Approve</button>
+                                            <button v-if="docu.status === 'submitted' && ($page.props.auth.user.role === 'administrator' || $page.props.auth.user.role === 'sekretariat')" @click.prevent="paraf(docu.id)" class="btn btn-sm btn-warning border-0 me-1">Paraf</button>
+                                            <button v-if="docu.status === 'paraf' && ($page.props.auth.user.role === 'administrator' || $page.props.auth.user.role === 'sekretariat')" @click.prevent="approve(docu.id)" class="btn btn-sm btn-success border-0 me-1">Approve</button>
+                                            <button v-if="docu.status !== 'approved' && docu.status !== 'cancelled' && ($page.props.auth.user.role === 'administrator' || $page.props.auth.user.role === 'sekretariat')" @click.prevent="cancel(docu.id)" class="btn btn-sm btn-secondary border-0 me-1">Batalkan</button>
                                             <button v-if="$page.props.auth.user.role === 'administrator'" @click.prevent="destroy(docu.id)" class="btn btn-sm btn-danger border-0 me-1"><i class="fa fa-trash" title="hapus"></i></button>
                                         </td>
                                     </tr>
@@ -151,16 +153,7 @@
                     })
                     .then((result) => {
                         if (result.isConfirmed) {
-
                             router.delete(`/admin/docudigi/${id}`);
-
-                            Swal.fire({
-                                title: 'Deleted!',
-                                text: 'Media Berhasil Dihapus!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }
@@ -178,16 +171,7 @@
                     })
                     .then((result) => {
                         if (result.isConfirmed) {
-
                             router.post(`/admin/docudigi/${id}/paraf`);
-
-                            Swal.fire({
-                                title: 'Berhasil!',
-                                text: 'Dokumen Berhasil Diparaf!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }
@@ -206,43 +190,39 @@
                     })
                     .then((result) => {
                         if (result.isConfirmed) {
-
                             router.post(`/admin/docudigi/${id}/approve`);
-
-                            Swal.fire({
-                                title: 'Berhasil!',
-                                text: 'Dokumen Berhasil Ditanda tangan!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }
 
 
-             //define method destroy
+             //define method to cancel a document, confirmed with the
+             //user's own account password
              const cancel = (id) => {
                 Swal.fire({
-                        title: 'Apakah Anda yakin?',
-                        text: "Anda tidak akan dapat mengembalikan ini!",
+                        title: 'Batalkan dokumen ini?',
+                        text: "Masukkan password akun Anda untuk konfirmasi.",
                         icon: 'warning',
+                        input: 'password',
+                        inputPlaceholder: 'Password',
+                        inputAttributes: {
+                            autocapitalize: 'off',
+                            autocorrect: 'off',
+                        },
                         showCancelButton: true,
                         confirmButtonColor: '#3085d6',
                         cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, cancel it!'
+                        confirmButtonText: 'Batalkan Dokumen',
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return 'Password harus diisi';
+                            }
+                        },
                     })
                     .then((result) => {
                         if (result.isConfirmed) {
-
-                            router.post(`/admin/docudigi/${id}/cancel`);
-
-                            Swal.fire({
-                                title: 'Deleted!',
-                                text: 'Media Berhasil Dihapus!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
+                            router.post(`/admin/docudigi/${id}/cancel`, {
+                                password: result.value,
                             });
                         }
                     })

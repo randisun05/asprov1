@@ -1,7 +1,7 @@
                 <template>
 
                     <Head>
-                        <title>Buat Dokumen Digital</title>
+                        <title>Edit Dokumen Digital</title>
                     </Head>
                     <div class="container padding px-5">
                         <div class="row mt-1">
@@ -20,7 +20,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <h3 class="text-center">Buat Dokumen Digital</h3>
+                                        <h3 class="text-center">Edit Dokumen Digital</h3>
                                         <form @submit.prevent="submit" enctype="multipart/form-data">
 
                                             <div class="row py-2 ms-2">
@@ -39,10 +39,40 @@
 
                                                 <div class="col-md-6 col-sm-6">
                                                     <span class="text-black">
+                                                        Nomor Surat
+                                                    </span>
+                                                    <div class="form-group mt-1 mb-4">
+                                                        <input type="text" class="form-control"
+                                                            placeholder="Masukan Nomor Surat" v-model="form.no_surat">
+                                                    </div>
+                                                    <div v-if="errors.no_surat" class="alert alert-danger mt-2">
+                                                        {{ errors.no_surat }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6 col-sm-6">
+                                                    <span class="text-black">
                                                         Jenis
                                                     </span>
                                                     <div class="form-group mt-1 mb-4">
                                                         <select class="form-select" v-model="form.jenis">
+                                                            <option value="" disabled selected>Pilih salah satu opsi
+                                                            </option>
+                                                            <option value="Biasa">Biasa</option>
+                                                            <option value="Penting">Penting</option>
+                                                        </select>
+                                                    </div>
+                                                    <div v-if="errors.jenis" class="alert alert-danger mt-2">
+                                                        {{ errors.jenis }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6 col-sm-6">
+                                                    <span class="text-black">
+                                                        Kategori Surat
+                                                    </span>
+                                                    <div class="form-group mt-1 mb-4">
+                                                        <select class="form-select" v-model="form.kategori">
                                                             <option value="" disabled selected>Pilih salah satu opsi
                                                             </option>
                                                             <option value="1">Surat</option>
@@ -50,8 +80,8 @@
                                                             <option value="3">Laporan</option>
                                                         </select>
                                                     </div>
-                                                    <div v-if="errors.jenis" class="alert alert-danger mt-2">
-                                                        {{ errors.jenis }}
+                                                    <div v-if="errors.kategori" class="alert alert-danger mt-2">
+                                                        {{ errors.kategori }}
                                                     </div>
                                                 </div>
 
@@ -182,9 +212,6 @@
                 //import inertia adapter
                 import { router } from '@inertiajs/vue3';
 
-                //import sweet alert2
-                import Swal from 'sweetalert2';
-
                 export default {
                     //layout
                     layout: LayoutAdmin,
@@ -216,39 +243,37 @@
                             anchor: props.docu.anchor,
                             nipparaf: props.docu.nipparaf,
                             tujuan: props.docu.tujuan,
-                            document: props.docu.document,
+                            document: null,
                             description: props.docu.description,
+                            no_surat: props.docu.no_surat,
+                            kategori: props.docu.kategori,
                         });
 
 
                         //submit method
                         const submit = () => {
 
-                            //send data to server
-                            router.post('/admin/docudigi/', {
+                            //send data to server - the resource route only
+                            //exposes PUT/PATCH for update, so spoof it via
+                            //POST + _method to keep the file upload working
+                            const formData = new FormData();
+                            formData.append('perihal', form.perihal ?? '');
+                            formData.append('jenis', form.jenis ?? '');
+                            formData.append('speciment', form.speciment ?? '');
+                            formData.append('nipttd', form.nipttd ?? '');
+                            formData.append('anchor', form.anchor ?? '');
+                            formData.append('nipparaf', form.nipparaf ?? '');
+                            formData.append('tujuan', form.tujuan ?? '');
+                            formData.append('description', form.description ?? '');
+                            formData.append('no_surat', form.no_surat ?? '');
+                            formData.append('kategori', form.kategori ?? '');
+                            if (form.document) {
+                                formData.append('document', form.document);
+                            }
+                            formData.append('_method', 'PUT');
 
-                                //data
-                                perihal: form.perihal,
-                                jenis: form.jenis,
-                                speciment: form.speciment,
-                                nipttd: form.nipttd,
-                                anchor: form.anchor,
-                                nipparaf: form.nipparaf,
-                                tujuan: form.tujuan,
-                                document: form.document,
-                                description: form.description,
-
-                            }, {
-                                onSuccess: () => {
-                                    //show success alert
-                                    Swal.fire({
-                                        title: 'Success!',
-                                        text: 'Document Berhasil Diupdate.',
-                                        icon: 'success',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                },
+                            router.post(`/admin/docudigi/${props.docu.id}`, formData, {
+                                forceFormData: true,
                             });
                         }
 
