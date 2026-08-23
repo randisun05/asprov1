@@ -151,9 +151,6 @@
     //import inertia adapter
     import { router } from '@inertiajs/vue3';
 
-    //import sweet alert2
-    import Swal from 'sweetalert2';
-
     export default {
         //layout
         layout: LayoutAdmin,
@@ -203,17 +200,6 @@
                     subtitle: form.subtitle,
                     color: form.color,
 
-                } ,{
-                    onSuccess: () => {
-                        //show success alert
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Merchandise Berhasil Diupdate.',
-                            icon: 'success',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    },
                 });
             }
 

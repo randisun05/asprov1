@@ -56,7 +56,7 @@ class MerchanController extends Controller
 
             $request->validate([
                 'title' => 'required|string',
-                'image' => 'required|',
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'body' => 'required',
                 'how' => 'required',
                 'price' => 'required'
@@ -73,7 +73,6 @@ class MerchanController extends Controller
             'image' =>  $image,
             'body' => $request->body,
             'how' => $request->how,
-            'status' => $request->status,
             'subtitle' => $request->subtitle,
             'color' => $request->color,
             'price' => $request->price,
@@ -81,7 +80,7 @@ class MerchanController extends Controller
         ]);
 
      //redirect
-     return redirect()->route('admin.merchans.index');
+     return redirect()->route('admin.merchans.index')->with('success', 'Merchandise berhasil ditambahkan.');
 
     }
 
@@ -126,6 +125,7 @@ class MerchanController extends Controller
                 //Validate request including file validation
                 $request->validate([
                     'title' => 'required|string',
+                    'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                     'body' => 'required',
                     'how' => 'required',
                     'price' => 'required'
@@ -151,7 +151,7 @@ class MerchanController extends Controller
 
 
             //redirect
-            return redirect()->route('admin.merchans.index');
+            return redirect()->route('admin.merchans.index')->with('success', 'Merchandise berhasil diperbarui.');
     }
 
     /**
@@ -167,7 +167,7 @@ class MerchanController extends Controller
         $merchan->delete();
 
         //redirect
-        return redirect()->route('admin.merchans.index');
+        return redirect()->route('admin.merchans.index')->with('success', 'Merchandise berhasil dihapus.');
     }
 
     public function change($id)
@@ -186,6 +186,6 @@ class MerchanController extends Controller
         }
 
      //redirect
-     return redirect()->route('admin.merchans.index');
+     return redirect()->route('admin.merchans.index')->with('success', 'Status merchandise berhasil diubah.');
     }
 }

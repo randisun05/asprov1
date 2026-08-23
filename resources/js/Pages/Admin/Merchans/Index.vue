@@ -124,7 +124,7 @@
 
             //define method search
             const handleSearch = () => {
-                router.get('/user/merchans', {
+                router.get('/admin/merchans', {
 
                     //send params "q" with value from state "search"
                     q: search.value,
@@ -144,16 +144,7 @@
                     })
                     .then((result) => {
                         if (result.isConfirmed) {
-
                             router.delete(`/admin/merchans/${id}`);
-
-                            Swal.fire({
-                                title: 'Deleted!',
-                                text: 'Merchan Berhasil Dihapus!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }
@@ -171,16 +162,7 @@
                     })
                     .then((result) => {
                         if (result.isConfirmed) {
-
                             router.post(`/admin/merchans/${id}/change`);
-
-                            Swal.fire({
-                                title: 'Changed!',
-                                text: 'Status Merchan Berhasil Dirubah!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }
