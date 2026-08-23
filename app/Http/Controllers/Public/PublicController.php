@@ -675,18 +675,21 @@ class PublicController extends Controller
         ]);
     }
 
-    public function downloadSertifikat($qr_link)
+    public function downloadSertifikat(Member $member, Event $event)
     {
+        $data = Certificate::with('event')
+            ->where('event_id', $event->id)
+            ->where('nip', $member->nip)
+            ->first();
 
-        $data = Member::where('qr_link', $qr_link)->first();
+        if (!$data) {
+            return redirect()->back()->with('error', 'Sertifikat tidak ditemukan.');
+        }
 
-        $data = Certificate::with('event')->where('link', $id)->first();
-
-        $data = Certificate::with('event')->findOrFail($id);
         // Generate QR Code
         $qrLink = $data->qr_code;
-        QrCode::format('png')->size(300)->generate($qrLink);
         $qr = QrCode::generate($qrLink);
+
         return view('Reports.Certificates.Certificate', compact('data', 'qr'));
     }
 
@@ -847,7 +850,7 @@ class PublicController extends Controller
     {
         // Validasi input
         $request->validate([
-            'nip'      => 'required',
+            'nip'      => 'required|numeric',
             'name'     => 'required',
             'agency'   => 'required',
         ], [
@@ -858,6 +861,15 @@ class PublicController extends Controller
         ]);
 
         $event = Event::findOrFail($id);
+
+        // The form page already hides itself behind this same check, but
+        // that's UI-only - enforce it here too so absen can't be submitted
+        // directly against a closed event (mirrors User\EventController::absen()).
+        if ($event->absen !== 'Y') {
+            return redirect()->back()->withErrors([
+                'message' => 'Absensi untuk kegiatan ini belum dibuka.',
+            ]);
+        }
 
         // Gunakan Transaction untuk keamanan nomor urut
         return DB::transaction(function () use ($request, $event) {
@@ -914,7 +926,7 @@ class PublicController extends Controller
                 'name'           => $request->name,
                 'body'           => $event->title,
                 'date'           => $targetDate->format('Y-m-d'),
-                'template'       => $event->template,
+                'template'       => $event->template_id,
                 'status'         => '1',
                 'qr_code'        => "https://asprosdma.id/certificates/$link",
                 'link'           => $link,
