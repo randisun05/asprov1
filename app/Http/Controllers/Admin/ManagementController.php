@@ -17,8 +17,14 @@ class ManagementController extends Controller
     {
         $this->cekAuth();
 
+        $datas = Management::when(request()->q, function ($query) {
+            $query->where('item', 'like', '%' . request()->q . '%');
+        })->latest()
+            ->paginate(10);
+        $datas->appends(['q' => request()->q]);
+
         return inertia('Admin/Management/Index', [
-            'datas' => [],
+            'datas' => $datas,
         ]);
     }
 
@@ -67,16 +73,16 @@ class ManagementController extends Controller
 
         // Validate request including file validation
         $request->validate([
-            // 'item' => 'required|string',
-            // 'sub' => 'string',
-            // 'subitem' => 'string',
-            // 'status' => 'integer',
-            // 'position' => 'integer',
-            // 'button' => 'integer',
-            // 'link' => 'string',
-            // 'desc' => 'string',
-            // 'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            // 'document' =>'mimes:pdf|max:2048',
+            'item' => 'required|string',
+            'sub' => 'nullable|string',
+            'subitem' => 'nullable|string',
+            'status' => 'nullable',
+            'position' => 'nullable',
+            'button' => 'nullable',
+            'link' => 'nullable|string',
+            'desc' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'document' => 'nullable|file|mimes:pdf|max:2048',
         ]);
 
         $image = $request->file('image');
@@ -143,18 +149,20 @@ class ManagementController extends Controller
     public function update(Request $request)
     {
 
+        $before = Management::findOrFail($request->id);
+
         // Validate request including file validation
         $request->validate([
-            // 'item' => 'required|string',
-            // 'sub' => 'string',
-            // 'subitem' => 'string',
-            // 'status' => 'integer',
-            // 'position' => 'integer',
-            // 'button' => 'integer',
-            // 'link' => 'string',
-            // 'desc' => 'string',
-            // 'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            // 'document' =>'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'item' => 'required|string',
+            'sub' => 'nullable|string',
+            'subitem' => 'nullable|string',
+            'status' => 'nullable',
+            'position' => 'nullable',
+            'button' => 'nullable',
+            'link' => 'nullable|string',
+            'desc' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'document' => 'nullable|file|mimes:pdf|max:2048',
         ]);
 
         $image = $request->file('image');
@@ -169,9 +177,7 @@ class ManagementController extends Controller
             // Proceed with storing or processing the uploaded file
         };
 
-        $before = Management::where('id', $request->id)->first();
-
-        Management::where('id', $request->id)->update([
+        $before->update([
             'item' => $request->item ?? $before->item,
             'sub' => $request->sub ?? $before->sub,
             'subitem' => $request->subitem ?? $before->subitem,
@@ -182,7 +188,7 @@ class ManagementController extends Controller
             'desc' => $request->desc ?? $before->desc,
             'image' =>  $image ?? $before->image,
             'document' =>  $document ?? $before->document,
-            'body' => $request->body ?? '-',
+            'body' => $request->body ?? $before->body,
         ]);
 
         //redirect
@@ -202,23 +208,17 @@ class ManagementController extends Controller
         $data->delete();
 
         //redirect
-        return redirect()->route('admin.management.index');
+        return redirect()->route('admin.management.index')->with('success', 'Data berhasil dihapus');
     }
 
     public function status(Request $request)
     {
-
-
         $data = Management::findOrFail($request->id);
 
-        if ($data->status == '1') {
-            Management::where('id', $request->id)->update([
-                'status' => "0",
-            ]);
-        } else {
-            Management::where('id', $request->id)->update([
-                'status' => "1",
-            ]);
-        }
+        $data->update([
+            'status' => $data->status == '1' ? '0' : '1',
+        ]);
+
+        return redirect()->route('admin.management.index')->with('success', 'Status berhasil diperbarui');
     }
 }
