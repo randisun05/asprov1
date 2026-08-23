@@ -122,16 +122,7 @@
                     })
                     .then((result) => {
                         if (result.isConfirmed) {
-
                             router.delete(`/admin/setting/${id}`);
-
-                            Swal.fire({
-                                title: 'Deleted!',
-                                text: 'Admin Berhasil Dihapus!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }

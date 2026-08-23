@@ -37,6 +37,7 @@ class RoleManagementTest extends TestCase
             'email' => 'staffbaru@example.com',
             'role' => 'humas',
             'password' => 'password',
+            'password_confirmation' => 'password',
             'position' => 'anggota',
         ]);
 

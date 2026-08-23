@@ -153,9 +153,6 @@ import { reactive } from 'vue';
 //import inertia adapter
 import { router } from '@inertiajs/vue3';
 
-//import sweet alert2
-import Swal from 'sweetalert2';
-
 export default {
 
     //layout
@@ -213,18 +210,6 @@ export default {
                     password: form.password,
                     password_confirmation: form.password_confirmation,
                     position: form.position,
-                },
-                {
-                    onSuccess: () => {
-                        //show success alert
-                        Swal.fire({
-                            title: "Success!",
-                            text: "Password Admin Berhasil Diupdate.",
-                            icon: "success",
-                            showConfirmButton: false,
-                            timer: 2000,
-                        });
-                    },
                 }
             );
         };

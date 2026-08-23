@@ -20,7 +20,7 @@ class AuthAdminController extends Controller
 
         $users = User::
         when(request()->q, function($query) {
-            $query->where('title', 'like', '%' . request()->q . '%');
+            $query->where('name', 'like', '%' . request()->q . '%');
         })
         ->latest()
         ->paginate(10);
@@ -56,15 +56,15 @@ class AuthAdminController extends Controller
     {
         // Validate request including file validation
       $request->validate([
-        'nip' => 'required|string',
+        'nip' => 'required|string|unique:users,nip',
         'name' => 'required|',
-        'email' => 'required',
+        'email' => 'required|email|unique:users,email',
         'role' => ['required', Rule::in(array_keys(config('roles')))],
-        'password' => 'required',
+        'password' => 'required|confirmed',
         'position' => 'required',
     ]);
 
-        $password = Hash::make($request->nip);
+        $password = Hash::make($request->password);
         User::create([
             'nip' => $request->nip,
             'name' => $request->name,
@@ -77,7 +77,7 @@ class AuthAdminController extends Controller
 
 
      //redirect
-     return redirect()->route('admin.setting.index');
+     return redirect()->route('admin.setting.index')->with('success', 'Akun admin berhasil dibuat.');
     }
 
     /**
@@ -117,30 +117,34 @@ class AuthAdminController extends Controller
 
         // Validate request including file validation
       $request->validate([
-        'nip' => 'required|string',
+        'nip' => ['required', 'string', Rule::unique('users', 'nip')->ignore($id)],
         'name' => 'required|',
-        'email' => 'required',
+        'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($id)],
         'role' => ['required', Rule::in(array_keys(config('roles')))],
-        'password' => 'required',
+        'password' => 'nullable|confirmed',
         'position' => 'required',
     ]);
 
-    $password = Hash::make($request->password);
-
-        User::where('id', $id)->update([
+        $data = [
             'nip' => $request->nip,
             'name' => $request->name,
             'email' => $request->email,
             'role' =>  $request->role,
-            'password' => $password,
             'position' => $request->position,
             'ref' => in_array($request->position, ['kabid', 'bendahara', 'sekretaris']) ? 1 : ($request->position === 'anggota' ? 2 : 3),
+        ];
 
-        ]);
+        // Only touch the password when a new one was actually submitted -
+        // otherwise every profile edit forced a password reset.
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        User::where('id', $id)->update($data);
 
 
      //redirect
-     return redirect()->route('admin.setting.index');
+     return redirect()->route('admin.setting.index')->with('success', 'Akun admin berhasil diperbarui.');
     }
 
     /**
@@ -151,9 +155,14 @@ class AuthAdminController extends Controller
      */
     public function destroy($id)
     {
-        $event = User::findOrFail($id);
-        $event->delete();
+        $user = User::findOrFail($id);
+
+        if (auth()->id() === $user->id) {
+            return redirect()->route('admin.setting.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+
+        $user->delete();
         //redirect
-        return redirect()->route('admin.setting.index');
+        return redirect()->route('admin.setting.index')->with('success', 'Akun admin berhasil dihapus.');
     }
 }
