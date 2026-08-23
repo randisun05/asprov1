@@ -257,8 +257,7 @@ Route::prefix('user')->group(function() {
         Route::get('/member-card/edit', [\App\Http\Controllers\User\MemberCardController::class, 'edit'])->name('user.card.edit');
         Route::get('/member-card/download', [\App\Http\Controllers\User\MemberCardController::class, 'download'])->name('user.card.download');
         Route::get('/member-card/backcard', [\App\Http\Controllers\User\MemberCardController::class, 'downloadBackcard'])->name('user.card.back');
-        // Route::get('/member-card/save-member-card', [\App\Http\Controllers\User\MemberCardController::class, 'saveMemberCard'])->name('user.card.index');
-        Route::get('/member-card/edit', [\App\Http\Controllers\User\MemberCardController::class, 'edit'])->name('user.card.edit');
+        Route::post('/member-card/save-member-card', [\App\Http\Controllers\User\MemberCardController::class, 'saveMemberCard'])->name('user.card.save');
         Route::post('/member-card/update', [\App\Http\Controllers\User\MemberCardController::class, 'updateImage'])->name('user.card.update');
         Route::get('/member-card/qrcode', [\App\Http\Controllers\User\MemberCardController::class, 'generateQRCode'])->name('user.card.qr');
         Route::get('/certificates', [\App\Http\Controllers\User\EventController::class, 'certificatesIndex'])->name('user.certificates.index');

@@ -149,7 +149,7 @@
                     link.click();
 
                     // Send the image data to the server to save it
-                    fetch('/save-member-card', {
+                    fetch('/user/member-card/save-member-card', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

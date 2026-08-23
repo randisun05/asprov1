@@ -16,36 +16,38 @@ class MemberCardController extends Controller
 {
     public function index()
     {
-        if (auth()->guard('member')->check()) {
-            $profile = Member::where('id', auth()->guard('member')->id())->first();
-            $foto = ProfileDataMain::where('nip', $profile->nip)->first('image');
+        if (!auth()->guard('member')->check()) {
+            return redirect()->route('login');
+        }
 
-            // Check if the member exists and has a qr_link
-            if ($profile && $profile->qr_link) {
-                $qrLink = "https://asprosdma.id/identity-verification/" . $profile->qr_link;
-            } elseif ($profile && !$profile->qr_link) {
-                // Generate a new qr_link if the member does not have one
-                // Buat QR Link
+        $profile = Member::where('id', auth()->guard('member')->id())->first();
+        $foto = ProfileDataMain::where('nip', $profile->nip)->first('image');
+
+        // Check if the member exists and has a qr_link
+        if ($profile && $profile->qr_link) {
+            $qrLink = "https://asprosdma.id/identity-verification/" . $profile->qr_link;
+        } elseif ($profile && !$profile->qr_link) {
+            // Generate a new qr_link if the member does not have one
+            // Buat QR Link
             $link = (string) Str::uuid();
             $profile->qr_link = $link;
             $profile->save();
             $qrLink = "https://asprosdma.id/identity-verification/" . $link;
-            } else {
-                // Handle the case where the member or qr_link is not found
-                return response('QR link not found', 404);
-            }
-
-            // Generate the QR code in SVG format
-            $qrCode = QrCode::format('svg')->size(75)->generate($qrLink);
-
-            return inertia('User/MemberCard/Index', [
-             'profile' => $profile,
-             'qrCode' => (string) $qrCode, // Konversi menjadi string biasa
-                'foto' => $foto,
-                'qrLink' => $qrLink
-
-            ]);
+        } else {
+            // Handle the case where the member or qr_link is not found
+            return response('QR link not found', 404);
         }
+
+        // Generate the QR code in SVG format
+        $qrCode = QrCode::format('svg')->size(75)->generate($qrLink);
+
+        return inertia('User/MemberCard/Index', [
+         'profile' => $profile,
+         'qrCode' => (string) $qrCode, // Konversi menjadi string biasa
+            'foto' => $foto,
+            'qrLink' => $qrLink
+
+        ]);
     }
 
     public function generateQRCode()
@@ -83,74 +85,99 @@ class MemberCardController extends Controller
 
     public function edit()
     {
-        if (auth()->guard('member')->check()) {
-            $profile = Member::where('id', auth()->guard('member')->id())->first();
-            $foto = ProfileDataMain::where('nip', $profile->nip)->first('image');
+        if (!auth()->guard('member')->check()) {
+            return redirect()->route('login');
+        }
 
-             // Check if the member exists and has a qr_link
-             if ($profile && $profile->qr_link) {
-                $qrLink = "https://asprosdma.id/identity-verification/" . $profile->qr_link;
-            } elseif ($profile && !$profile->qr_link) {
-                // Generate a new qr_link if the member does not have one
-                // Buat QR Link
-             $link = (string) Str::uuid();
+        $profile = Member::where('id', auth()->guard('member')->id())->first();
+        $foto = ProfileDataMain::where('nip', $profile->nip)->first('image');
+
+         // Check if the member exists and has a qr_link
+         if ($profile && $profile->qr_link) {
+            $qrLink = "https://asprosdma.id/identity-verification/" . $profile->qr_link;
+        } elseif ($profile && !$profile->qr_link) {
+            // Generate a new qr_link if the member does not have one
+            // Buat QR Link
+            $link = (string) Str::uuid();
             $profile->qr_link = $link;
             $profile->save();
             $qrLink = "https://asprosdma.id/identity-verification/" . $link;
-            } else {
-                // Handle the case where the member or qr_link is not found
-                return response('QR link not found', 404);
-            }
-
-            // Generate the QR code in SVG format
-            $qrCode = QrCode::format('svg')->size(75)->generate($qrLink);
-
-
-            return inertia('User/MemberCard/Edit', [
-             'profile' => $profile,
-                'foto' => $foto,
-                'qrCode' => (string) $qrCode,
-
-            ]);
+        } else {
+            // Handle the case where the member or qr_link is not found
+            return response('QR link not found', 404);
         }
+
+        // Generate the QR code in SVG format
+        $qrCode = QrCode::format('svg')->size(75)->generate($qrLink);
+
+
+        return inertia('User/MemberCard/Edit', [
+         'profile' => $profile,
+            'foto' => $foto,
+            'qrCode' => (string) $qrCode,
+
+        ]);
     }
 
     public function download()
     {
-        if (auth()->guard('member')->check()) {
-            $profile = Member::where('id', auth()->guard('member')->id())->first();
-            $foto = ProfileDataMain::where('nip', $profile->nip)->first('image');
-
-            // Check if the member exists and has a qr_link
-            if ($profile && $profile->qr_link) {
-                $qrLink = "https://asprosdma.id/identity-verification/" . $profile->qr_link;
-            } elseif ($profile && !$profile->qr_link) {
-                // Generate a new qr_link if the member does not have one
-                $link = (string) \Illuminate\Support\Str::uuid();
-                $profile->qr_link = $link;
-                $profile->save();
-                $qrLink = "https://asprosdma.id/identity-verification/" . $link;
-            } else {
-                // Handle the case where the member or qr_link is not found
-                return response('QR link not found', 404);
-            }
-
-            // Generate the QR code using the retrieved qr_link
-            $qrCode = QrCode::size(200)->generate($qrLink);
-
-            // Render the view with the profile and qrCode
-            return view('Layouts/Components/MemberCard', compact('profile', 'qrCode', 'foto'));
+        if (!auth()->guard('member')->check()) {
+            return redirect()->route('login');
         }
+
+        $profile = Member::where('id', auth()->guard('member')->id())->first();
+        $foto = ProfileDataMain::where('nip', $profile->nip)->first('image');
+
+        // Check if the member exists and has a qr_link
+        if ($profile && $profile->qr_link) {
+            $qrLink = "https://asprosdma.id/identity-verification/" . $profile->qr_link;
+        } elseif ($profile && !$profile->qr_link) {
+            // Generate a new qr_link if the member does not have one
+            $link = (string) \Illuminate\Support\Str::uuid();
+            $profile->qr_link = $link;
+            $profile->save();
+            $qrLink = "https://asprosdma.id/identity-verification/" . $link;
+        } else {
+            // Handle the case where the member or qr_link is not found
+            return response('QR link not found', 404);
+        }
+
+        // Generate the QR code using the retrieved qr_link
+        $qrCode = QrCode::size(200)->generate($qrLink);
+
+        // Render the view with the profile and qrCode
+        return view('Layouts/Components/MemberCard', compact('profile', 'qrCode', 'foto'));
     }
 
     public function saveMemberCard(Request $request)
     {
+        if (!auth()->guard('member')->check()) {
+            return response()->json(['success' => false, 'message' => 'Unauthenticated.'], 401);
+        }
+
+        $request->validate([
+            'image' => 'required|string',
+        ]);
+
         $imageData = $request->input('image');
+        if (!preg_match('/^data:image\/png;base64,/', $imageData)) {
+            return response()->json(['success' => false, 'message' => 'Invalid image data.'], 422);
+        }
+
         $imageData = str_replace('data:image/png;base64,', '', $imageData);
         $imageData = str_replace(' ', '+', $imageData);
-        $imageName = 'member-card-' . time() . '.png';
+        $decoded = base64_decode($imageData, true);
 
-        Storage::disk('public')->put($imageName, base64_decode($imageData));
+        if ($decoded === false || strlen($decoded) > 5 * 1024 * 1024) {
+            return response()->json(['success' => false, 'message' => 'Invalid image data.'], 422);
+        }
+
+        // Named per-member so repeated saves overwrite the same file
+        // instead of piling up under guessable, unowned filenames.
+        $memberId = auth()->guard('member')->id();
+        $imageName = "member-cards/member-card-{$memberId}.png";
+
+        Storage::disk('public')->put($imageName, $decoded);
 
         return response()->json(['success' => true, 'message' => 'Image saved successfully']);
     }
@@ -165,16 +192,16 @@ class MemberCardController extends Controller
 
 
         $image = $request->file('image');
-        if ($image) {
-            $image = $request->file('image')->storePublicly('/images');
-            // Proceed with storing or processing the uploaded file
-        };
         $main = ProfileDataMain::where('nip',auth()->guard('member')->user()->nip)
         ->first();
-        //update data main
-        $main->update([
-                'image' => $image,
-        ]);
+
+        if ($image) {
+            // Keep the existing photo when no new file is uploaded
+            // instead of wiping it.
+            $main->update([
+                'image' => $image->storePublicly('/images'),
+            ]);
+        }
 
         return redirect()->route('user.card.index');
 }
