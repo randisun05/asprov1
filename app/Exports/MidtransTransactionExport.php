@@ -26,9 +26,9 @@ class MidtransTransactionExport implements FromCollection, WithMapping, WithHead
     public function map($transaction): array
     {
         return [
-            $transaction->registration->name ?? '-',
+            $this->escapeFormula($transaction->registration->name ?? '-'),
             "'" . ($transaction->registration->nip ?? '-'),
-            $transaction->registration->agency ?? '-',
+            $this->escapeFormula($transaction->registration->agency ?? '-'),
             $transaction->order_id,
             $transaction->transaction_id,
             $transaction->gross_amount,
@@ -51,5 +51,16 @@ class MidtransTransactionExport implements FromCollection, WithMapping, WithHead
             'Status Transaksi',
             'Waktu Transaksi',
         ];
+    }
+
+    /**
+     * Nama/instansi berasal dari form pendaftaran publik tanpa login, jadi
+     * bisa diisi bebas oleh siapa saja. Cegah formula/CSV injection dengan
+     * menahan awalan yang bisa dieksekusi Excel/LibreOffice sebagai rumus
+     * saat admin membuka file export ini.
+     */
+    private function escapeFormula(string $value): string
+    {
+        return preg_match('/^[=+\-@\t\r]/', $value) ? "'" . $value : $value;
     }
 }
