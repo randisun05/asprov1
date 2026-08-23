@@ -58,7 +58,7 @@ class MediaController extends Controller
         // Validate request including file validation
       $request->validate([
         'title' => 'required|string',
-        'media' => 'required|',
+        'media' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         'event_id' => 'required',
     ]);
 
@@ -75,7 +75,7 @@ class MediaController extends Controller
         ]);
 
      //redirect
-     return redirect()->route('admin.medias.index');
+     return redirect()->route('admin.medias.index')->with('success', 'Media berhasil ditambahkan.');
 
     }
 
@@ -98,7 +98,7 @@ class MediaController extends Controller
      */
     public function edit($id)
     {
-        $media = Media::findOrFail($id)->with('event')->first();
+        $media = Media::with('event')->findOrFail($id);
         $event = Event::get();
 
         return inertia('Admin/Medias/Edit', [
@@ -120,6 +120,7 @@ class MediaController extends Controller
           // Validate request including file validation
       $request->validate([
         'title' => 'required|string',
+        'media' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         'event_id' => 'required',
     ]);
 
@@ -128,7 +129,7 @@ class MediaController extends Controller
         $image = $request->file('media')->storePublicly('/images');
         // Proceed with storing or processing the uploaded file
     }else{
-        $image = Media::where('id', $id)->value('image');
+        $image = Media::where('id', $id)->value('media');
     };
 
         Media::where('id',$id)->update([
@@ -138,7 +139,7 @@ class MediaController extends Controller
         ]);
 
      //redirect
-     return redirect()->route('admin.medias.index');
+     return redirect()->route('admin.medias.index')->with('success', 'Media berhasil diperbarui.');
 
     }
 
@@ -155,6 +156,6 @@ class MediaController extends Controller
         $media->delete();
 
         //redirect
-        return redirect()->route('admin.medias.index');
+        return redirect()->route('admin.medias.index')->with('success', 'Media berhasil dihapus.');
     }
 }
