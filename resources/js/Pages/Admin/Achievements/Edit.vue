@@ -1,7 +1,7 @@
 <template>
 
     <Head>
-        <title>Tambah Penghargaan</title>
+        <title>Edit Penghargaan</title>
     </Head>
     <div class="px-5 shadow padding">
         <div class="row">
@@ -165,6 +165,7 @@ export default {
         const form = ref({
             nip: props.data.member.nip,
             name: props.data.member.name,
+            agency: props.data.member.agency,
             title: props.data.title,
             category: props.data.category,
             description: props.data.description,
@@ -216,18 +217,6 @@ export default {
                 document: form.document,
                 icon: form.value.icon,
 
-
-            }, {
-                onSuccess: () => {
-                    //show success alert
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Data Anda Berhasil Disimpan.',
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                },
             });
         };
 

@@ -213,17 +213,6 @@
                             document: form.document,
                             icon: form.value.icon
 
-                        }, {
-                            onSuccess: () => {
-                                //show success alert
-                                Swal.fire({
-                                    title: 'Success!',
-                                    text: 'Data Anda Berhasil Disimpan.',
-                                    icon: 'success',
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-                            },
                         });
                     };
 

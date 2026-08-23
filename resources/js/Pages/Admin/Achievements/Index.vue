@@ -152,16 +152,7 @@
                     })
                     .then((result) => {
                         if (result.isConfirmed) {
-
                             router.delete(`/admin/achievements/${id}`);
-
-                            Swal.fire({
-                                title: 'Deleted!',
-                                text: 'Event Berhasil Dihapus!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }
@@ -179,16 +170,7 @@
                     })
                     .then((result) => {
                         if (result.isConfirmed) {
-
                             router.post(`/admin/achievements/${id}/change`);
-
-                            Swal.fire({
-                                title: 'Changed!',
-                                text: 'Status Achievement Berhasil Dirubah!.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false,
-                            });
                         }
                     })
             }

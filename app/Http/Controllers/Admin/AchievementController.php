@@ -56,7 +56,7 @@ class AchievementController extends Controller
     {
 
         $request->validate([
-            'nip' => 'required|string|max:255',
+            'nip' => 'required|string|max:255|exists:members,nip',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'required|string|max:255',
@@ -64,6 +64,8 @@ class AchievementController extends Controller
             'image' => '',
             'document' => '',
             'icon' => 'required|string|max:255',
+        ], [
+            'nip.exists' => 'NIP tidak ditemukan di data anggota.',
         ]);
 
         $memberId = Member::where('nip', $request->nip)->first()->id;
@@ -131,7 +133,7 @@ class AchievementController extends Controller
     {
 
          $request->validate([
-            'nip' => 'required|string|max:255',
+            'nip' => 'required|string|max:255|exists:members,nip',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'required|string|max:255',
@@ -139,10 +141,12 @@ class AchievementController extends Controller
             'image' => '',
             'document' => '',
             'icon' => 'required|string|max:255',
+        ], [
+            'nip.exists' => 'NIP tidak ditemukan di data anggota.',
         ]);
 
         $memberId = Member::where('nip', $request->nip)->first()->id;
-        $data = Achievement::where('id', $id)->first();
+        $data = Achievement::findOrFail($id);
         $image = $request->file('image');
         if ($image) {
             $image = $request->file('image')->storePublicly('/images');
