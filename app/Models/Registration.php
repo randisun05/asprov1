@@ -41,4 +41,9 @@ class Registration extends Model
         });
     }
 
+    public function midtransTransaction()
+    {
+        return $this->hasOne(MidtransTransaction::class);
+    }
+
 }

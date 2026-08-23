@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\MidtransTransaction;
 use App\Models\Registration;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
@@ -62,6 +63,20 @@ class MidtransService
         if ($response->failed()) {
             throw new RuntimeException('Gagal membuat transaksi Midtrans: ' . $response->body());
         }
+
+        // Freeze the gross amount actually charged at the moment the Snap
+        // token was issued, so the transparency report below stays accurate
+        // even if the position's fee in config changes later. firstOrCreate
+        // (not updateOrCreate) so a repeat visit to the payment page before
+        // completion never clobbers a record the webhook already settled.
+        MidtransTransaction::firstOrCreate(
+            ['order_id' => (string) $registration->id],
+            [
+                'registration_id' => $registration->id,
+                'gross_amount' => $grossAmount,
+                'transaction_status' => 'pending',
+            ]
+        );
 
         return [
             'token' => $response->json('token'),

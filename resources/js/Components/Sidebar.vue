@@ -157,6 +157,17 @@
                     </Link>
                 </li>
 
+                <li class="nav-item" v-if="$page.props.auth.user.role == 'administrator' || $page.props.auth.user.role == 'pendanaan'" :class="{ 'active': $page.url.startsWith('/admin/midtrans-report') }">
+                    <Link href="/admin/midtrans-report" class="nav-link d-flex justify-content-between">
+                    <span>
+                        <span class="sidebar-icon">
+                           <i class="fa fa-credit-card fa-lg" aria-hidden="true"></i>
+                        </span>
+                        <span class="sidebar-text ms-3">Laporan Transaksi Midtrans</span>
+                    </span>
+                    </Link>
+                </li>
+
 
                  <li class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/questions') }">
                     <Link href="/admin/questions" class="nav-link d-flex justify-content-between">

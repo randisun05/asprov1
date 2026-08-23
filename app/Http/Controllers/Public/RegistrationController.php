@@ -298,7 +298,12 @@ class RegistrationController extends Controller
     {
         $register = Registration::findOrFail($id);
 
-        if ($register->paid) {
+        // $register->paid only covers the manual proof-of-transfer upload;
+        // an online Midtrans payment instead moves `status` to 'paid' (and
+        // beyond, once admin reviews it) without ever touching `paid`. Check
+        // both so someone who already paid online can't reopen this page and
+        // create a second Snap transaction.
+        if ($register->paid || in_array($register->status, ['paid', 'confirm', 'approved'], true)) {
             return redirect()->route('/')->with('error', 'Link pembayaran telah ditutup.');
         }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\MidtransTransaction;
 use App\Models\Registration;
 use App\Services\MidtransService;
 use Illuminate\Http\Request;
@@ -25,6 +26,20 @@ class MidtransNotificationController extends Controller
         }
 
         $status = $payload['transaction_status'] ?? null;
+
+        MidtransTransaction::updateOrCreate(
+            ['order_id' => (string) $registration->id],
+            [
+                'registration_id' => $registration->id,
+                'transaction_id' => $payload['transaction_id'] ?? null,
+                'gross_amount' => isset($payload['gross_amount']) ? (int) round((float) $payload['gross_amount']) : 0,
+                'payment_type' => $payload['payment_type'] ?? null,
+                'transaction_status' => $status ?? 'pending',
+                'fraud_status' => $payload['fraud_status'] ?? null,
+                'transaction_time' => $payload['transaction_time'] ?? null,
+                'raw_payload' => $payload,
+            ]
+        );
 
         if (in_array($status, ['settlement', 'capture'], true)) {
             $registration->update(['status' => 'paid']);

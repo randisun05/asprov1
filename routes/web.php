@@ -181,6 +181,12 @@ Route::prefix('admin')->group(function() {
             Route::get('/jurnals/show', [\App\Http\Controllers\Admin\JurnalController::class, 'show'])->name('admin.jurnals.show');
             Route::resource('/jurnals', \App\Http\Controllers\Admin\JurnalController::class, ['as' => 'admin']);
         });
+
+        //laporan transaksi midtrans
+        Route::middleware('role:administrator,pendanaan')->group(function () {
+            Route::get('/midtrans-report', [\App\Http\Controllers\Admin\MidtransReportController::class, 'index'])->name('admin.midtrans-report.index');
+            Route::get('/midtrans-report/export', [\App\Http\Controllers\Admin\MidtransReportController::class, 'export'])->name('admin.midtrans-report.export');
+        });
         Route::get('/update-gender', [\App\Http\Controllers\Admin\DataMembersController::class, 'updateMissingGenders'])->name('missing.gender');
 
 
