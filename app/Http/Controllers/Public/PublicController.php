@@ -52,11 +52,10 @@ class PublicController extends Controller
         $pranatapaid = Registration::where('position', 'Pranata SDM Aparatur')->where('emailstatus', '>', 0)
             ->whereNotIn('status', ['approved', 'rejected'])
             ->count();
-        $showPopup = Management::where('item', 'popup')->sum('status');
         $datas = Management::where('item', 'popup')->where('status', '1')->get();
         $agencydone = Registration::distinct()->count('agency');
 
-        return view('Index', [
+        return inertia('Public/Website/Index', [
             "events" => $events,
             'analisdone' => $analisdone,
             'analisproses' => $analisproses,
@@ -65,7 +64,6 @@ class PublicController extends Controller
             'agencydone' => $agencydone,
             'pranatapaid' => $pranatapaid,
             'analispaid' => $analispaid,
-            'showPopup' => $showPopup,
             'datas' => $datas
         ]);
     }
