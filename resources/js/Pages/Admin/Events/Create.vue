@@ -5,11 +5,11 @@
     </Head>
     <div class="container padding px-5 text-black">
         <div class="row mt-1">
-            <div class="col-md-12">
+            <div class="col-12 col-md-12">
                 <div class="card border-0 shadow">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-12 col-md-12">
                                 <div class="row py-4">
                                     <div class="col-md-2 col-12 mb-2">
                                         <Link href="/admin/events" class="btn btn-md btn-primary border-0 shadow w-100"
@@ -22,7 +22,7 @@
                         <h3 class="text-center">Buat Events</h3>
                         <form @submit.prevent="submit" enctype="multipart/form-data">
                             <div class="row py-4 ms-5">
-                                <div class="col-md-11">
+                                <div class="col-12 col-md-11">
                                     <span class="text-black">
                                         Judul
                                     </span>
@@ -35,7 +35,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-11">
+                                <div class="col-12 col-md-11">
                                     <span class="text-black">
                                         Deskripsi
                                     </span>
@@ -52,7 +52,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-3">
+                                <div class="col-12 col-md-3">
                                     <span class="text-black">
                                         Tanggal Pelaksanaan
                                     </span>
@@ -65,7 +65,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-3">
+                                <div class="col-12 col-md-3">
                                     <span class="text-black">
                                         Tutup Pendaftaran
                                     </span>
@@ -78,7 +78,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-2">
+                                <div class="col-12 col-md-2">
                                     <span class="text-black">
                                         Kapasitas Peserta
                                     </span>
@@ -91,7 +91,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-2">
+                                <div class="col-12 col-md-2">
                                     <span class="text-black">
                                         Upload File
                                     </span>
@@ -106,7 +106,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6">
                                     <span class="text-black">
                                         Tempat Pelaksanaan
                                     </span>
@@ -119,7 +119,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6">
                                     <span class="text-black">
                                         Template Sertifikat
                                     </span>
@@ -135,7 +135,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6">
                                     <span class="text-black">
                                         Link
                                     </span>
@@ -148,7 +148,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6">
                                     <span class="text-black">Kategori</span>
                                     <div class="form-group mt-1 mb-4">
                                         <select class="form-control" v-model="form.category">
@@ -168,7 +168,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-12 col-md-6">
                                         <span class="text-black">
                                            Dimulai Pada
                                         </span>
@@ -181,7 +181,7 @@
 
                                     </div>
 
-                                    <div class="col-md-6">
+                                    <div class="col-12 col-md-6">
                                         <span class="text-black">
                                             Berakhir Pada
                                         </span>
@@ -197,7 +197,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-12 col-md-6">
                                         <span class="text-black">
                                             Gambar/Foto
                                         </span>
@@ -213,7 +213,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
+                                    <div class="col-12 col-md-6">
                                         <span class="text-black">
                                             Durasi Kegiatan (Menit)
                                         </span>
@@ -228,7 +228,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-12 col-md-6">
                                         <span class="text-black">
                                             Biaya Poin untuk Ikut Kegiatan
                                         </span>
@@ -243,7 +243,7 @@
                                 </div>
                             </div>
                             <div class="row d-flex justify-content-center">
-                                <div class="col-md-2">
+                                <div class="col-12 col-md-2">
                                     <button type="submit"
                                         class="btn btn-md btn-primary border-0 shadow me-2">Simpan</button>
                                     <button type="reset" class="btn btn-md btn-warning border-0 shadow">Reset</button>

@@ -1389,10 +1389,26 @@ i::before,i::after{
 }
 
 @media (max-width: 767px) {
+   /* The sidebar (admin left rail / member left rail) only shows its
+      .navbar-collapse when toggled open on a phone. Before this rule it
+      stayed `position: fixed; height: 100%` from the desktop rule above
+      with no scroll of its own, so with a full menu (e.g. ~18 admin items)
+      anything past the bottom of the screen was permanently unreachable -
+      there was no way to scroll down to it. Also raised z-index above the
+      fixed .userbg header (100000) so the open panel isn't clipped under it,
+      and added padding-top to clear the header's height instead of relying
+      on the .mt-5 utility class (a guessed 48px that isn't the header's
+      real height). */
    .navbar.sidebar-nav {
       width: 100%;
-      height: auto;
+      height: 100vh;
+      max-height: 100vh;
+      margin-top: 0 !important;
       padding: 0 1rem;
+      padding-top: 90px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      z-index: 100001;
       display: -webkit-box;
       display: -webkit-flex;
       display: -moz-box;
@@ -1418,6 +1434,28 @@ i::before,i::after{
    }
    .sidebar-nav .social-icons{
       display: none;
+   }
+
+   /* Several admin/member Create-Edit forms apply Bootstrap's .padding
+      (7.5rem = 120px top+bottom), .ms-5 (3rem = 48px) and .px-5 (3rem each
+      side) utilities with no responsive variant at all, eating a large
+      chunk of a phone's width/height before any actual field is shown.
+      Scaling these down only on narrow screens; desktop is untouched. */
+   .padding {
+      padding: 2.5rem 0;
+   }
+   .padding_top {
+      padding-top: 2.5rem;
+   }
+   .padding_bottom {
+      padding-bottom: 2.5rem;
+   }
+   .ms-5 {
+      margin-left: 1rem !important;
+   }
+   .px-5 {
+      padding-left: 1rem !important;
+      padding-right: 1rem !important;
    }
 }
 

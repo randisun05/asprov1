@@ -6,7 +6,7 @@
                                                     <h3 class="text-center">Management Website</h3>
 
                                                     <div class="row">
-                                                        <div class="col-md-3">
+                                                        <div class="col-12 col-md-3">
                                                             <ul class="nav nav-pills flex-column" id="item-list">
                                                                 <li class="nav-item" v-for="tab in tabs" :key="tab.value">
                                                                     <a class="nav-link" @click="setActiveTab(tab.value)"
@@ -17,7 +17,7 @@
                                                             </ul>
                                                         </div>
 
-                                                        <div class="col-md-8 mt-4">
+                                                        <div class="col-12 col-md-8 mt-4">
                                                             <!-- <button type="button" class="btn btn-primary" @click="ModalCreate()"
                                                                 v-show="activeTab === 'popup' || activeTab === 'peraturan' || activeTab === 'dataanggota' || activeTab === 'strukturorganisasi' || activeTab === 'proker' || activeTab === 'faq'">
                                                                 <i class="fa fa-plus-circle"></i>Tambah
@@ -33,6 +33,7 @@
                                                             </span>
                                                             <!-- ACTIVETAB = {{ activeTab }}
                                                             {{ filteredData }} -->
+                                                            <div class="table-responsive">
                                                             <table
                                                                 class="table table-bordered table-centered table-nowrap mb-0 rounded">
                                                                 <thead class="thead-dark">
@@ -86,6 +87,7 @@
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
+                                                            </div>
                                                             <Pagination :links="datas.links" align="end" />
                                                         </div>
                                                     </div>
@@ -105,7 +107,7 @@
                                                                 <div class="program-description" id="program-description-1">
 
                                                                     <div class="row py-4 ms-5">
-                                                                        <!-- <div class="col-md-11">
+                                                                        <!-- <div class="col-12 col-md-11">
                                                                                 <span class="text-black">Item</span>
                                                                                 <div class="form-group mt-1 mb-4">
                                                                                     <select class="form-select" v-model="form.item">
@@ -125,14 +127,14 @@
                                                                                 </div>
                                                                                 <div v-if="errors.item" class="alert alert-danger mt-2">{{ errors.item }}</div>
                                                                             </div> -->
-                                                                        <div class="col-md-11">
+                                                                        <div class="col-12 col-md-11">
                                                                             <span class="text-black">Item</span>
                                                                             <div class="form-group mt-1 mb-4">
                                                                                 <input type="text" class="form-control"
                                                                                     v-model="activeTab" disabled>
                                                                             </div>
                                                                         </div>
-                                                                        <div class="col-md-11">
+                                                                        <div class="col-12 col-md-11">
                                                                             <span class="text-black">Sub</span>
                                                                             <div class="form-group mt-1 mb-4">
                                                                                 <input type="text" class="form-control"
@@ -145,7 +147,7 @@
                                                                                 }}</div>
                                                                         </div>
 
-                                                                        <div class="col-md-11" v-show="activeTab == 'proker'">
+                                                                        <div class="col-12 col-md-11" v-show="activeTab == 'proker'">
                                                                             <span class="text-black">Sub</span>
                                                                             <div class="form-group mt-1 mb-4">
                                                                                 <div class="form-group mt-1 mb-4">
@@ -178,7 +180,7 @@
                                                                                 }}</div>
                                                                         </div>
 
-                                                                        <div class="col-md-11"
+                                                                        <div class="col-12 col-md-11"
                                                                             v-show="activeTab == 'proker' || activeTab == 'faq'">
                                                                             <span class="text-black">Subitem</span>
                                                                             <div class="form-group mt-1 mb-4">
@@ -193,7 +195,7 @@
                                                                         </div>
 
 
-                                                                        <div class="col-md-11" v-show="activeTab != 'popup'">
+                                                                        <div class="col-12 col-md-11" v-show="activeTab != 'popup'">
                                                                             <span class="text-black">Body</span>
 
                                                                             <div class="form-group mt-1 mb-4">
@@ -212,7 +214,7 @@
                                                                         </div>
 
 
-                                                                        <div class="col-md-11"
+                                                                        <div class="col-12 col-md-11"
                                                                             v-show="activeTab == 'popup' || activeTab == 'peraturan' || activeTab == 'dataanggota'">
                                                                             <span class="text-black">Link</span>
                                                                             <div class="form-group mt-1 mb-4">
@@ -225,7 +227,7 @@
                                                                                     errors.link }}</div>
                                                                         </div>
 
-                                                                        <div class="col-md-5"
+                                                                        <div class="col-12 col-md-5"
                                                                             v-show="activeTab == 'proker' || activeTab == 'faq'">
                                                                             <span class="text-black">Posisi</span>
                                                                             <div class="form-group mt-1 mb-4">
@@ -245,7 +247,7 @@
                                                                             </div>
                                                                         </div>
 
-                                                                        <div class="col-md-5" v-show="activeTab == 'popup'">
+                                                                        <div class="col-12 col-md-5" v-show="activeTab == 'popup'">
                                                                             <span class="text-black">Button</span>
                                                                             <div class="form-group mt-1 mb-4">
                                                                                 <select class="form-select"
@@ -262,7 +264,7 @@
                                                                                     errors.button }}</div>
                                                                         </div>
 
-                                                                        <div class="col-md-5" v-show="activeTab === ''">
+                                                                        <div class="col-12 col-md-5" v-show="activeTab === ''">
                                                                             <span class="text-black">Keterangan</span>
                                                                             <div class="form-group mt-1 mb-4">
                                                                                 <Editor
@@ -280,7 +282,7 @@
                                                                         </div>
 
                                                                         <div class="row">
-                                                                            <div class="col-md-5">
+                                                                            <div class="col-12 col-md-5">
                                                                                 <span class="text-black">Gambar/Foto</span>
                                                                                 <div class="form-group mt-1">
                                                                                     <input type="file" class="form-control"
@@ -297,7 +299,7 @@
                                                                                         errors[0] }}</div>
                                                                             </div>
 
-                                                                            <div class="col-md-5"
+                                                                            <div class="col-12 col-md-5"
                                                                                 v-show="activeTab === 'peraturan' || activeTab === 'dataanggota'">
                                                                                 <span class="text-black">Dokumen</span>
                                                                                 <div class="form-group mt-1">
@@ -315,7 +317,7 @@
                                                                         </div>
                                                                     </div>
                                                                     <div class="row d-flex justify-content-center">
-                                                                        <div class="col-md-4">
+                                                                        <div class="col-12 col-md-4">
                                                                             <button type="button"
                                                                                 class="btn btn-md btn-primary border-0 shadow me-2"
                                                                                 @click="store"
@@ -342,7 +344,7 @@
                                                                 <div class="program-description" id="program-description-1">
                                                                     <div class="tab-pane fade show active" id="modaledit">
                                                                         <div class="row py-4 ms-5">
-                                                                            <div class="col-md-11">
+                                                                            <div class="col-12 col-md-11">
                                                                                 <span class="text-black">Item</span>
                                                                                 <div class="form-group mt-1 mb-4">
                                                                                     <input type="text" class="form-control"
@@ -355,7 +357,7 @@
                                                                                         errors.item }}</div>
                                                                             </div>
 
-                                                                            <div class="col-md-11"
+                                                                            <div class="col-12 col-md-11"
                                                                                 v-show="activeTab == 'proker' || activeTab == 'faq' || activeTab == 'popup'">
                                                                                 <span class="text-black">Sub</span>
                                                                                 <div class="form-group mt-1 mb-4">
@@ -368,7 +370,7 @@
                                                                                         errors.sub }}</div>
                                                                             </div>
 
-                                                                            <div class="col-md-11"
+                                                                            <div class="col-12 col-md-11"
                                                                                 v-show="activeTab == 'proker' || activeTab == 'faq'">
                                                                                 <span class="text-black">Subitem</span>
                                                                                 <div class="form-group mt-1 mb-4">
@@ -383,7 +385,7 @@
                                                                             </div>
 
 
-                                                                            <div class="col-md-11" v-show="activeTab != 'popup'">
+                                                                            <div class="col-12 col-md-11" v-show="activeTab != 'popup'">
                                                                                 <span class="text-black">Body</span>
                                                                                 <div class="form-group mt-1 mb-4">
                                                                                     <Editor
@@ -401,7 +403,7 @@
                                                                             </div>
 
 
-                                                                            <div class="col-md-11"
+                                                                            <div class="col-12 col-md-11"
                                                                                 v-show="activeTab == 'popup' || activeTab == 'peraturan' || activeTab == 'dataanggota'">
                                                                                 <span class="text-black">Link</span>
                                                                                 <div class="form-group mt-1 mb-4">
@@ -414,7 +416,7 @@
                                                                                         errors.link }}</div>
                                                                             </div>
 
-                                                                            <div class="col-md-5"
+                                                                            <div class="col-12 col-md-5"
                                                                                 v-show="activeTab == 'proker' || activeTab == 'faq'">
                                                                                 <span class="text-black">Posisi</span>
                                                                                 <div class="form-group mt-1 mb-4">
@@ -434,7 +436,7 @@
                                                                                     }}</div>
                                                                             </div>
 
-                                                                            <div class="col-md-5" v-show="activeTab === 'popup'">
+                                                                            <div class="col-12 col-md-5" v-show="activeTab === 'popup'">
                                                                                 <span class="text-black">Button</span>
                                                                                 <div class="form-group mt-1 mb-4">
                                                                                     <select class="form-select"
@@ -452,7 +454,7 @@
                                                                                 </div>
                                                                             </div>
 
-                                                                            <div class="col-md-5" v-show="activeTab === ''">
+                                                                            <div class="col-12 col-md-5" v-show="activeTab === ''">
                                                                                 <span class="text-black">Keterangan</span>
                                                                                 <div class="form-group mt-1 mb-4">
                                                                                     <Editor
@@ -472,7 +474,7 @@
 
 
                                                                             <div class="row">
-                                                                                <div class="col-md-5">
+                                                                                <div class="col-12 col-md-5">
                                                                                     <span
                                                                                         class="text-black">Gambar/Foto</span>
                                                                                     <div class="form-group mt-1">
@@ -491,7 +493,7 @@
                                                                                             errors[0] }}</div>
                                                                                 </div>
 
-                                                                                <div class="col-md-5"
+                                                                                <div class="col-12 col-md-5"
                                                                                     v-show="activeTab === 'peraturan' || activeTab === 'dataanggota'">
                                                                                     <span class="text-black">Dokumen</span>
                                                                                     <div class="form-group mt-1">
@@ -511,7 +513,7 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="row d-flex justify-content-center">
-                                                                            <div class="col-md-2">
+                                                                            <div class="col-12 col-md-2">
                                                                                 <button type="submit"
                                                                                     class="btn btn-md btn-primary border-0 shadow me-2"
                                                                                     data-bs-dismiss="modal"

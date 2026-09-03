@@ -1,6 +1,6 @@
 <template>
 <header class="site-header userbg">
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-md">
         <div class="container">
             <a class="navbar-brand" href="index.html">
           <img src="/assets/images/logo.png" alt="logo" style="width: 70%;">

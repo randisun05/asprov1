@@ -1,7 +1,7 @@
 <template>
 
    <nav class="navbar navbar-expand-md sidebar-nav padding padding_m">
-    <div class="collapse navbar-collapse" id="xenav">
+    <div class="collapse navbar-collapse" id="usersidebarnav">
        <ul class="navbar-nav ms-auto">
         <li class="nav-item py-3">
         </li>

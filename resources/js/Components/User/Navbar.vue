@@ -2,13 +2,13 @@
     <!-- header -->
 
     <header class="site-header userbg">
-        <nav class="navbar navbar-expand-lg  static-nav">
+        <nav class="navbar navbar-expand-md  static-nav">
             <div class="container">
                 <a class="navbar-brand" href="index.html">
                     <img src="/assets/images/logo.png" alt="logo" style="width: 70%;">
                 </a>
                 <button class="navbar-toggler navbar-toggler-right collapsed" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#xenav">
+                    data-bs-target="#xenav, #usersidebarnav">
                     <span> </span>
                     <span> </span>
                     <span> </span>

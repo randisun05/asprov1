@@ -4,11 +4,11 @@
     </Head>
     <div class="container padding px-5 text-black">
         <div class="row mt-1">
-            <div class="col-md-12">
+            <div class="col-12 col-md-12">
                 <div class="card border-0 shadow">
                     <div class="card-body">
                         <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-12 col-md-12">
                             <div class="row py-4">
                                         <div class="col-md-2 col-12 mb-2">
                                             <Link href="/admin/merchans" class="btn btn-md btn-primary border-0 shadow w-100" type="button"><i
@@ -21,7 +21,7 @@
                             <h3 class="text-center">Update Merchandise</h3>
                         <form @submit.prevent="submit" enctype="multipart/form-data">
                                 <div class="row py-4 ms-5">
-                                            <div class="col-md-5">
+                                            <div class="col-12 col-md-5">
                                                 <span>
                                                 Nama Merchandise
                                                 </span>
@@ -33,7 +33,7 @@
                                                 </div>
                                             </div>
 
-                                                <div class="col-md-6 mb-4">
+                                                <div class="col-12 col-md-6 mb-4">
                                                     <span>
                                                     Sub-Title
                                                     </span>
@@ -45,7 +45,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-5 mb-4">
+                                                <div class="col-12 col-md-5 mb-4">
                                                     <span>
                                                     Warna
                                                     </span>
@@ -57,7 +57,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-6 mb-4">
+                                                <div class="col-12 col-md-6 mb-4">
                                                     <span>
                                                     Harga
                                                     </span>
@@ -69,7 +69,7 @@
                                                     </div>
                                                 </div>
 
-                                            <div class="col-md-11 mb-4">
+                                            <div class="col-12 col-md-11 mb-4">
                                                 <span>
                                                 Deskripsi
                                                 </span>
@@ -84,7 +84,7 @@
                                                     />
                                             </div>
 
-                                            <div class="col-md-11 mb-4">
+                                            <div class="col-12 col-md-11 mb-4">
                                                 <span>
                                                 How To Buy
                                                 </span>
@@ -99,7 +99,7 @@
                                                     />
                                             </div>
 
-                                            <div class="col-md-5">
+                                            <div class="col-12 col-md-5">
                                                     <span>
                                                     Image
                                                     </span>
@@ -117,7 +117,7 @@
 
                                 </div>
                                         <div class="row d-flex justify-content-center">
-                                            <div class="col-md-2">
+                                            <div class="col-12 col-md-2">
                                                 <button type="submit" class="btn btn-md btn-primary border-0 shadow me-2">Simpan</button>
                                                 <Link href="/admin/merchans" class="btn btn-md btn-primary border-0 shadow" type="button">Batal</Link>
                                             </div>
