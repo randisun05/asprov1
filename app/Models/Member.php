@@ -54,6 +54,11 @@ class Member extends Authenticatable
         return $this->hasMany(MemberNotificationRead::class);
     }
 
+    public function pollVotes()
+    {
+        return $this->hasMany(PollVote::class);
+    }
+
     /**
      * A null expires_at means no expiry restriction (kept for defensive
      * backward compatibility, even though the backfill/approval flow always

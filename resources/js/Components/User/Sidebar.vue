@@ -83,6 +83,17 @@
                   </Link>
               </li>
 
+              <li class="nav-item" :class="{ 'active': $page.url.startsWith('/user/polls') }">
+                  <Link href="/user/polls" class="nav-link d-flex justify-content-between">
+                  <span>
+                      <span class="sidebar-icon">
+                        <i class="fa fa-check-square-o"></i>
+                      </span>
+                      <span class="sidebar-text ms-3">Polling</span>
+                  </span>
+                  </Link>
+              </li>
+
               <li class="nav-item" :class="{ 'active': $page.url.startsWith('/user/points') }">
                   <Link href="/user/points" class="nav-link d-flex justify-content-between">
                   <span>

@@ -69,6 +69,17 @@
                     </Link>
                 </li>
 
+                <li v-if="$page.props.auth.user.role === 'humas' || $page.props.auth.user.role === 'administrator'" class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/polls') }">
+                    <Link href="/admin/polls" class="nav-link d-flex justify-content-between">
+                    <span>
+                        <span class="sidebar-icon">
+                           <i class="fa fa-check-square-o fa-lg" aria-hidden="true"></i>
+                        </span>
+                        <span class="sidebar-text ms-3">Polling</span>
+                    </span>
+                    </Link>
+                </li>
+
                 <li v-if="$page.props.auth.user.role === 'humas' || $page.props.auth.user.role === 'administrator'" class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/events') }">
                     <Link href="/admin/events" class="nav-link d-flex justify-content-between">
                     <span>

@@ -78,6 +78,7 @@ export default {
             post: 'fa-newspaper-o',
             merchan: 'fa-shopping-bag',
             announcement: 'fa-bullhorn',
+            poll: 'fa-check-square-o',
         }[type] ?? 'fa-bell');
 
         const typeBadgeClass = (type) => ({
@@ -86,6 +87,7 @@ export default {
             post: 'bg-info',
             merchan: 'bg-success',
             announcement: 'bg-danger',
+            poll: 'bg-dark',
         }[type] ?? 'bg-secondary');
 
         return { hasUnread, open, readAll, typeIcon, typeBadgeClass };

@@ -73,6 +73,9 @@ Route::prefix('admin')->group(function() {
             Route::post('/announcements/{id}/status', [\App\Http\Controllers\Admin\AnnouncementController::class, 'status'])->name('admin.announcements.status');
             Route::resource('/announcements', \App\Http\Controllers\Admin\AnnouncementController::class, ['as' => 'admin']);
 
+            Route::post('/polls/{id}/status', [\App\Http\Controllers\Admin\PollController::class, 'status'])->name('admin.polls.status');
+            Route::resource('/polls', \App\Http\Controllers\Admin\PollController::class, ['as' => 'admin']);
+
             Route::get('/admin/posts/', [\App\Http\Controllers\Admin\PostController::class, 'list'])->name('admin.posts.list');
             Route::post('/posts/{id}', [\App\Http\Controllers\Admin\PostController::class, 'update'])->name('admin.posts.update');
             Route::resource('/posts', \App\Http\Controllers\Admin\PostController::class, ['as' => 'admin']);
@@ -267,6 +270,9 @@ Route::prefix('user')->group(function() {
         Route::put('/setting/update', [App\Http\Controllers\User\LoginController::class, 'resetPassword'])->name('user.setting.update');
         Route::get('/merchans/', [\App\Http\Controllers\User\MerchansController::class, 'index'])->name('user.merchan.index');
         Route::get('/merchans/{id}', [\App\Http\Controllers\User\MerchansController::class, 'show'])->name('user.merchan.show');
+        Route::get('/polls', [\App\Http\Controllers\User\PollController::class, 'index'])->name('user.polls.index');
+        Route::get('/polls/{id}', [\App\Http\Controllers\User\PollController::class, 'show'])->name('user.polls.show');
+        Route::post('/polls/{id}/vote', [\App\Http\Controllers\User\PollController::class, 'vote'])->name('user.polls.vote');
         Route::get('/member-card/', [\App\Http\Controllers\User\MemberCardController::class, 'index'])->name('user.card.index');
         Route::get('/member-card/edit', [\App\Http\Controllers\User\MemberCardController::class, 'edit'])->name('user.card.edit');
         Route::get('/member-card/download', [\App\Http\Controllers\User\MemberCardController::class, 'download'])->name('user.card.download');

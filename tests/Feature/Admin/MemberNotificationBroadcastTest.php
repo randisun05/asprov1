@@ -165,4 +165,29 @@ class MemberNotificationBroadcastTest extends TestCase
 
         $this->actingAs($keanggotaan)->get('/admin/announcements')->assertForbidden();
     }
+
+    public function test_creating_a_poll_broadcasts_a_notification()
+    {
+        $admin = $this->makeAdminUser('administrator');
+
+        $this->actingAs($admin)->post('/admin/polls', [
+            'question' => 'Kegiatan apa yang paling diminati?',
+            'options' => ['Webinar', 'Workshop'],
+        ])->assertRedirect(route('admin.polls.index'));
+
+        $poll = \App\Models\Poll::where('question', 'Kegiatan apa yang paling diminati?')->firstOrFail();
+
+        $this->assertDatabaseHas('member_notifications', [
+            'type' => 'poll',
+            'title' => 'Polling baru: Kegiatan apa yang paling diminati?',
+            'link' => "/user/polls/{$poll->id}",
+        ]);
+    }
+
+    public function test_poll_management_is_restricted_to_administrator_and_humas()
+    {
+        $keanggotaan = $this->makeAdminUser('keanggotaan');
+
+        $this->actingAs($keanggotaan)->get('/admin/polls')->assertForbidden();
+    }
 }
