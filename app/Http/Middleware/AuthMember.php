@@ -30,6 +30,20 @@ class AuthMember
             return redirect('/user/login');
         }
 
+        // Membership can expire while a session is still active (login
+        // itself is only checked once, at sign-in) - catch that here too so
+        // an expired member is force-logged-out on their very next request
+        // instead of keeping access until they happen to log in again.
+        if ($member->isExpired()) {
+            auth()->guard('member')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            Session::flash('error', 'Masa berlaku keanggotaan Anda telah berakhir pada ' . $member->expires_at->translatedFormat('d F Y') . '. Silakan hubungi admin untuk perpanjangan.');
+
+            return redirect('/user/login');
+        }
+
         return $next($request);
     }
 }

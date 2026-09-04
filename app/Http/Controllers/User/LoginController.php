@@ -65,6 +65,8 @@ class LoginController extends Controller
                 return redirect()->back()->with('error', 'NIP belum terdaftar. Silakan lakukan pendaftaran keanggotaan.');
             } elseif (!password_verify($request->password, $member->password)) {
                 return redirect()->back()->with('error', 'NIP atau Password salah');
+            } elseif ($member->isExpired()) {
+                return redirect()->back()->with('error', 'Masa berlaku keanggotaan Anda telah berakhir pada ' . $member->expires_at->translatedFormat('d F Y') . '. Silakan hubungi admin untuk perpanjangan.');
             }
 
             // Login the user

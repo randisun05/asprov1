@@ -43,6 +43,9 @@ class ProfileDataMain extends Model
         return $this->hasOne(ProfileDataPosition::class, 'main_id', 'id');
     }
 
-
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'nip', 'nip');
+    }
 
 }

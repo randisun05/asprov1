@@ -47,6 +47,7 @@
                                                         <th class="border-0">Nama</th>
                                                         <th class="border-0">Jabatan</th>
                                                         <th class="border-0">Instansi</th>
+                                                        <th class="border-0">Masa Berlaku</th>
                                                         <th class="border-0 rounded-end" style="width:12%">Aksi</th>
                                                     </tr>
                                                 </thead>
@@ -59,6 +60,14 @@
                                                         <td>{{ data.main.name }}</td>
                                                         <td>{{ data.position }} {{ data.level }}</td>
                                                         <td>{{ data.agency }}</td>
+                                                        <td class="text-center">
+                                                            <span v-if="data.main.member && data.main.member.expires_at"
+                                                                class="badge"
+                                                                :class="isExpired(data.main.member.expires_at) ? 'bg-danger' : 'bg-success'">
+                                                                {{ isExpired(data.main.member.expires_at) ? 'Kedaluwarsa' : 'Aktif' }}
+                                                            </span>
+                                                            <span v-else class="badge bg-secondary">-</span>
+                                                        </td>
                                                         <td class="text-center">
                                                             <Link :href="`/admin/members/${data.id}`" title="view"
                                                                 class="btn btn-sm btn-primary border-0 shadow me-1" type="button"><i
@@ -194,7 +203,10 @@
                         closeModal() {
                             this.showModal = false;
                             this.qrCode = null;
-                        }
+                        },
+                        isExpired(expiresAt) {
+                            return new Date(expiresAt) < new Date();
+                        },
                     },
 
 

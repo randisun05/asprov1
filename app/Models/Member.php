@@ -19,7 +19,8 @@ class Member extends Authenticatable
         'agency',
         'code-password',
         'code_password_expires_at',
-        'qr_link'
+        'qr_link',
+        'expires_at'
     ];
 
     protected $hidden = [
@@ -29,6 +30,7 @@ class Member extends Authenticatable
 
     protected $casts = [
         'code_password_expires_at' => 'datetime',
+        'expires_at' => 'datetime',
     ];
 
      public function position()
@@ -50,6 +52,16 @@ class Member extends Authenticatable
     public function notificationReads()
     {
         return $this->hasMany(MemberNotificationRead::class);
+    }
+
+    /**
+     * A null expires_at means no expiry restriction (kept for defensive
+     * backward compatibility, even though the backfill/approval flow always
+     * sets one today).
+     */
+    public function isExpired(): bool
+    {
+        return $this->expires_at !== null && $this->expires_at->isPast();
     }
 
 }

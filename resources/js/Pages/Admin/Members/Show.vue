@@ -300,6 +300,54 @@
 
                 <div class="col-sm-12 card shadow mt-4" v-if="memberId">
                     <div class="py-4">
+                        <span> Masa Berlaku Keanggotaan </span>
+                    </div>
+
+                    <div class="row ms-2 mb-3">
+                        <div class="col-md-6 col-sm-6">
+                            <span class="text-black"> Berlaku Sampai </span>
+                            <div class="form-group mt-1">
+                                <h5 class="mb-0">
+                                    {{ expiresAt ? formatDate(expiresAt) : '-' }}
+                                    <span v-if="expiresAt" class="badge ms-2"
+                                        :class="isExpired ? 'bg-danger' : 'bg-success'">
+                                        {{ isExpired ? 'Kedaluwarsa' : 'Aktif' }}
+                                    </span>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row ms-2 mb-3 align-items-end">
+                        <div class="col-md-3 col-sm-4">
+                            <button type="button" class="btn btn-md btn-primary border-0 shadow w-100"
+                                :disabled="extendForm.processing" @click="submitExtend">
+                                Perpanjang 1 Tahun
+                            </button>
+                        </div>
+                    </div>
+
+                    <form @submit.prevent="submitUpdateExpiry" class="row ms-2 mb-3 align-items-end">
+                        <div class="col-md-4 col-sm-5">
+                            <span class="text-black"> Atur Tanggal Kedaluwarsa </span>
+                            <div class="form-group mt-1">
+                                <input type="date" class="form-control" v-model="updateExpiryForm.expires_at" required>
+                            </div>
+                            <div v-if="updateExpiryForm.errors.expires_at" class="alert alert-danger mt-2 py-1 px-2">
+                                {{ updateExpiryForm.errors.expires_at }}
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-4">
+                            <button type="submit" class="btn btn-md btn-secondary border-0 shadow w-100"
+                                :disabled="updateExpiryForm.processing">
+                                Simpan Tanggal
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-sm-12 card shadow mt-4" v-if="memberId">
+                    <div class="py-4">
                         <span> Poin Anggota </span>
                     </div>
 
@@ -402,6 +450,9 @@ export default {
         setActiveTab(tabName) {
             this.activeTab = tabName;
         },
+        formatDate(value) {
+            return new Date(value).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        },
     },
 
     //layout
@@ -421,6 +472,13 @@ export default {
         memberId: [Number, String],
         points: [Number, String],
         pointTransactions: Array,
+        expiresAt: String,
+    },
+
+    computed: {
+        isExpired() {
+            return this.expiresAt !== null && this.expiresAt !== undefined && new Date(this.expiresAt) < new Date();
+        },
     },
 
     //define composition API
@@ -484,12 +542,35 @@ export default {
             });
         };
 
+        // Membership expiry forms
+        const extendForm = useForm({});
+
+        const submitExtend = () => {
+            extendForm.post(`/admin/members/${props.memberId}/expiry/extend`, {
+                preserveScroll: true,
+            });
+        };
+
+        const updateExpiryForm = useForm({
+            expires_at: props.expiresAt ? props.expiresAt.substring(0, 10) : '',
+        });
+
+        const submitUpdateExpiry = () => {
+            updateExpiryForm.post(`/admin/members/${props.memberId}/expiry`, {
+                preserveScroll: true,
+            });
+        };
+
         //return form state and submit method
         return {
             form,
             getImageUrl,
             rewardForm,
             submitReward,
+            extendForm,
+            submitExtend,
+            updateExpiryForm,
+            submitUpdateExpiry,
         };
     },
 };

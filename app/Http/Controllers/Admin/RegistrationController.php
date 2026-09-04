@@ -377,6 +377,7 @@ class RegistrationController extends Controller
                         'agency'   => $locked->agency,
                         'nomember' => $code,
                         'password' => Hash::make($locked->nip),
+                        'expires_at' => now()->addYear(),
                     ]);
 
                     $profileMain = ProfileDataMain::create([
@@ -848,6 +849,7 @@ class RegistrationController extends Controller
                         'agency'         => $register->agency,
                         'nomember'       => $code,
                         'password'       => Hash::make($register->nip),
+                        'expires_at'     => now()->addYear(),
                     ]);
 
                     $profileMain = ProfileDataMain::create([

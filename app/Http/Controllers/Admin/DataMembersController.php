@@ -27,7 +27,7 @@ class DataMembersController extends Controller
     public function index()
     {
         if (auth()->user()->role === 'keanggotaan' || auth()->user()->role === 'administrator' || auth()->user()->role === 'pendanaan') {
-            $datas = ProfileDataPosition::with('main')
+            $datas = ProfileDataPosition::with('main.member')
             ->when(request()->q, function($query) {
             $query->whereHas('main', function($query) {
                 $query->where('name', 'like', '%' . request()->q . '%')
@@ -125,6 +125,7 @@ class DataMembersController extends Controller
                'memberId' => $member?->id,
                'points' => $points,
                'pointTransactions' => $pointTransactions,
+               'expiresAt' => $member?->expires_at,
             ]);
             } else {
             return redirect()->route('admin.dashboard')->with('error','anda tidak memiliki akses ke halaman tersebut');
@@ -251,6 +252,63 @@ class DataMembersController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * Extend a member's membership by 1 year, from whichever is later: their
+     * current expiry, or now. Using "later of the two" (rather than always
+     * "now + 1 year") means extending an already-active membership doesn't
+     * throw away time they haven't used yet, while an expired one still
+     * correctly restarts from today.
+     *
+     * @param  int  $id  ProfileDataPosition id, same as show()/edit()
+     */
+    public function extendExpiry($id)
+    {
+        if (auth()->user()->role !== 'keanggotaan' && auth()->user()->role !== 'administrator') {
+            return redirect()->route('admin.dashboard')->with('error', 'anda tidak memiliki akses ke halaman tersebut');
+        }
+
+        $data = ProfileDataPosition::with('main')->findOrFail($id);
+        $member = Member::where('nip', $data->main->nip)->first();
+
+        if (!$member) {
+            return redirect()->back()->with('error', 'Data anggota tidak ditemukan.');
+        }
+
+        $base = $member->expires_at && $member->expires_at->isFuture() ? $member->expires_at : now();
+        $member->update(['expires_at' => $base->copy()->addYear()]);
+
+        return redirect()->back()->with('success', 'Masa berlaku keanggotaan berhasil diperpanjang 1 tahun, sampai ' . $member->expires_at->translatedFormat('d F Y') . '.');
+    }
+
+    /**
+     * Set a member's expiry to an admin-chosen date, for cases the quick
+     * "+1 year" extend button doesn't cover (e.g. correcting a wrong date,
+     * a shorter/longer grant, reinstating an expired member early).
+     *
+     * @param  int  $id  ProfileDataPosition id, same as show()/edit()
+     */
+    public function updateExpiry(Request $request, $id)
+    {
+        if (auth()->user()->role !== 'keanggotaan' && auth()->user()->role !== 'administrator') {
+            return redirect()->route('admin.dashboard')->with('error', 'anda tidak memiliki akses ke halaman tersebut');
+        }
+
+        $request->validate([
+            'expires_at' => 'required|date',
+        ]);
+
+        $data = ProfileDataPosition::with('main')->findOrFail($id);
+        $member = Member::where('nip', $data->main->nip)->first();
+
+        if (!$member) {
+            return redirect()->back()->with('error', 'Data anggota tidak ditemukan.');
+        }
+
+        $member->update(['expires_at' => $request->expires_at]);
+
+        return redirect()->back()->with('success', 'Masa berlaku keanggotaan berhasil diperbarui, sampai ' . $member->expires_at->translatedFormat('d F Y') . '.');
     }
 
     public function indexReport()

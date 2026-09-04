@@ -136,6 +136,8 @@ Route::prefix('admin')->group(function() {
         Route::get('/members/report/recap', [\App\Http\Controllers\Admin\DataMembersController::class, 'recapitulation'])->name('admin.member.report.recap');
         Route::resource('/members', \App\Http\Controllers\Admin\DataMembersController::class, ['as' => 'admin']);
         Route::post('/members/{id}/image', [\App\Http\Controllers\Admin\DataMembersController::class, 'updateImage'])->name('admin.members.image');
+        Route::post('/members/{id}/expiry/extend', [\App\Http\Controllers\Admin\DataMembersController::class, 'extendExpiry'])->name('admin.members.expiry.extend');
+        Route::post('/members/{id}/expiry', [\App\Http\Controllers\Admin\DataMembersController::class, 'updateExpiry'])->name('admin.members.expiry.update');
         Route::post('/members/{id}/points/reward', [\App\Http\Controllers\Admin\PointController::class, 'reward'])->name('admin.members.points.reward');
         Route::get('/points/reward-group', [\App\Http\Controllers\Admin\PointController::class, 'rewardGroupForm'])->name('admin.points.reward-group');
         Route::post('/points/reward-group', [\App\Http\Controllers\Admin\PointController::class, 'rewardGroup'])->name('admin.points.reward-group.store');
