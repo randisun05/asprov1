@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Mail\SendEmailForgetPassword;
+use App\Models\EmailLog;
+use Illuminate\Support\Facades\Log;
 use App\Models\Achievement;
 use App\Models\Answer;
 use App\Models\Category;
@@ -26,7 +28,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Log;
 use F9WebLtd\QrCode\Facades\QrCode;
 
 class PublicController extends Controller
@@ -580,7 +581,16 @@ class PublicController extends Controller
                 'code_password_expires_at' => now()->addMinutes(60),
             ]);
 
-            Mail::to($data->email)->send(new SendEmailForgetPassword($data));
+            try {
+                $emailLog = EmailLog::start(SendEmailForgetPassword::class, 'forgot_password', $data->email, $data);
+                Mail::to($data->email)->send((new SendEmailForgetPassword($data))->withEmailLog($emailLog->id));
+            } catch (\Throwable $mailError) {
+                Log::error('Gagal mengirim email lupa password', [
+                    'member_id' => $data->id,
+                    'error' => $mailError->getMessage(),
+                ]);
+            }
+
             return back()->with('success', 'Email telah dikirimkan untuk reset password.');
         }
 

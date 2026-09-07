@@ -3,6 +3,7 @@
 namespace Tests\Feature\Public;
 
 use App\Mail\SendEmailForgetPassword;
+use App\Models\EmailLog;
 use App\Models\Member;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -38,7 +39,29 @@ class MemberPasswordResetTest extends TestCase
         $this->assertNotNull($member->{'code-password'});
         $this->assertNotNull($member->code_password_expires_at);
         $this->assertTrue($member->code_password_expires_at->isFuture());
-        Mail::assertSent(SendEmailForgetPassword::class);
+        // SendEmailForgetPassword now implements ShouldQueue (see
+        // EmailLogTrackingTest / LogsEmailStatusTest for the delivery
+        // status tracking this enables), so the fake records it as queued
+        // rather than immediately sent.
+        Mail::assertQueued(SendEmailForgetPassword::class);
+    }
+
+    public function test_requesting_a_reset_link_logs_the_email_as_sent()
+    {
+        config(['mail.default' => 'array']);
+        $member = $this->makeMember();
+
+        $this->post('/forget-password/email', [
+            'nip' => $member->nip,
+            'email' => $member->email,
+        ])->assertSessionHas('success');
+
+        $this->assertDatabaseHas('email_logs', [
+            'mailable' => SendEmailForgetPassword::class,
+            'type' => 'forgot_password',
+            'to_email' => $member->email,
+            'status' => EmailLog::STATUS_SENT,
+        ]);
     }
 
     public function test_reset_page_rejects_an_unknown_code()

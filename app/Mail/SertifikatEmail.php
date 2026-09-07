@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Mail\Concerns\LogsEmailStatus;
 use App\Models\Certificate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -13,7 +14,7 @@ use Illuminate\Queue\Middleware\RateLimited;
 
 class SertifikatEmail extends Mailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, LogsEmailStatus;
     public $tries = 1;
 
     /**
@@ -54,9 +55,6 @@ class SertifikatEmail extends Mailable implements ShouldQueue
      */
    public function build()
     {
-
-        sleep(60);
-
         return $this->subject('Sertifikat Anda: ' . $this->certificate->body)
                     ->view('Emails.Certificate') // Nama file blade yang sudah dibuat sebelumnya
                     ->with([

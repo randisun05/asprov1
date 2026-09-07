@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Models\Member;
+use App\Models\EmailLog;
 use App\Models\instansi;
 use App\Models\Registration;
 use Illuminate\Http\Request;
@@ -413,7 +414,8 @@ class RegistrationController extends Controller
                 $member = $outcome['member'];
 
                 try {
-                    Mail::to($member->email)->send(new SendEmailAprrove($member));
+                    $emailLog = EmailLog::start(SendEmailAprrove::class, 'registration_approved', $member->email, $member);
+                    Mail::to($member->email)->send((new SendEmailAprrove($member))->withEmailLog($emailLog->id));
                 } catch (\Throwable $mailError) {
                     Log::error('Gagal mengirim email approval registrasi', [
                         'registration_id' => $registration->id,
@@ -510,7 +512,15 @@ class RegistrationController extends Controller
 
         $register = Registration::findOrFail($id);
 
-        Mail::to($register['email'])->send(new SendEmailReject($register));
+        try {
+            $emailLog = EmailLog::start(SendEmailReject::class, 'registration_rejected', $register->email, $register);
+            Mail::to($register['email'])->send((new SendEmailReject($register))->withEmailLog($emailLog->id));
+        } catch (\Throwable $mailError) {
+            Log::error('Gagal mengirim email penolakan registrasi', [
+                'registration_id' => $id,
+                'error' => $mailError->getMessage(),
+            ]);
+        }
 
         Registration::where('id', $id)->update([
             'status' => "rejected",
@@ -525,7 +535,15 @@ class RegistrationController extends Controller
     {
         $register = Registration::findOrFail($id);
 
-        Mail::to($register['email'])->send(new SendEmailRegistration($register));
+        try {
+            $emailLog = EmailLog::start(SendEmailRegistration::class, 'registration_payment_request', $register->email, $register);
+            Mail::to($register['email'])->send((new SendEmailRegistration($register))->withEmailLog($emailLog->id));
+        } catch (\Throwable $mailError) {
+            Log::error('Gagal mengirim email permintaan pembayaran', [
+                'registration_id' => $id,
+                'error' => $mailError->getMessage(),
+            ]);
+        }
 
         Registration::where('id', $id)->increment('emailstatus');
         //redirect
@@ -540,7 +558,15 @@ class RegistrationController extends Controller
 
         $register = Registration::findOrFail($id);
 
-        Mail::to($request['email'])->send(new SendEmailConfirm($register));
+        try {
+            $emailLog = EmailLog::start(SendEmailConfirm::class, 'registration_confirm', $request['email'], $register);
+            Mail::to($request['email'])->send((new SendEmailConfirm($register))->withEmailLog($emailLog->id));
+        } catch (\Throwable $mailError) {
+            Log::error('Gagal mengirim email konfirmasi registrasi', [
+                'registration_id' => $id,
+                'error' => $mailError->getMessage(),
+            ]);
+        }
 
         Registration::where('id', $id)->update([
             'status' => "confirm",
@@ -678,7 +704,15 @@ class RegistrationController extends Controller
     {
         $register = Registration::findOrFail($id);
 
-        Mail::to($register['email'])->send(new SendEmailAprrove($register));
+        try {
+            $emailLog = EmailLog::start(SendEmailAprrove::class, 'registration_approved', $register->email, $register);
+            Mail::to($register['email'])->send((new SendEmailAprrove($register))->withEmailLog($emailLog->id));
+        } catch (\Throwable $mailError) {
+            Log::error('Gagal mengirim ulang email approval registrasi', [
+                'registration_id' => $id,
+                'error' => $mailError->getMessage(),
+            ]);
+        }
 
         Registration::where('id', $id)->increment('emailstatus');
         //redirect

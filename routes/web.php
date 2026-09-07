@@ -195,6 +195,11 @@ Route::prefix('admin')->group(function() {
             Route::get('/midtrans-report', [\App\Http\Controllers\Admin\MidtransReportController::class, 'index'])->name('admin.midtrans-report.index');
             Route::get('/midtrans-report/export', [\App\Http\Controllers\Admin\MidtransReportController::class, 'export'])->name('admin.midtrans-report.export');
         });
+
+        //monitoring status pengiriman email (berhasil/gagal/pending)
+        Route::middleware('role:administrator')->group(function () {
+            Route::get('/email-logs', [\App\Http\Controllers\Admin\EmailLogController::class, 'index'])->name('admin.email-logs.index');
+        });
         Route::get('/update-gender', [\App\Http\Controllers\Admin\DataMembersController::class, 'updateMissingGenders'])->name('missing.gender');
 
 

@@ -190,6 +190,17 @@
                     </Link>
                 </li>
 
+                <li class="nav-item" v-if="$page.props.auth.user.role == 'administrator'" :class="{ 'active': $page.url.startsWith('/admin/email-logs') }">
+                    <Link href="/admin/email-logs" class="nav-link d-flex justify-content-between">
+                    <span>
+                        <span class="sidebar-icon">
+                           <i class="fa fa-envelope-o fa-lg" aria-hidden="true"></i>
+                        </span>
+                        <span class="sidebar-text ms-3">Monitoring Email</span>
+                    </span>
+                    </Link>
+                </li>
+
 
                  <li class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/questions') }">
                     <Link href="/admin/questions" class="nav-link d-flex justify-content-between">

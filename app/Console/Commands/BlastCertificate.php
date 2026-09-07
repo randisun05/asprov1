@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Certificate;
+use App\Models\EmailLog;
 use App\Mail\SertifikatEmail;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -47,7 +48,8 @@ class BlastCertificate extends Command
     foreach ($certificates as $index => $cert) {
        try {
                 // 2. Kirim email masuk ke antrean (Queue)
-                Mail::to($cert->email)->later(now()->addSeconds($index * 20), new SertifikatEmail($cert));
+                $emailLog = EmailLog::start(SertifikatEmail::class, 'certificate', $cert->email, $cert);
+                Mail::to($cert->email)->later(now()->addSeconds($index * 20), (new SertifikatEmail($cert))->withEmailLog($emailLog->id));
 
                 // 3. UPDATE STATUS: Ubah dari 0 ke 1 agar tidak terkirim ganda besok
                 $cert->update([

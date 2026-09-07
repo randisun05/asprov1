@@ -64,7 +64,10 @@ class RegistrationApprovalTest extends TestCase
             'nip' => $registration->nip,
             'email' => $registration->email,
         ]);
-        Mail::assertSent(SendEmailAprrove::class);
+        // SendEmailAprrove now implements ShouldQueue (see
+        // EmailLogTrackingTest for the delivery status tracking this
+        // enables), so the fake records it as queued rather than sent.
+        Mail::assertQueued(SendEmailAprrove::class);
     }
 
     public function test_approving_an_already_approved_registration_is_idempotent()
