@@ -200,6 +200,12 @@ Route::prefix('admin')->group(function() {
         Route::middleware('role:administrator')->group(function () {
             Route::get('/email-logs', [\App\Http\Controllers\Admin\EmailLogController::class, 'index'])->name('admin.email-logs.index');
         });
+
+        //pengaturan on/off + monitoring status pengiriman WhatsApp
+        Route::middleware('role:administrator')->group(function () {
+            Route::get('/whatsapp', [\App\Http\Controllers\Admin\WhatsappController::class, 'index'])->name('admin.whatsapp.index');
+            Route::put('/whatsapp/settings', [\App\Http\Controllers\Admin\WhatsappController::class, 'updateSettings'])->name('admin.whatsapp.settings.update');
+        });
         Route::get('/update-gender', [\App\Http\Controllers\Admin\DataMembersController::class, 'updateMissingGenders'])->name('missing.gender');
 
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Mail\SendEmailForgetPassword;
 use App\Models\EmailLog;
+use App\Services\WhatsappNotifier;
 use Illuminate\Support\Facades\Log;
 use App\Models\Achievement;
 use App\Models\Answer;
@@ -590,6 +591,13 @@ class PublicController extends Controller
                     'error' => $mailError->getMessage(),
                 ]);
             }
+
+            WhatsappNotifier::send(
+                'forgot_password',
+                $data->profileMain?->contact,
+                "Halo {$data->name}, klik link berikut untuk atur ulang password akun Aspro SDMA Anda: https://asprosdma.id/user/forget-password/{$passwordCode}. Jika Anda tidak meminta ini, abaikan pesan ini.",
+                $data
+            );
 
             return back()->with('success', 'Email telah dikirimkan untuk reset password.');
         }

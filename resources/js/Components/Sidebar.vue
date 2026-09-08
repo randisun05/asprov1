@@ -201,6 +201,17 @@
                     </Link>
                 </li>
 
+                <li class="nav-item" v-if="$page.props.auth.user.role == 'administrator'" :class="{ 'active': $page.url.startsWith('/admin/whatsapp') }">
+                    <Link href="/admin/whatsapp" class="nav-link d-flex justify-content-between">
+                    <span>
+                        <span class="sidebar-icon">
+                           <i class="fa fa-whatsapp fa-lg" aria-hidden="true"></i>
+                        </span>
+                        <span class="sidebar-text ms-3">Notifikasi WhatsApp</span>
+                    </span>
+                    </Link>
+                </li>
+
 
                  <li class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/questions') }">
                     <Link href="/admin/questions" class="nav-link d-flex justify-content-between">

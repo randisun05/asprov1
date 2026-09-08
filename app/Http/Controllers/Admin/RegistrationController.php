@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Models\Member;
 use App\Models\EmailLog;
+use App\Services\WhatsappNotifier;
 use App\Models\instansi;
 use App\Models\Registration;
 use Illuminate\Http\Request;
@@ -423,6 +424,13 @@ class RegistrationController extends Controller
                     ]);
                 }
 
+                WhatsappNotifier::send(
+                    'registration_approved',
+                    $registration->contact,
+                    "Halo {$member->name}, pendaftaran Anda sebagai Anggota Aspro SDMA telah *disetujui*. Silakan login di https://asprosdma.id/user/login dengan Username: {$member->nip} dan Password: {$member->nip} (wajib diganti setelah login pertama). Terima kasih - Tim Keanggotaan Aspro SDMA.",
+                    $member
+                );
+
                 return ['success' => true, 'already_processed' => false, 'member' => $member];
             } catch (\Illuminate\Database\QueryException $e) {
                 if ($this->isDuplicateKeyViolation($e) && $attempt < $maxAttempts) {
@@ -522,6 +530,13 @@ class RegistrationController extends Controller
             ]);
         }
 
+        WhatsappNotifier::send(
+            'registration_rejected',
+            $register->contact,
+            "Halo {$register->name}, mohon maaf setelah verifikasi, data Anda belum sesuai sehingga pendaftaran keanggotaan Aspro SDMA belum dapat kami proses. Silakan hubungi kami untuk info lebih lanjut. Terima kasih - Tim Keanggotaan Aspro SDMA.",
+            $register
+        );
+
         Registration::where('id', $id)->update([
             'status' => "rejected",
         ]);
@@ -545,6 +560,13 @@ class RegistrationController extends Controller
             ]);
         }
 
+        WhatsappNotifier::send(
+            'registration_payment_request',
+            $register->contact,
+            "Halo {$register->name}, terima kasih telah mendaftar sebagai anggota Aspro SDMA. Token usul Anda: {$register->id}. Silakan lakukan pembayaran ke Rek. BNI 1925300643 a.n. ASOSIASI PROFESI SDM APARATUR, lalu konfirmasi di https://asprosdma.id/registration/paid/{$register->id}. Terima kasih - Tim Keanggotaan Aspro SDMA.",
+            $register
+        );
+
         Registration::where('id', $id)->increment('emailstatus');
         //redirect
         return redirect()->route('admin.registration.index')->with('success', 'Email permintaan pembayaran berhasil dikirim.');
@@ -567,6 +589,13 @@ class RegistrationController extends Controller
                 'error' => $mailError->getMessage(),
             ]);
         }
+
+        WhatsappNotifier::send(
+            'registration_confirm',
+            $register->contact,
+            "Halo {$register->name}, ada beberapa data pendaftaran Anda yang perlu diperbaiki. Silakan lakukan konfirmasi/perbaikan data di https://asprosdma.id/registration/confirm/{$register->id}/edit. Terima kasih - Tim Keanggotaan Aspro SDMA.",
+            $register
+        );
 
         Registration::where('id', $id)->update([
             'status' => "confirm",
@@ -713,6 +742,13 @@ class RegistrationController extends Controller
                 'error' => $mailError->getMessage(),
             ]);
         }
+
+        WhatsappNotifier::send(
+            'registration_approved',
+            $register->contact,
+            "Halo {$register->name}, pendaftaran Anda sebagai Anggota Aspro SDMA telah *disetujui*. Silakan login di https://asprosdma.id/user/login dengan Username: {$register->nip} dan Password: {$register->nip} (wajib diganti setelah login pertama). Terima kasih - Tim Keanggotaan Aspro SDMA.",
+            $register
+        );
 
         Registration::where('id', $id)->increment('emailstatus');
         //redirect

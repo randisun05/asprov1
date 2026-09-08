@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use App\Models\Certificate;
 use App\Models\EmailLog;
+use App\Models\ProfileDataMain;
 use App\Mail\SertifikatEmail;
+use App\Services\WhatsappNotifier;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -50,6 +52,13 @@ class BlastCertificate extends Command
                 // 2. Kirim email masuk ke antrean (Queue)
                 $emailLog = EmailLog::start(SertifikatEmail::class, 'certificate', $cert->email, $cert);
                 Mail::to($cert->email)->later(now()->addSeconds($index * 20), (new SertifikatEmail($cert))->withEmailLog($emailLog->id));
+
+                WhatsappNotifier::send(
+                    'certificate',
+                    ProfileDataMain::where('nip', $cert->nip)->value('contact'),
+                    "Halo {$cert->name}, terima kasih telah berpartisipasi dalam kegiatan {$cert->body}. Sertifikat Anda dapat dilihat/diunduh di: {$cert->link}. Terima kasih - Aspro SDMA.",
+                    $cert
+                );
 
                 // 3. UPDATE STATUS: Ubah dari 0 ke 1 agar tidak terkirim ganda besok
                 $cert->update([
