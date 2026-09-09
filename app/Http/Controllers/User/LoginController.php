@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use Inertia\Inertia;
 use App\Models\Member;
+use App\Models\Registration;
 use Illuminate\Http\Request;
 use PhpParser\Node\Stmt\Else_;
 use Illuminate\Support\Facades\Log;
@@ -62,6 +63,21 @@ class LoginController extends Controller
             $member = Member::where('nip', $request->nip)->first();
 
             if (!$member) {
+                // A NIP with no Member row yet isn't necessarily "never
+                // registered" - it could be a pending/rejected Registration
+                // that hasn't been approved into a Member. Telling that
+                // person "please register" instead of "please wait" is
+                // confusing, so check which case this actually is.
+                $registration = Registration::where('nip', $request->nip)->latest()->first();
+
+                if ($registration && $registration->status === 'rejected') {
+                    return redirect()->back()->with('error', 'Pendaftaran Anda dengan NIP ini telah ditolak. Silakan hubungi admin untuk informasi lebih lanjut.');
+                }
+
+                if ($registration) {
+                    return redirect()->back()->with('error', 'Pendaftaran Anda sedang diproses dan belum disetujui oleh admin. Mohon tunggu, Anda akan menerima notifikasi setelah disetujui.');
+                }
+
                 return redirect()->back()->with('error', 'NIP belum terdaftar. Silakan lakukan pendaftaran keanggotaan.');
             } elseif (!password_verify($request->password, $member->password)) {
                 return redirect()->back()->with('error', 'NIP atau Password salah');
