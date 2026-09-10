@@ -22,7 +22,6 @@ use App\Models\ProfileDataPosition;
 use App\Models\ReactDetail;
 use App\Models\Registration;
 use App\Models\RegistrationGroup;
-use App\Models\TemplateCertificate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -742,48 +741,16 @@ class PublicController extends Controller
 
     public function certificatesShow($id)
     {
-
         $data = Certificate::with('event')->findOrFail($id);
-        $template = TemplateCertificate::where('id', $data->template)->first();
         $nomor = substr($data->no_certificate, 0, 4);
-        $storagePath = storage_path('app/public/sertifikat');
 
-        // Generate QR Code
-        $qrLink = $data->qr_code;
-        QrCode::format('png')->size(300)->generate($qrLink);
-        // Generate QR Code (variable $qr removed as it was unused)
-        QrCode::generate($qrLink);
-
-        // Build the command
-
-        $command = "python3 " . escapeshellarg(base_path('resources/py/certificate.py')) .
-            // " " . escapeshellarg('template=' . 'storage/documents/' . $data->template) .
-            " " . escapeshellarg(public_path('storage/' . $template->image)) .
-            " " . escapeshellarg('nomor=' . $data->no_certificate) .
-            " " . escapeshellarg('nama=' . $data->name) .
-            " " . escapeshellarg('qr=' . $qrLink) .
-            " " . escapeshellarg('file=' . 'sertifikat-' . $nomor . '-' . $data->name . '.pdf') .
-            " " . escapeshellarg('path=' . $storagePath);
-
-        $output = shell_exec($command);
-
-        if ($output === null) {
-            //\Log::error("Python Error: " . $output);
-            return back()->with('error', 'Gagal menghasilkan sertifikat.');
-            //  return response()->json(['error' => 'Command execution failed.'], 500);
+        try {
+            $path = app(\App\Services\CertificateGenerator::class)->generate($data);
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
         }
 
-        $data->update([
-            'doc' => 'sertifikat/' . 'sertifikat-' . $nomor . '-' . $data->name . '.pdf'
-        ]);
-
-        return response()->download(public_path('storage/' . $data->doc), 'sertifikat-' . $nomor . '-' . $data->name . '.pdf')->deleteFileAfterSend(true);
-
-        //  return response()->json(['success' => 'Certificate generated successfully.']);
-
-        // Return success response
-        //  return redirect()->route('admin.events.certificates.index', $event)->with('success', 'Sertifikat berhasil dihasilkan');
-
+        return response()->download($path, 'sertifikat-' . $nomor . '-' . $data->name . '.pdf')->deleteFileAfterSend(true);
     }
 
 
@@ -946,7 +913,10 @@ class PublicController extends Controller
                 'status'         => '1',
                 'qr_code'        => "https://asprosdma.id/certificates/$link",
                 'link'           => $link,
-                'doc'            => $request->agency,
+                // Generated on demand later (see certificatesShow()), not
+                // at creation time - this was previously set to the
+                // requester's agency name instead of being left empty.
+                'doc'            => '',
             ]);
 
             return redirect()->back()->with('success', 'Absensi berhasil dan sertifikat telah terbit!');

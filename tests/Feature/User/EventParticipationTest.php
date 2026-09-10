@@ -6,6 +6,8 @@ use App\Models\DetailEvent;
 use App\Models\Event;
 use App\Models\Member;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class EventParticipationTest extends TestCase
@@ -98,5 +100,62 @@ class EventParticipationTest extends TestCase
 
         $response->assertSessionHas('error');
         $this->assertSame('approved', DetailEvent::where('event_id', $event->id)->where('member_id', $member->id)->value('status'));
+    }
+
+    public function test_joining_an_event_that_requires_a_document_rejects_an_invalid_file_type()
+    {
+        Storage::fake('local');
+        $member = $this->makeMember();
+        $event = $this->makeEvent(['status' => 'active', 'file' => 'Y']);
+
+        $response = $this->actingAs($member, 'member')->post("/user/events/{$event->id}/join", [
+            'document' => UploadedFile::fake()->create('malware.exe', 100),
+        ]);
+
+        $response->assertSessionHasErrors('document');
+        $this->assertDatabaseMissing('detail_events', [
+            'event_id' => $event->id,
+            'member_id' => $member->id,
+        ]);
+    }
+
+    public function test_joining_an_event_that_requires_a_document_rejects_an_oversized_file()
+    {
+        Storage::fake('local');
+        $member = $this->makeMember();
+        $event = $this->makeEvent(['status' => 'active', 'file' => 'Y']);
+
+        $response = $this->actingAs($member, 'member')->post("/user/events/{$event->id}/join", [
+            'document' => UploadedFile::fake()->create('bukti.pdf', 6000),
+        ]);
+
+        $response->assertSessionHasErrors('document');
+    }
+
+    public function test_joining_an_event_that_requires_a_document_accepts_a_valid_pdf()
+    {
+        Storage::fake('local');
+        $member = $this->makeMember();
+        $event = $this->makeEvent(['status' => 'active', 'file' => 'Y']);
+
+        $response = $this->actingAs($member, 'member')->post("/user/events/{$event->id}/join", [
+            'document' => UploadedFile::fake()->create('bukti.pdf', 500, 'application/pdf'),
+        ]);
+
+        $response->assertRedirect(route('user.events.index'));
+        $this->assertDatabaseHas('detail_events', [
+            'event_id' => $event->id,
+            'member_id' => $member->id,
+        ]);
+    }
+
+    public function test_joining_an_event_with_no_duration_set_leaves_duration_null()
+    {
+        $member = $this->makeMember();
+        $event = $this->makeEvent(['status' => 'active', 'duration' => null]);
+
+        $this->actingAs($member, 'member')->post("/user/events/{$event->id}/join");
+
+        $this->assertNull(DetailEvent::where('event_id', $event->id)->where('member_id', $member->id)->value('duration'));
     }
 }

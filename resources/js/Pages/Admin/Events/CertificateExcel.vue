@@ -9,6 +9,34 @@
                     <div class="card-body">
                         <form @submit.prevent="submitImport">
                             <div class="row mt-2">
+                                <div class="col-md-3">
+                                    <label class="fw-bold">Kategori</label>
+                                    <select class="form-control" :class="{ 'is-invalid': errors.category }" v-model="form.category">
+                                        <option disabled value="">Pilih Kategori</option>
+                                        <option value="Kombel">Komunitas Belajar - Peserta</option>
+                                        <option value="Kombel-Panitia">Komunitas Belajar - Panitia</option>
+                                        <option value="Kombel-Narasumber">Komunitas Belajar - Narasumber</option>
+                                        <option value="Kombel-Moderator">Komunitas Belajar - Moderator</option>
+                                        <option value="sayembara">Sayembara</option>
+                                        <option value="lain">Lainnya</option>
+                                    </select>
+                                    <div v-if="errors.category" class="invalid-feedback">{{ errors.category }}</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="fw-bold">Tanggal</label>
+                                    <input type="date" class="form-control" :class="{ 'is-invalid': errors.date }" v-model="form.date">
+                                    <div v-if="errors.date" class="invalid-feedback">{{ errors.date }}</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="fw-bold">Template</label>
+                                    <select class="form-select" :class="{ 'is-invalid': errors.template }" v-model="form.template">
+                                        <option value="" disabled>Pilih salah satu opsi</option>
+                                        <option v-for="(template, index) in templates" :key="index" :value="template.id">{{ template.title }}</option>
+                                    </select>
+                                    <div v-if="errors.template" class="invalid-feedback">{{ errors.template }}</div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
                                 <div class="col-md-8">
                                     <label class="fw-bold">File Excel</label>
                                     <input type="file" @change="form.file = $event.target.files[0]" class="form-control" :class="{ 'is-invalid': errors.file }">
@@ -55,6 +83,9 @@ export default {
     setup(props) {
         const form = useForm({
             file: null,
+            category: '',
+            date: '',
+            template: '',
         });
 
         const submitImport = () => {

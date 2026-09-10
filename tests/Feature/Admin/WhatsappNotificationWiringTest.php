@@ -214,7 +214,7 @@ class WhatsappNotificationWiringTest extends TestCase
             'is_emailed' => 0,
         ]);
 
-        $this->artisan('blast:certificate');
+        $this->artisan('blast:certificate', ['event_id' => 8]);
 
         Bus::assertDispatched(SendWhatsappMessage::class, function ($job) {
             return $job->phone === '081111111108';

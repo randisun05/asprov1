@@ -17,8 +17,9 @@ use App\Models\TemplateCertificate;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\EventParticipantsExport;
-use F9WebLtd\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use App\Services\CertificateGenerator;
 
 class EventController extends Controller
 {
@@ -163,13 +164,7 @@ class EventController extends Controller
 
     public function absenAll($id)
     {
-        $details = DetailEvent::where('event_id', $id)->get();
-
-        foreach ($details as $detail) {
-            $detail->update([
-                'status' => 'hadir',
-            ]);
-        }
+        DetailEvent::where('event_id', $id)->update(['status' => 'hadir']);
 
         return redirect()->route('admin.events.show', $id)->with('success', 'Data has been saved');
     }
@@ -234,17 +229,25 @@ class EventController extends Controller
         'start_at' => 'required|date',
         'end_at' => 'required|date|after_or_equal:start_at',
         'point_cost' => 'nullable|integer|min:0',
+        'image' => 'nullable|image:allow_svg|mimes:jpeg,png,jpg,gif,svg|max:5048',
 
     ]);
 
     $slug = strtolower(str_replace(' ', '-', $request->title));
 
+    $oldImage = Event::where('id', $id)->value('image');
+
     $image = $request->file('image');
     if ($image) {
         $image = $request->file('image')->storePublicly('/images');
-        // Proceed with storing or processing the uploaded file
+        // The old image is only replaced once the new one is safely
+        // stored, and only deleted after that succeeds - so a failed
+        // upload never leaves the event without any image on disk.
+        if ($oldImage) {
+            Storage::delete($oldImage);
+        }
     } else {
-        $image = Event::where('id', $id)->value('image');
+        $image = $oldImage;
     };
 
         Event::where('id',$id)->update([
@@ -285,7 +288,19 @@ class EventController extends Controller
     {
         $event = Event::findOrFail($id);
 
-        $event->delete();
+        try {
+            $event->delete();
+        } catch (\Illuminate\Database\QueryException $e) {
+            // detail_events/certificates both restrict-on-delete this FK -
+            // an event with participants or issued certificates can't be
+            // deleted outright, and letting the constraint violation
+            // bubble up as an uncaught 500 gives the admin no explanation.
+            return redirect()->route('admin.events.index')->with('error', 'Kegiatan ini tidak bisa dihapus karena sudah memiliki peserta dan/atau sertifikat.');
+        }
+
+        if ($event->image) {
+            Storage::delete($event->image);
+        }
 
         //redirect
         return redirect()->route('admin.events.index')->with('success', 'Event berhasil dihapus.');
@@ -337,7 +352,12 @@ class EventController extends Controller
         $details = DetailEvent::where('event_id',$id)
         ->with('member.profileMain.position','event')
         ->when(request()->q, function($query) {
-            $query->where('title', 'like', '%' . request()->q . '%');
+            // Was filtering on DetailEvent.title (the participant *role*
+            // label, e.g. "peserta" for everyone) instead of the member's
+            // name, so the search box on this export was a silent no-op.
+            $query->whereHas('member', function ($memberQuery) {
+                $memberQuery->where('name', 'like', '%' . request()->q . '%');
+            });
         })
         ->latest()
         ->get();
@@ -389,46 +409,16 @@ class EventController extends Controller
 
     public function certificatesView($event, $id)
     {
-
         $data = Certificate::with('event')->findOrFail($id);
-        $template = TemplateCertificate::where('id',$data->template)->first();
         $nomor = substr($data->no_certificate, 0, 4);
-        $storagePath = storage_path('app/public/sertifikat');
 
-         // Generate QR Code
-        $qrLink = $data->qr_code;
-        QrCode::format('png')->size(300)->generate($qrLink);
-        // Generate QR Code (variable $qr removed as it was unused)
-        QrCode::generate($qrLink);
+        try {
+            $path = app(CertificateGenerator::class)->generate($data);
+        } catch (\RuntimeException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
 
-         // Build the command
-         $command = "python3 " . escapeshellarg(base_path('resources/py/certificate.py')) .
-        // " " . escapeshellarg('template=' . 'storage/documents/' . $data->template) .
-        " " . escapeshellarg(public_path('storage/' . $template->image)) .
-         " " . escapeshellarg('nomor=' . $data->no_certificate) .
-         " " . escapeshellarg('nama=' . $data->name) .
-         " " . escapeshellarg('qr=' . $qrLink) .
-         " " . escapeshellarg('file=' . 'sertifikat-' . $nomor . '-' . $data->name . '.pdf').
-         " " . escapeshellarg('path=' . $storagePath);
-
-         $output = shell_exec($command);
-
-
-         if ($output === null) {
-             return response()->json(['error' => 'Command execution failed.'], 500);
-         }
-
-        $data->update([
-            'doc' => 'sertifikat/' . 'sertifikat-' . $nomor . '-' . $data->name . '.pdf'
-        ]);
-
-        return response()->download(public_path('storage/' . $data->doc), 'sertifikat-' . $nomor . '-' . $data->name . '.pdf')->deleteFileAfterSend(true);
-
-        //  return response()->json(['success' => 'Certificate generated successfully.']);
-
-         // Return success response
-        //  return redirect()->route('admin.events.certificates.index', $event)->with('success', 'Sertifikat berhasil dihasilkan');
-
+        return response()->download($path, 'sertifikat-' . $nomor . '-' . $data->name . '.pdf')->deleteFileAfterSend(true);
     }
 
 
@@ -437,7 +427,10 @@ class EventController extends Controller
 
         $request->validate([
             'title' => 'required|unique:template_certificates,title',
-            'image' => 'required',
+            // The certificate-generation script opens this file as a PDF
+            // (PyMuPDF/fitz), so anything else uploaded here would fail
+            // silently later at generation time instead of at upload time.
+            'image' => 'required|mimes:pdf|max:10240',
         ]);
 
         $image = $request->file('image')->storePublicly('/template');
@@ -468,6 +461,10 @@ class EventController extends Controller
         $template = TemplateCertificate::findOrFail($id);
 
         $template->delete();
+
+        if ($template->image) {
+            Storage::delete($template->image);
+        }
 
         return redirect()->back()->with('success', 'Data has been deleted');
     }
@@ -594,7 +591,10 @@ class EventController extends Controller
                     'status' => '1',
                     'qr_code' => $qrcode,
                     'link' => $link,
-                    'doc' => $member->member->agency,
+                    // Generated on demand later (see certificatesView()),
+                    // not at creation time - this was previously set to
+                    // the member's agency name instead of being left empty.
+                    'doc' => '',
                 ]);
             } catch (\Exception $e) {
                 $errors[] = [
@@ -706,7 +706,11 @@ class EventController extends Controller
             'status'        => '1',
             'qr_code'       => $qrcode,
             'link'          => $link,
-            'doc'           => $request->agency,
+            // The PDF itself is generated on demand the first time it's
+            // viewed/downloaded (see certificatesView()), not at creation
+            // time - "doc" was previously mistakenly set to the requester's
+            // agency name here instead of being left empty until then.
+            'doc'           => '',
         ]);
 
         return redirect()->route('admin.events.certificates.index', $id)
@@ -735,7 +739,10 @@ class EventController extends Controller
     public function certificatesExcelStore(Request $request, $id)
 {
     $request->validate([
-        'file' => 'required|mimes:xlsx,xls,csv'
+        'file' => 'required|mimes:xlsx,xls,csv',
+        'category' => 'required|string',
+        'date' => 'required|date',
+        'template' => 'required',
     ]);
 
     $event = Event::findOrFail($id);
@@ -745,56 +752,75 @@ class EventController extends Controller
         return back()->withErrors(['file' => 'File Excel kosong atau tidak terbaca.']);
     }
 
+    // Previously hardcoded to one specific historical event (a fixed date,
+    // a "Kombel" category that didn't even match the "Kombel-Panitia"
+    // string the numbering sequence below was querying by, and a fixed
+    // template UUID) - this form's date/category/template inputs were
+    // being ignored entirely, so importing for any other event silently
+    // produced wrong certificate numbers and the wrong template.
+    $category = $request->category;
+    $targetDate = $request->date;
+    $month = date('m', strtotime($targetDate));
+    $year = date('Y', strtotime($targetDate));
+
     $excelNips = $rows->pluck('nip')->toArray();
-    $existingCertificates = Certificate::where('category', 'Kombel')
+    $existingCertificates = Certificate::where('category', $category)
         ->where('event_id', $event->id)
         ->whereIn('nip', $excelNips)
         ->pluck('nip')
         ->toArray();
 
-    // PERBAIKAN 1: Gunakan penanggalan yang konsisten
-    $targetDate = '2025-12-18';
-    $month = date('m', strtotime($targetDate));
-    $year = date('Y', strtotime($targetDate));
-
-    $sequenceKey = "excel:Kombel-Panitia:{$year}:{$month}";
+    $sequenceKey = "excel:{$category}:{$year}:{$month}";
     $failedImports = [];
 
     foreach ($rows as $row) {
+        if (empty($row['nip']) || empty($row['name'])) {
+            $failedImports[] = 'Baris dengan NIP "' . ($row['nip'] ?? '-') . '" dilewati karena NIP atau nama kosong.';
+            continue;
+        }
+
         if (in_array($row['nip'], $existingCertificates)) {
             $failedImports[] = "NIP {$row['nip']} sudah memiliki sertifikat.";
             continue;
         }
 
         try {
-            $nextNumber = $this->lockedNextCertificateNumber($sequenceKey, function () use ($year, $month) {
-                return Certificate::where('category', 'Kombel-Panitia')
+            $nextNumber = $this->lockedNextCertificateNumber($sequenceKey, function () use ($category, $year, $month) {
+                return Certificate::where('category', $category)
                     ->whereYear('date', $year)
                     ->whereMonth('date', $month)
-                    ->where('no_certificate', 'like', "%/Kombel-Panitia/PP Aspro SDMA/{$month}/{$year}")
+                    ->where('no_certificate', 'like', "%/{$category}/PP Aspro SDMA/{$month}/{$year}")
                     ->get()
                     ->map(fn ($cert) => (int) explode('/', $cert->no_certificate)[0])
                     ->max() ?? 0;
             });
 
             $newNumber = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-            $nomor = "{$newNumber}/kombel/PP Aspro SDMA/{$month}/{$year}";
+            $nomor = "{$newNumber}/{$category}/PP Aspro SDMA/{$month}/{$year}";
+
+            if (Certificate::where('no_certificate', $nomor)->exists()) {
+                $failedImports[] = "Nomor sertifikat {$nomor} sudah digunakan.";
+                continue;
+            }
 
             $link = (string) Str::uuid();
 
             Certificate::create([
                 'event_id' => $event->id,
                 'no_certificate' => $nomor,
-                'category' => 'Kombel',
+                'category' => $category,
                 'nip' => $row['nip'],
                 'name' => $row['name'],
                 'body' => $event->title,
                 'date' => $targetDate,
-                'template' => 'a0ab92e9-82d4-45c8-86fc-ddf5c9ce13d7', //9ea04e9f-0d35-49a0-b026-a507233139a4
+                'template' => $request->template,
                 'status' => '1',
                 'qr_code' => "https://asprosdma.id/certificates/$link",
                 'link' => $link,
-                'doc' => $row['instansi'],
+                // Generated on demand later (see certificatesView()), not
+                // at creation time - this was previously set to the row's
+                // "instansi" column instead of being left empty.
+                'doc' => '',
             ]);
 
         } catch (\Exception $e) {

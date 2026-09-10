@@ -59,7 +59,7 @@ class BlastCertificateTest extends TestCase
         $this->makeEventEight();
         $certificate = $this->makeCertificate();
 
-        $this->artisan('blast:certificate')->assertExitCode(0);
+        $this->artisan('blast:certificate', ['event_id' => 8])->assertExitCode(0);
 
         $this->assertEquals(1, $certificate->fresh()->is_emailed);
         Mail::assertQueued(SertifikatEmail::class);
@@ -77,7 +77,7 @@ class BlastCertificateTest extends TestCase
         $this->makeEventEight();
         $this->makeCertificate(['is_emailed' => 1]);
 
-        $this->artisan('blast:certificate')->assertExitCode(0);
+        $this->artisan('blast:certificate', ['event_id' => 8])->assertExitCode(0);
 
         Mail::assertNothingQueued();
         $this->assertDatabaseCount('email_logs', 0);
@@ -89,7 +89,7 @@ class BlastCertificateTest extends TestCase
         $this->makeEventEight();
         $certificate = $this->makeCertificate();
 
-        $this->artisan('blast:certificate');
+        $this->artisan('blast:certificate', ['event_id' => 8]);
 
         $this->assertDatabaseHas('email_logs', [
             'mailable' => SertifikatEmail::class,

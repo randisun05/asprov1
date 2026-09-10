@@ -67,7 +67,7 @@ class EventController extends Controller
 
             if ($event->file == "Y") {
                 $request->validate([
-                    'document' => 'required',
+                    'document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
                 ]);
                 // Store the file using Laravel's file storage system
                 $document = $request->file('document')->storePublicly('/documents');
@@ -96,7 +96,7 @@ class EventController extends Controller
                         'title' => "peserta",
                         'status' => "approved",
                         'desc' => $document ?? null,
-                        'duration' => $event->duration * 60000 ?? null,
+                        'duration' => $event->duration !== null ? $event->duration * 60000 : null,
                     ]);
                 });
             } catch (InsufficientPointsException $e) {
@@ -283,7 +283,13 @@ class EventController extends Controller
     {
         if (auth()->guard('member')->check()) {
 
-            $data = Certificate::with('event')->findOrFail($id);
+            // Was missing the ownership filter that certificatesIndex()
+            // above already applies - any logged-in member could view
+            // another member's certificate just by changing the ID in the
+            // URL.
+            $data = Certificate::with('event')
+                ->where('nip', auth()->guard('member')->user()->nip)
+                ->findOrFail($id);
             // Generate QR Code
             $qrLink = $data->qr_code;
             QrCode::format('png')->size(300)->generate($qrLink);

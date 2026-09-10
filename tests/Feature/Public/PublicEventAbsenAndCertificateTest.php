@@ -61,6 +61,12 @@ class PublicEventAbsenAndCertificateTest extends TestCase
             'nip' => '199001012020121005',
             'template' => $event->template_id,
         ]);
+
+        // "doc" (the generated PDF path) is filled in on demand later, the
+        // first time the certificate is actually viewed/downloaded - it
+        // used to be mistakenly set to the requester's agency name here
+        // instead of being left empty until then.
+        $this->assertSame('', \App\Models\Certificate::where('nip', '199001012020121005')->value('doc'));
     }
 
     public function test_absen_rejects_a_duplicate_submission_for_the_same_nip()
@@ -119,6 +125,30 @@ class PublicEventAbsenAndCertificateTest extends TestCase
         $response->assertViewHas('data', function ($data) use ($certificate) {
             return $data->id === $certificate->id;
         });
+    }
+
+    public function test_certificates_show_reports_a_friendly_error_when_the_template_is_missing_instead_of_crashing()
+    {
+        $event = $this->makeEvent();
+        $certificate = \App\Models\Certificate::create([
+            'event_id' => $event->id,
+            'no_certificate' => '0001/Kombel/PP Aspro SDMA/01/2026',
+            'category' => 'Kombel',
+            'nip' => '199001012020121005',
+            'name' => 'Anggota Uji',
+            'body' => $event->title,
+            'date' => now()->toDateString(),
+            'template' => (string) \Illuminate\Support\Str::uuid(), // no TemplateCertificate row exists for this id
+            'status' => '1',
+            'qr_code' => 'https://asprosdma.id/certificates/' . \Illuminate\Support\Str::uuid(),
+            'link' => (string) \Illuminate\Support\Str::uuid(),
+            'doc' => '',
+        ]);
+
+        $response = $this->get("/certificates/{$certificate->id}/view");
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
     }
 
     public function test_download_sertifikat_redirects_back_when_no_certificate_exists_for_the_member_and_event()

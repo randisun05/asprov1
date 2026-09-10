@@ -18,14 +18,14 @@ class BlastCertificate extends Command
      *
      * @var string
      */
-    protected $signature = 'blast:certificate';
+    protected $signature = 'blast:certificate {event_id : ID kegiatan yang sertifikatnya akan dikirim}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Kirim email + WhatsApp berisi sertifikat untuk semua peserta kegiatan tertentu yang belum dikirimi';
 
     /**
      * Execute the console command.
@@ -34,8 +34,12 @@ class BlastCertificate extends Command
      */
     public function handle()
     {
-        // Ambil 500 data yang belum dikirimi email
-    $certificates = Certificate::where('event_id', '8') // Ganti dengan ID event yang sesuai
+        // event_id used to be hardcoded to '8' here, meaning this command
+        // only ever worked for one specific past event - it's now an
+        // argument so it can actually be reused for any event.
+        $eventId = $this->argument('event_id');
+
+        $certificates = Certificate::where('event_id', $eventId)
     ->where('is_emailed', '0')
     ->whereNotNull('email') // Memastikan kolom email tidak NULL
     ->get();

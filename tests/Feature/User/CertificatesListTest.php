@@ -67,4 +67,48 @@ class CertificatesListTest extends TestCase
             ->has('datas.data', 1)
         );
     }
+
+    private function makeEventAndCertificate(string $nip, string $name): Certificate
+    {
+        $event = Event::create([
+            'title' => 'Workshop ' . $name,
+            'slug' => 'workshop-' . \Illuminate\Support\Str::slug($name),
+            'body' => 'desc',
+            'date' => now()->toDateString(),
+            'enddate' => now()->toDateString(),
+            'participant' => 10,
+            'place' => 'Jakarta',
+            'link' => '-',
+            'status' => 'active',
+        ]);
+
+        return Certificate::create([
+            'event_id' => $event->id,
+            'no_certificate' => 'CERT-' . $nip,
+            'nip' => $nip,
+            'name' => $name,
+            'body' => 'Sertifikat',
+            'date' => now()->toDateString(),
+            'template' => '1',
+            'category' => 'Workshop',
+            'qr_code' => 'https://example.com/verify/' . $nip,
+            'link' => '-',
+            'doc' => '',
+        ]);
+    }
+
+    // Note: a "member can view their own certificate" happy-path test would
+    // also belong here, but certificateView() unconditionally calls
+    // QrCode::generate() before rendering, which requires the imagick PHP
+    // extension - not installed in this sandbox - so it can't be exercised
+    // end-to-end here. The security-relevant case (ownership is enforced)
+    // is verified below, since that 404s before QR generation is reached.
+
+    public function test_member_cannot_view_another_members_certificate()
+    {
+        $member = $this->makeMember();
+        $otherCertificate = $this->makeEventAndCertificate('199001012020121999', 'Anggota Lain');
+
+        $this->actingAs($member, 'member')->get("/user/certificates/{$otherCertificate->id}")->assertNotFound();
+    }
 }

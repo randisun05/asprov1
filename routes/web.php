@@ -108,7 +108,7 @@ Route::prefix('admin')->group(function() {
             // 1. Route untuk menampilkan halaman form import (GET)
             Route::get('/events/{event}/certificates-excel', [App\Http\Controllers\Admin\EventController::class, 'certificatesExcelIndex'])->name('admin.events.certificates.import');
             // 2. Route untuk memproses file excel (POST)
-            Route::post('/events/{event}/certificates-import', [App\Http\Controllers\Admin\EventController::class, 'certificatesExcelStore'])->name('admin.events.certificates.import.store');
+            Route::post('/events/{event}/certificates-import', [App\Http\Controllers\Admin\EventController::class, 'certificatesExcelStore'])->name('admin.events.certificates.excel.store');
             Route::post('/events/{id}', [\App\Http\Controllers\Admin\EventController::class, 'update'])->name('admin.events.update');
             Route::get('/events/{id}/export', [\App\Http\Controllers\Admin\EventController::class, 'exportParticipant'])->name('admin.events.export');
             Route::post('/events/{id}/change', [\App\Http\Controllers\Admin\EventController::class, 'change'])->name('admin.events.status.change');
@@ -292,7 +292,7 @@ Route::prefix('user')->group(function() {
         Route::post('/member-card/update', [\App\Http\Controllers\User\MemberCardController::class, 'updateImage'])->name('user.card.update');
         Route::get('/member-card/qrcode', [\App\Http\Controllers\User\MemberCardController::class, 'generateQRCode'])->name('user.card.qr');
         Route::get('/certificates', [\App\Http\Controllers\User\EventController::class, 'certificatesIndex'])->name('user.certificates.index');
-        Route::get('/certificates/{id}', [\App\Http\Controllers\User\EventController::class, 'certificateView'])->name('admin.events.certificates.view');
+        Route::get('/certificates/{id}', [\App\Http\Controllers\User\EventController::class, 'certificateView'])->name('user.certificates.view');
          Route::get('/jurnals/show', [\App\Http\Controllers\User\JurnalController::class, 'show'])->name('user.jurnals.show');
         Route::get('/points', [\App\Http\Controllers\User\PointController::class, 'index'])->name('user.points.index');
 

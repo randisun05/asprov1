@@ -29,7 +29,11 @@ def main():
         sys.exit(1)
 
     pdf_template_path = sys.argv[1]
-    args = {key: value for key, value in (arg.split('=') for arg in sys.argv[2:])}
+    # maxsplit=1: a certificate holder's name or category can legitimately
+    # contain '=' - splitting on every '=' would raise "too many values to
+    # unpack" and crash the whole script instead of just parsing the value
+    # as everything after the first '='.
+    args = {key: value for key, value in (arg.split('=', 1) for arg in sys.argv[2:])}
 
     data = {
         "#nomor": args.get("nomor", ""),
@@ -77,12 +81,15 @@ def main():
         "#nama": {"fontsize": 24, "fontname": "helv", "color": (0, 0, 0), "y_offset": 15},
     }
 
+    found_anchors = set()
+
     for anchor, value in data.items():
         if anchor in ["#qr", "$file", "$path"]:
             continue
 
         areas = page.search_for(anchor)
         if areas:
+            found_anchors.add(anchor)
             for area in areas:
                 page.add_redact_annot(area, fill=(1, 1, 1))
                 page.apply_redactions()
@@ -102,10 +109,21 @@ def main():
 
                 page.insert_text((x, y), value, fontsize=fontsize, fontname=fontname, color=color)
 
+    # Previously this fell through silently when a template had none of the
+    # expected placeholder text (e.g. a corrupted file, or an image
+    # mistakenly uploaded as a template) - it would still "successfully"
+    # produce a PDF with no certificate number or name on it at all.
+    if not found_anchors:
+        print("Error: tidak ada placeholder (#nomor/#nama) yang ditemukan di template.", file=sys.stderr)
+        sys.exit(1)
+
     # --- Simpan PDF ---
     output_dir = data.get("$path", ".")
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, data["$file"])
+    # basename() as defense in depth - the PHP caller already sanitizes the
+    # filename before it gets here, but a '/' slipping through would
+    # otherwise let this write outside output_dir.
+    output_path = os.path.join(output_dir, os.path.basename(data["$file"]))
 
     # Gunakan deflate=True dan garbage=4 untuk optimasi file
     doc.save(output_path, garbage=4, deflate=True, clean=True)
