@@ -209,6 +209,35 @@ class EventManagementHardeningTest extends TestCase
         Storage::disk('local')->assertMissing($path);
     }
 
+    public function test_deleting_a_certificate_template_still_used_by_an_event_is_blocked()
+    {
+        Storage::fake('local');
+        $admin = $this->makeAdminUser('administrator');
+        $path = UploadedFile::fake()->create('template.pdf', 200)->store('/template');
+        $template = TemplateCertificate::create(['title' => 'Template Dipakai', 'image' => $path, 'status' => '1']);
+        Event::factory()->create(['template_id' => (string) $template->id]);
+
+        $response = $this->actingAs($admin)->delete("/admin/events/certificates/templates/{$template->id}");
+
+        $response->assertSessionHas('error');
+        $this->assertDatabaseHas('template_certificates', ['id' => $template->id]);
+        Storage::disk('local')->assertExists($path);
+    }
+
+    public function test_deleting_a_certificate_template_still_used_by_a_certificate_is_blocked()
+    {
+        Storage::fake('local');
+        $admin = $this->makeAdminUser('administrator');
+        $path = UploadedFile::fake()->create('template.pdf', 200)->store('/template');
+        $template = TemplateCertificate::create(['title' => 'Template Dipakai Sertifikat', 'image' => $path, 'status' => '1']);
+        $this->makeCertificate(['template' => (string) $template->id]);
+
+        $response = $this->actingAs($admin)->delete("/admin/events/certificates/templates/{$template->id}");
+
+        $response->assertSessionHas('error');
+        $this->assertDatabaseHas('template_certificates', ['id' => $template->id]);
+    }
+
     // --- exportParticipant(): search filter fix ---
 
     public function test_export_participant_search_filters_by_member_name()

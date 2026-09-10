@@ -460,6 +460,18 @@ class EventController extends Controller
     {
         $template = TemplateCertificate::findOrFail($id);
 
+        // events.template_id and certificates.template both just store this
+        // id as a plain string with no FK constraint, so nothing at the DB
+        // level stops this template from being deleted while still
+        // referenced - it would only surface later, as a generation
+        // failure, when someone tries to view/download one of those
+        // certificates.
+        $inUse = Event::where('template_id', $id)->exists() || Certificate::where('template', $id)->exists();
+
+        if ($inUse) {
+            return redirect()->back()->with('error', 'Template ini masih digunakan oleh kegiatan atau sertifikat yang sudah terbit, sehingga tidak bisa dihapus.');
+        }
+
         $template->delete();
 
         if ($template->image) {

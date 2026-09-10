@@ -63,55 +63,34 @@ class RegistrationController extends Controller
             ->orWhere('contact', $request->contact);
         })->first();
 
-        if ($existingRegistration) {
-            if ($existingRegistration->status !== 'rejected') {
+        if ($existingRegistration && $existingRegistration->status !== 'rejected') {
             return redirect()->back()->withErrors([
                 'nip' => 'Anda sudah terdaftar dengan NIP, email, atau kontak ini.'
             ]);
-            }
-            // Jika status 'rejected', validasi tanpa unique NIP
-            $existingRegistration->update([
-                'nip' => $existingRegistration->nip . '-1',
+        }
 
-            ]);
+        // A rejected applicant is allowed to resubmit, but nip/email/contact
+        // are all unique at the DB level - the old code "freed up" the nip
+        // by renaming it to "<nip>-1" and left email/contact untouched,
+        // which meant resubmitting with the *same* email or phone (the
+        // overwhelmingly likely case, since it's their own real contact
+        // info) still failed uniqueness validation and corrupted the old
+        // row's nip permanently in the process. Ignoring the existing
+        // rejected row's own id in the uniqueness check - and reusing that
+        // row instead of inserting a new one - avoids the DB constraint
+        // entirely without mangling any data.
+        $ignoreId = $existingRegistration?->id;
 
-            $validatedData = $request->validate([
-            'nip' => ['required', 'string', 'regex:/^\d{18}$/'],
+        $validatedData = $request->validate([
+            'nip' => ['required', 'string', 'regex:/^\d{18}$/', Rule::unique('registrations', 'nip')->ignore($ignoreId)],
             'name' => 'required|string',
-            'email' => 'required|email|unique:registrations,email',
-            'contact' => 'required|string|unique:registrations,contact',
+            'email' => ['required', 'email', Rule::unique('registrations', 'email')->ignore($ignoreId)],
+            'contact' => ['required', 'string', Rule::unique('registrations', 'contact')->ignore($ignoreId)],
             'agency' => 'required|string',
             'position' => 'required|string',
             'level' => 'required|string',
             'document_jab' => 'required|file|mimes:pdf|max:2048',
-            ],
-            [
-            'nip.regex' => 'NIP harus terdiri dari 18 angka.',
-            'email.unique' => 'Data email sudah digunakan.',
-            'contact.unique' => 'Data kontak sudah digunakan.',
-            'nip.required' => 'NIP harus diisi.',
-            'name.required' => 'Nama harus diisi.',
-            'email.required' => 'Email harus diisi.',
-            'contact.required' => 'Kontak harus diisi.',
-            'agency.required' => 'Instansi harus diisi.',
-            'position.required' => 'Jabatan harus diisi.',
-            'level.required' => 'Jenjang harus diisi.',
-            'document_jab.required' => 'SK jabatan harus diisi.',
-            'document_jab.max' => 'Ukuran Dokumen tidak boleh lebih dari 2MB.',
-            ]);
-        } else {
-            // Jika tidak ada registration, validasi dengan unique NIP
-            $validatedData = $request->validate([
-            'nip' => ['required', 'string', 'regex:/^\d{18}$/', 'unique:registrations,nip'],
-            'name' => 'required|string',
-            'email' => 'required|email|unique:registrations,email',
-            'contact' => 'required|string|unique:registrations,contact',
-            'agency' => 'required|string',
-            'position' => 'required|string',
-            'level' => 'required|string',
-            'document_jab' => 'required|file|mimes:pdf|max:2048',
-            ],
-            [
+        ], [
             'nip.regex' => 'NIP harus terdiri dari 18 angka.',
             'nip.unique' => 'Data NIP sudah digunakan.',
             'email.unique' => 'Data email sudah digunakan.',
@@ -125,8 +104,7 @@ class RegistrationController extends Controller
             'level.required' => 'Jenjang harus diisi.',
             'document_jab.required' => 'SK jabatan harus diisi.',
             'document_jab.max' => 'Ukuran Dokumen tidak boleh lebih dari 2MB.',
-            ]);
-        }
+        ]);
 
     $request->validate([
         'code' => 'required|string',
@@ -142,8 +120,16 @@ class RegistrationController extends Controller
  // Store the file using Laravel's file storage system
     $document_jab = $request->file('document_jab')->storePublicly('/documents');
 
-    // Create registration
-    $registration = Registration::create(array_merge($validatedData, ['document_jab' => $document_jab, 'from' => 'individu']));
+    if ($existingRegistration) {
+        $existingRegistration->update(array_merge($validatedData, [
+            'document_jab' => $document_jab,
+            'status' => 'submission',
+            'from' => 'individu',
+        ]));
+        $registration = $existingRegistration;
+    } else {
+        $registration = Registration::create(array_merge($validatedData, ['document_jab' => $document_jab, 'from' => 'individu']));
+    }
     $token = $registration->id;
 
      //redirect
@@ -228,6 +214,8 @@ class RegistrationController extends Controller
         'agency' => 'required|string',
         'position' => 'required|string',
         'level' => 'required|string',
+        'document_jab' => 'nullable|file|mimes:pdf|max:2048',
+        'paid' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
     ], [
         'nip.regex' => 'NIP harus terdiri dari 18 angka.',
         'nip.unique' => 'Data NIP sudah digunakan.',
@@ -240,8 +228,19 @@ class RegistrationController extends Controller
         'agency.required' => 'Instansi harus diisi.',
         'position.required' => 'Jabatan harus diisi.',
         'level.required' => 'Jenjang harus diisi.',
-        'document_jab.required' => 'SK jabatan harus diisi.',
+        'document_jab.mimes' => 'SK jabatan harus berupa file PDF.',
+        'document_jab.max' => 'Ukuran SK jabatan tidak boleh lebih dari 2MB.',
+        'paid.mimes' => 'Bukti transfer harus berupa file JPG, PNG, atau PDF.',
+        'paid.max' => 'Ukuran bukti transfer tidak boleh lebih dari 2MB.',
     ]);
+
+            // document_jab/paid are only in $validatedData for their file
+            // validation rules above - both are optional here, and merging
+            // a null value for whichever one wasn't uploaded this time
+            // would wipe out the column already set from a previous step.
+            // Each branch below re-adds the one(s) that were actually
+            // uploaded, as a stored path string.
+            $validatedData = collect($validatedData)->except(['document_jab', 'paid'])->all();
 
             // Store the file using Laravel's file storage system
             $document_jab = $request->file('document_jab');
@@ -249,7 +248,7 @@ class RegistrationController extends Controller
 
             if ($document_jab && $paid) {
                 // Jika keduanya diisi, update semua
-                $document_jab = $document_jab->storePublicly('/document');
+                $document_jab = $document_jab->storePublicly('/documents');
                 $paid = $paid->storePublicly('/images');
                 Registration::where('id',$id)->update(array_merge($validatedData, [
                     'document_jab' => $document_jab,
@@ -257,7 +256,7 @@ class RegistrationController extends Controller
                     'status' => "paid"
                 ]));
             } elseif ($document_jab) {
-                $document_jab = $document_jab->storePublicly('/images');
+                $document_jab = $document_jab->storePublicly('/documents');
                 // Jika hanya document_jab diisi, update semua kecuali paid
                 Registration::where('id',$id)->update(array_merge($validatedData, [
                     'document_jab' => $document_jab,
@@ -326,7 +325,10 @@ class RegistrationController extends Controller
 
         // Validate request including file validation
     $request->validate([
-        'paid' => 'required|max:2048', // Adjust validation rule for file
+        'paid' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+    ], [
+        'paid.mimes' => 'Bukti transfer harus berupa file JPG, PNG, atau PDF.',
+        'paid.max' => 'Ukuran bukti transfer tidak boleh lebih dari 2MB.',
     ]);
 
     // Store the file using Laravel's file storage system
@@ -356,7 +358,7 @@ class RegistrationController extends Controller
         'name' => 'required|string',
         'email' => 'required|email|unique:registration_groups,email',
         'contact' => 'required|string|unique:registration_groups,contact',
-        'total' => 'required|string',
+        'total' => 'required|integer|min:1',
         'file' => 'required|file|mimes:xls,xlsx|max:2048', // Ensure 'document_jab' is a valid file
     ],
             [
@@ -367,6 +369,8 @@ class RegistrationController extends Controller
                 'email.required' => 'Email harus diisi.',
                 'contact.required' => 'Kontak harus diisi.',
                 'total.required' => 'Total data harus diisi.',
+                'total.integer' => 'Total data harus berupa angka.',
+                'total.min' => 'Total data minimal 1.',
                 'file.required' => 'File harus diisi.',
             ]);
 
