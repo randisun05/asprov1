@@ -60,4 +60,23 @@ class EventParticipantsExportTest extends TestCase
         $this->assertSame('Budi Santoso', $row[1]);
         $this->assertSame('Kementerian Contoh', $row[3]);
     }
+
+    public function test_the_uploaded_document_url_is_included_when_present()
+    {
+        $detail = $this->makeDetail('Budi Santoso', 'Kementerian Contoh');
+        $detail->update(['desc' => 'documents/bukti.pdf']);
+
+        $row = (new EventParticipantsExport(collect([$detail])))->map($detail->fresh());
+
+        $this->assertSame(url('/storage/documents/bukti.pdf'), $row[12]);
+    }
+
+    public function test_the_document_column_shows_a_dash_when_no_document_was_uploaded()
+    {
+        $detail = $this->makeDetail('Budi Santoso', 'Kementerian Contoh');
+
+        $row = (new EventParticipantsExport(collect([$detail])))->map($detail);
+
+        $this->assertSame('-', $row[12]);
+    }
 }

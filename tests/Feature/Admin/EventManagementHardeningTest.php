@@ -151,6 +151,34 @@ class EventManagementHardeningTest extends TestCase
         Storage::disk('local')->assertMissing($image);
     }
 
+    // --- show(): the uploaded document was tracked (detail_events.desc)
+    // but never actually surfaced to the admin - Show.vue had a
+    // getDocumentUrl() helper defined but never wired to any column, so
+    // there was no way to view what a participant uploaded for an event
+    // that requires a document. Confirms the data admin needs for that is
+    // present in the response (the Vue-side column itself isn't
+    // Inertia-testable from here).
+
+    public function test_show_exposes_the_participants_uploaded_document_path()
+    {
+        $admin = $this->makeAdminUser('administrator');
+        $event = Event::factory()->create(['file' => 'Y']);
+        $member = $this->makeMember();
+        DetailEvent::create([
+            'event_id' => $event->id,
+            'member_id' => $member->id,
+            'status' => 'approved',
+            'desc' => 'documents/bukti-sk.pdf',
+        ]);
+
+        $response = $this->actingAs($admin)->get("/admin/events/{$event->id}");
+
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/Events/Show')
+            ->where('details.data.0.desc', 'documents/bukti-sk.pdf')
+        );
+    }
+
     // --- absenAll(): batch update ---
 
     public function test_absen_all_marks_every_participant_present()

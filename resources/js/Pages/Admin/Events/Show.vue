@@ -163,6 +163,7 @@
                                                     <th class="border-0">Nama</th>
                                                     <th class="border-0">Instansi</th>
                                                     <th class="border-0">Sebagai</th>
+                                                    <th class="border-0">Dokumen</th>
                                                     <th class="border-0 rounded-end" style="width:12%">Status
 
                                                     </th>
@@ -179,6 +180,12 @@
                                                     <td @click="openRoleModal(detail)" style="cursor: pointer;"
                                                         title="Klik untuk ubah peran">
                                                         {{ detail.title }}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <a v-if="detail.desc" :href="getDocumentUrl(detail.desc)"
+                                                            target="_blank" class="btn btn-sm btn-primary border-0 shadow"
+                                                            title="Lihat dokumen"><i class="fa fa-file"></i></a>
+                                                        <span v-else>-</span>
                                                     </td>
                                                     <td class="text-center">
                                                         {{ detail.status }}

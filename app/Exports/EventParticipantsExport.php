@@ -45,6 +45,7 @@ class EventParticipantsExport implements FromCollection, WithMapping, WithHeadin
             $datas->end_at,
             $selisih,
             $datas->grade,
+            $datas->desc ? url('/storage/' . $datas->desc) : '-',
         ] ;
     }
 
@@ -73,6 +74,7 @@ class EventParticipantsExport implements FromCollection, WithMapping, WithHeadin
                 'Selesai',
                 'Durasi',
                 'Nilai',
+                'Dokumen',
         ] ;
     }
 }
